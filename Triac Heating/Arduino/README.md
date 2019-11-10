@@ -4,6 +4,8 @@ three_element_heat_control.ino measures the temperature of the oven, injector, a
 ### Estimating Temperature
 The voltage across the thermocouples is amplified by ~250 by an [LM358N](http://www.ti.com/product/LM358-N) as seen in the figure below.
 
+![Non-inverting_amp](https://github.com/cgreen18/Gas-Chromatography/blob/master/Triac%20Heating/Arduino/images/GC_ThermoAmp_SimpleCircuit_Snippet.png)
+
 
 
 
