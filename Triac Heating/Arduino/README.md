@@ -8,3 +8,4 @@ The voltage across the thermocouples is amplified by ~250 by op-amps as seen in 
 
 
 ![PID_Diagram](https://github.com/cgreen18/Gas-Chromatography/blob/master/Triac%20Heating/Arduino/PID_en.svg)
+[PID_Diagram_Link](https://en.wikipedia.org/wiki/PID_controller)
