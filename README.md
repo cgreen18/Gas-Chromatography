@@ -4,7 +4,7 @@ The senior capstone project by Conor Green and Matt McPartlan to fulfill degree 
 ## Three Main Components 
 * Analog voltage measurement
 * Heating
-* Analog to digital conversion (ADC)
+* [Analog to digital conversion (ADC)](https://github.com/cgreen18/Gas-Chromatography/tree/master/ADC)
 
 ## Additional Requirements
 * Graphical user interface (GUI)
