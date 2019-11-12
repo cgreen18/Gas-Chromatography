@@ -24,3 +24,7 @@ Our current prototype uses the shell of an old Gow-mac GC.
 
 #### Matt McPartlan
 * coming shortly
+
+## Acknowledgments
+We would like to thank the Electrical Engineering and Computer Science and Chemistry departments at Loyola Marymount University for funding and support throughout the process. We would like to thank Dr. Hossein Asghari and Dr. Robert Senter for their advice and support as mentors. In particular, Dr. Robert Senter has been on-board with the project since the inception 2 years ago and has provided tremendous help throughout.
+
