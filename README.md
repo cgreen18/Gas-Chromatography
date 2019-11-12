@@ -2,8 +2,8 @@
 The senior capstone project by Conor Green and Matt McPartlan to fulfill degree requirements for a B.S. in Electrical Engineering at Loyola Marymount University. The objective is to design a economic, diode based gas chromatography (GC) detector.
 
 ## Three Main Components 
-* Analog voltage measurement
-* Heating
+* [Analog voltage measurement](https://github.com/cgreen18/Gas-Chromatography/tree/master/Voltage%20Measurement)
+* [Heating](https://github.com/cgreen18/Gas-Chromatography/tree/master/Heating)
 * [Analog to digital conversion (ADC)](https://github.com/cgreen18/Gas-Chromatography/tree/master/ADC)
 
 ## Additional Requirements
