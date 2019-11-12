@@ -1,7 +1,7 @@
 # Gas Chromatography Capstone Project
 The senior capstone project by Conor Green and Matt McPartlan to fulfill degree requirements for a B.S. in Electrical Engineering at Loyola Marymount University. The objective is to design a economic, diode based gas chromatography (GC) detector.
 
-## Three Main Avenues
+## Three Focii
 * Analog voltage measurement
 * Heating
 * Analog to digital conversion (ADC)
