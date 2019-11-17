@@ -1,6 +1,8 @@
 # Thermal Conductivity Sensing via Diodes
 ![Total Sensing Circuit Diagram](https://github.com/cgreen18/Gas-Chromatography/blob/master/Voltage%20Measurement/images/GC_ForwardVoltageDiffAmp.png)
 
+# Breakdown of the System
+![Total Diagram Illustrated](https://github.com/cgreen18/Gas-Chromatography/blob/master/Voltage%20Measurement/images/GC_ForwardVoltageDiffAmp_Illustrated.png)
 
 ### Diode Biasing
 The core operation of our GC is to measure the difference in forward voltage between the dependent and control diodes, D1 and D2 in the figure below. Both the dependent and control diodes are in the detector, at the same temperature, and have inert gas flowing over them; however, the substance being tested does not flow over the control. The diodes are biased with an AC voltage (CITE PAPER) and set in parallel with a current limiting 1kOHM resistor in series as seen in the figure below.
