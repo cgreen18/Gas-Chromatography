@@ -1,6 +1,7 @@
 # Oven, Injector, and Detector Heating Control
 
 ![Increasing Delay gif](https://github.com/cgreen18/Gas-Chromatography/blob/master/Heating/images/GC_TriacClipping_Oscilloscope_IncreasingDelay.gif)
+
 Example of Reducing Power Delivered to Element.
 
 ## Breakdown of the System
@@ -10,6 +11,7 @@ Two [RoboDyn AC Light Dimmer](https://robotdyn.com/ac-light-dimmer-module-1-chan
 
 The method of operation is illustrated in the oscilloscope reading in the figure below.
 ![Example Clip Oscilloscope](https://github.com/cgreen18/Gas-Chromatography/blob/master/Heating/images/GC_TriacClipping_Oscilloscope.png)
+
 Legend:
 * Yellow - Wall voltage = 120V @ 60Hz
 * Blue - Load (heating element) voltage
