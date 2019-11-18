@@ -9,7 +9,7 @@ Example of Reducing Power Delivered to Element
 ### Triac Dimmer
 Two [RoboDyn AC Light Dimmer](https://robotdyn.com/ac-light-dimmer-module-1-channel-3-3v-5v-logic-ac-50-60hz-220v-110v.html) were used to heat the elements: one dimmer for the oven and the other for the injector and detector together. This modules are triac based and as such, can clip the positive and negative waveforms. When the source voltage crosses zero, an interrupt is signalled for the microcontroller as seen in purple in the figure below. In this interrupt routine, the MCU delays some time then sends an ~8.33uS square pulse that allows the module to output the voltage to the load for the remainder of the wave as seen in green and blue in the figure below. 
 
-![Example Clip Oscilloscope](https://github.com/cgreen18/Gas-Chromatography/blob/master/Heating/images/GC_TriacClipping_Oscilloscope.png)
+![Example Clip Oscilloscope](https://github.com/cgreen18/Gas-Chromatography/blob/master/Heating/images/GC_TriacClipping_Oscilloscope_3.png)
 
 Legend:
 * Yellow - Wall voltage = 120V @ 60Hz
