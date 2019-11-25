@@ -8,7 +8,7 @@ Version:
 '''
 
 import wx
-
+#import numpy as np
 
 ### Classes for the script
 
@@ -26,8 +26,21 @@ class GC_GUI(wx.Frame):
     def setup(self):
         menubar = wx.MenuBar()
         file_menu = wx.Menu()
-        file_item = file_menu.Append(wx.ID_EXIT, 'Quit' , 'Quit application')
-        menubar.Append(file_menu,'&File') #Underlines F for hotkey
+
+
+
+
+        file_menu.Append(wx.ID_NEW, '&New')
+        file_menu.Append(wx.ID_OPEN, '&Open')
+        file_menu.Append(wx.ID_SAVE, '&Save')
+        file_menu.AppendSeparator()
+        file_item = file_menu.Append(wx.ID_EXIT, '&Quit' , 'Quit application')
+
+
+
+
+        menubar.Append(file_menu,'&File')
+
         self.SetMenuBar(menubar)
 
         self.Bind(wx.EVT_MENU, self.OnQuit,file_item)
@@ -47,6 +60,8 @@ def main():
     app = wx.App()
 
     gc_gui = GC_GUI(None)
+
+
     gc_gui.Show()
 
     app.MainLoop()
