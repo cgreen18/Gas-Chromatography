@@ -5,10 +5,13 @@ Description: Highest level script of wxPython based GUI application to perform d
 Usage: Call from command line as main
 Version:
 1.0 - November 24 2019 - Initial creation. All dependencies left in the script: will later be split into various scripts that are imported.
+1.1 - November 24 2019 - Implements numpy and plotting to window. Uses random numbers
 '''
 
 import wx
-#import numpy as np
+
+import numpy as np
+import wx.lib.plot as plot
 
 ### Classes for the script
 
@@ -20,6 +23,7 @@ class GC_GUI(wx.Frame):
         self.defaults = { 'window_size':(800,600) , 'title' : 'LMU EE GC DAQ App'}
 
         super(GC_GUI,self).__init__(*args , **kwargs)
+
 
         self.setup()
 
