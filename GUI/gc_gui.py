@@ -26,12 +26,19 @@ class GC_GUI(wx.Frame):
 
 
         self.setup()
+        self.Centre()
 
     def setup(self):
         menubar = wx.MenuBar()
         file_menu = wx.Menu()
 
+        self.panel = wx.Panel(self,-1)
 
+        self.button1 = wx.Button(self.panel,-1,'start', (8,72), (75,23))
+        self.button1.SetFont(wx.Font(8.25, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, 'Microsoft Sans Serif'))
+        self.button1.SetCursor(wx.Cursor(wx.CURSOR_DEFAULT))
+
+        self.Bind(wx.EVT_BUTTON,self.start_button_clicked,self.button1)
 
 
         file_menu.Append(wx.ID_NEW, '&New')
@@ -58,6 +65,8 @@ class GC_GUI(wx.Frame):
     def OnQuit(self , err):
         self.Close()
 
+    def start_button_clicked(self, err):
+        print('worx')
 ### Methods for the script
 
 def main():
