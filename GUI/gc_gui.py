@@ -1,4 +1,4 @@
-'''
+"""
 Title: gc_gui.py
 Author: Conor Green & Matt McPartlan
 Description: Highest level script of wxPython based GUI application to perform data acquisition and display.
@@ -6,7 +6,7 @@ Usage: Call from command line as main
 Version:
 1.0 - November 24 2019 - Initial creation. All dependencies left in the script: will later be split into various scripts that are imported.
 1.1 - November 24 2019 - Implements numpy and plotting to window. Uses random numbers
-'''
+"""
 
 import wx
 

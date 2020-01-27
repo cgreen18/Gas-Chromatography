@@ -1,2 +1,9 @@
 #test files
 *_test.py
+
+#no pyc
+*.pyc
+
+#ignore the html for now
+
+*.html

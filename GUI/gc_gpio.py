@@ -2,9 +2,9 @@
 Name: gc_gpio.py
 Authors: Conor Green and Matt McPartlan
 Description: Script to read analog input via ADS1115 A/D converter, as given in Adafruit tutorial (https://learn.adafruit.com/adafruit-4-channel-adc-breakouts/python-circuitpython).
-Usage: For now call as main
+Usage: Call as main
 Version:
-
+1.0 - 24 January 2020 - Initial creation. Serves as test bed to read voltage values from ADS1115. Will be integrated into larger script.
 '''
 
 import board
