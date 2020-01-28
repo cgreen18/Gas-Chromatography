@@ -10,7 +10,7 @@ Matt has written a great explanation and justification for this project in the d
 * [Analog to digital conversion (ADC)](https://github.com/cgreen18/Gas-Chromatography/tree/master/ADC)
 
 ## Additional Requirements
-* Graphical user interface (GUI)
+* [Graphical user interface (GUI)](https://github.com/cgreen18/Gas-Chromatography/tree/master/GUI)
 * Auto-injector
 
 ## Gow-mac Detector
