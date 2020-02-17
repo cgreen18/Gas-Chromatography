@@ -7,10 +7,11 @@ Versions
 
 |Package     | Version |
 |:-----------|:--------|
-|virtualenv | |
-| Python3 | 3.7.2 |
+| Python3 | 3.7.3 |
+| virtualenv | 20.0.4 |
+| pip | 18.1 |
 | wxPython | 4.0.6 |
-| GPIO | | 
+| ADS1x15 library | | 
 
 First, clone the whole repo (https://github.com/cgreen18/Gas-Chromatography) into your home directory and navigate to the Installation folder.
 ```
