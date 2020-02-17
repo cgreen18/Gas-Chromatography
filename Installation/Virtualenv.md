@@ -22,15 +22,15 @@ source .bashrc
 
 ### Build Python 3 environment
 
-'''
+```
 python3 -m venv gc
-'''
+```
 
 Update pip and tools for building a wheel (for use later)
 
-'''
+```
 pip install -U pip
 pip install -U six wheel setuptools
-'''
+```
 
 
