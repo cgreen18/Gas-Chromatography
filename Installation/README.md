@@ -7,7 +7,7 @@ Versions
 
 |Package     | Version |
 |:-----------|:--------|
-|virtualenv | unknown|
+|virtualenv | |
 | Python3 | 3.7.2 |
 | wxPython | 4.0.6 |
 | GPIO | | 
