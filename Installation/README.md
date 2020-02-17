@@ -26,4 +26,4 @@ sudo ./install.sh
 ```
 
 ### Manual Installation
-For the 
+For the Linux savvy, go to town. The markdown files in this folder give the steps taken for each download/install. If you want to change which version of Python or wxPython, it is pretty straightforward but I cannot guarantee it will work.
