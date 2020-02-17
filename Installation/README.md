@@ -2,8 +2,7 @@
 
 
 ### Auto Installation
-I have made a [bash script](https://github.com/cgreen18/Gas-Chromatography/blob/master/Installation/install.sh) that will automatically install virtualenv, create a Python3 virtual environment, and install wxPython and GPIO within that virtual environment.
-Versions
+I have made a [bash script](https://github.com/cgreen18/Gas-Chromatography/blob/master/Installation/install.sh) that will automatically install virtualenv, create a Python3 virtual environment, and install wxPython and GPIO within that virtual environment. The following versions were used in this installation.
 
 |Package     | Version |
 |:-----------|:--------|
