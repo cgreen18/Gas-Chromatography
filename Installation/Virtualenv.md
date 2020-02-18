@@ -32,5 +32,3 @@ Update pip and tools for building a wheel (for use later)
 pip install -U pip
 pip install -U six wheel setuptools
 ```
-
-

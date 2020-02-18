@@ -10,7 +10,7 @@ I have made a [bash script](https://github.com/cgreen18/Gas-Chromatography/blob/
 | virtualenv | 20.0.4 |
 | pip | 18.1 |
 | wxPython | 4.0.6 |
-| ADS1x15 library | | 
+| ADS1x15 library | |
 
 First, clone the whole repo (https://github.com/cgreen18/Gas-Chromatography) into your home directory and navigate to the Installation folder.
 ```

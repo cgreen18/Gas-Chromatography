@@ -40,4 +40,3 @@ pip3 install -r requirements.txt
 ```
 python3 build.py build bdist_wheel --jobs=1 --gtk2
 ```
-
