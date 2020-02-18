@@ -1,21 +1,84 @@
 '''
-Name: gas_chromatography.py
+Name: gc_class.py
 Authors: Conor Green and Matt McPartlan
-Description: Highest abstraction of GC GUI interface. Will be initially called from bash upon startup of Raspberry Pi.
+Description: Mid-level abstraction that will do most of the work. User interaction as well as data processing.
 Usage: Call as main
 Version:
 1.0 - 26 January 2020 - Initial creation. Skeleton to outline work for later
+1.1 - 18 February 2020 - Initialized and created some methods for ADS1115 and numpy
 '''
+
+# GPIO imports
+import board
+import busio
+import adafruit_ads1x15.ads1115 as ADS
+from adafruit_ads1x15.analog_in import AnalogIn
+
 
 class Gas_Chrom:
 
-    def __init__(self):
+
+    # TODO:
+    # Default single ended and make differential a keyword arg
+    # Default P0 and P1 but allow arguments
+
+    def __init__(self, single_ended):
         self.__version__ = '1.0'
         self.__authors__ = 'Conor Green and Matt McPartlan'
+
+
+        #ADS1115
+        self.i2c = busio.I2C(board.SCL , board.SDA)
+        self.ads = ADS.ADS1115(self.i2c)
+
+        self.single_ended = single_ended # T/F
+        self.port0 = ADS.P0 # Later allow user input
+        self.port1 = ADS.P1
+
+        if single_ended:
+            self.chan = AnalogIn(ads , self.port0)
+        else:
+            self.chan = AnalogIn(ads, self.port0 , self.port1)
+
+        #Numpy/data
+        self.curr_data = np.array([])
+        self.prev_runs = [self.curr_data]
+        self.run_num = 0
 
 
     def main(self):
         pass
 
+    # Numpy/data methods
+
+
+    # ADS1115 Methods
+    def reinit_ADS(self):
+        self.i2c = busio.I2C(board.SCL , board.SDA)
+        self.ads = ADS.ADS1115(self.i2c)
+
+        self.chan = AnalogIn(ads , self.port0) if self.single_ended else AnalogIn(ads, self.port0 , self.port1)
+
+    def set_gain(self, gain):
+        self.ads.gain = gain
+
+    def set_mode(self, single_ended):
+        self.single_ended = single_ended
+
+        self.reinit_ADS()
+
+    # TODO:
+    # Finish
+    def set_pins(self, pin1, *args):
+        #self.port0 =
+        pass
+
+    def print_voltage(self):
+        print(self.chan.voltage)
+
+    def print_value(self):
+        print(self.chan.value)
+
 if __name__ == '__main__':
-    main()
+    gc = Gas_Chrom()
+    gc
