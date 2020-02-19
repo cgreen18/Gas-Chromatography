@@ -1,8 +1,7 @@
 # Folder for instructions on installation
-
-
-### Auto Installation
-I have made a [bash script](https://github.com/cgreen18/Gas-Chromatography/blob/master/Installation/install.sh) that will automatically install virtualenv, create a Python3 virtual environment, and install wxPython and GPIO within that virtual environment. The following versions were used in this installation.
+### Hardware and Sofrtware
+Hardware: Raspberry Pi Model 3B+ (armv71 32bit)
+OS: Raspbian 10 Buster
 
 |Package     | Version |
 |:-----------|:--------|
@@ -10,7 +9,12 @@ I have made a [bash script](https://github.com/cgreen18/Gas-Chromatography/blob/
 | virtualenv | 20.0.4 |
 | pip | 18.1 |
 | wxPython | 4.0.6 |
-| ADS1x15 library | | 
+| ADS1x15 library | ? | 
+
+### Auto Installation
+I have made a [bash script](https://github.com/cgreen18/Gas-Chromatography/blob/master/Installation/install.sh) that will automatically install virtualenv, create a Python3 virtual environment, and install wxPython and GPIO within that virtual environment. The following versions were used in this installation.
+
+
 
 First, clone the whole repo (https://github.com/cgreen18/Gas-Chromatography) into your home directory and navigate to the Installation folder.
 ```
