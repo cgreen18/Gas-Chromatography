@@ -1,7 +1,8 @@
 # Folder for instructions on installation
 ### Hardware and Sofrtware
-Hardware: Raspberry Pi Model 3B+ (armv71 32bit)
-OS: Raspbian 10 Buster
+*Hardware*: Raspberry Pi Model 3B+ (armv71 32bit)
+
+*OS*: Raspbian 10 Buster
 
 |Package     | Version |
 |:-----------|:--------|
