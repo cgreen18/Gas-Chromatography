@@ -41,3 +41,7 @@ pip3 install -r requirements.txt
 python3 build.py build bdist_wheel --jobs=1 --gtk2
 ```
 
+```
+pip3 install ~/wxPython-3.0.6/dist/wxPython-4.0.6-cp37-cp37m-linux_armv7l.whl
+```
+
