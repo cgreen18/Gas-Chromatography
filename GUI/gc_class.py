@@ -57,7 +57,7 @@ class Gas_Chrom:
     # Temporary graphing methods
     def graph_curr_data(self):
         plt.figure()
-        plt.scatter(self.curr_data[0][:], self.curr_data[1][:])
+        plt.scatter(self.curr_data[1][:], self.curr_data[0][:])
         plt.show()
 
     # Numpy/data methods
@@ -66,7 +66,7 @@ class Gas_Chrom:
 
         t_start = time.time()
         for i in range(0,num_pts):
-            time.sleep(.1)
+            time.sleep(.01)
             self.print_voltage()
             voltage_and_time[0][i] = self.get_voltage()
             print(voltage_and_time[0][i])
@@ -118,7 +118,7 @@ class Gas_Chrom:
 if __name__ == '__main__':
     gc = Gas_Chrom(True)
 
-    print("Collecting 50 data points")
-    gc.coll_volt_const_pts_self(50)
+    print("Collecting 1000 data points")
+    gc.coll_volt_const_pts_self(1000)
     print("Graphing")
     gc.graph_curr_data()
