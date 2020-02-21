@@ -66,6 +66,7 @@ class Gas_Chrom:
 
         t_start = time.time()
         for i in range(0,num_pts - 1):
+            time.sleep(.1)
             self.print_voltage()
             voltage_and_time[i][0] = self.get_voltage()
             print(voltage_and_time[i][0])
@@ -78,6 +79,7 @@ class Gas_Chrom:
         self.run_num += 1
         self.prev_runs.append(self.curr_data)
         self.curr_data = self.coll_volt_const_pts(num_pts)
+        print(self.curr_data)
 
 
     # ADS1115 Methods
