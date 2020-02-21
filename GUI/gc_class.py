@@ -23,8 +23,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Gas_Chrom:
-
-
     # TODO:
     # Default single ended and make differential a keyword arg
     # Default P0 and P1 but allow arguments
@@ -115,4 +113,3 @@ class Gas_Chrom:
 
 if __name__ == '__main__':
     gc = Gas_Chrom()
-    gc
