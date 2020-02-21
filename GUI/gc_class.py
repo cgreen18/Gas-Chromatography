@@ -41,9 +41,9 @@ class Gas_Chrom:
         self.port1 = ADS.P1
 
         if single_ended:
-            self.chan = AnalogIn(ads , self.port0)
+            self.chan = AnalogIn(self.ads , self.port0)
         else:
-            self.chan = AnalogIn(ads, self.port0 , self.port1)
+            self.chan = AnalogIn(self.ads, self.port0 , self.port1)
 
         #Numpy/data
         self.curr_data = np.array([])
