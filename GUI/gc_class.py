@@ -75,7 +75,7 @@ class Gas_Chrom:
     def coll_volt_const_pts_self(self, num_pts):
         self.run_num += 1
         self.prev_runs.append(self.curr_data)
-        self.curr_data = self.coll_volt_const_pts(number_pts)
+        self.curr_data = self.coll_volt_const_pts(num_pts)
 
 
     # ADS1115 Methods
