@@ -113,3 +113,6 @@ class Gas_Chrom:
 
 if __name__ == '__main__':
     gc = Gas_Chrom(True)
+
+    gc.coll_volt_const_pts_self(50)
+    gc.graph_curr_data()
