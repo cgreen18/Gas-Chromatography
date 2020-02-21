@@ -6,6 +6,7 @@ Usage: Call as main
 Version:
 1.0 - 26 January 2020 - Initial creation. Skeleton to outline work for later
 1.1 - 18 February 2020 - Initialized and created some methods for ADS1115 and numpy
+1.2 20 February 2020 - Added methods for data collection and organizing self variables
 '''
 
 # GPIO imports
@@ -14,6 +15,12 @@ import busio
 import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 
+# Extra
+import time
+
+# Numpy and Matplotlib
+import numpy as np
+import matplotlib.pyplot as plt
 
 class Gas_Chrom:
 
@@ -49,7 +56,28 @@ class Gas_Chrom:
     def main(self):
         pass
 
+    # Temporary graphing methods
+    def graph_curr_data(self):
+        plt.figure
+        plt.plot(self.curr_data[:][0], self.curr_data[:][1])
+        plt.show()
+
     # Numpy/data methods
+    def coll_volt_const_pts(self , num_pts):
+        voltage_and_time =  np.zeros((num_pts , 2) ) #dtype=float )
+
+        t_start = time.time()
+        for i in range(0,number_pts - 1):
+            voltage_and_time[i][0] = self.get_voltage()
+            t_curr = time.time()
+            voltage_and_time[i][1] = t_curr - t_start
+
+        return voltage_and_time
+
+    def coll_volt_const_pts_self(self, num_pts):
+        self.run_num += 1
+        self.prev_runs.append(self.curr_data)
+        self.curr_data = self.coll_volt_const_pts(number_pts)
 
 
     # ADS1115 Methods
@@ -78,6 +106,12 @@ class Gas_Chrom:
 
     def print_value(self):
         print(self.chan.value)
+
+    def get_voltage(self):
+        return self.chan.voltage
+
+    def get_value(self):
+        return self.chan.value
 
 if __name__ == '__main__':
     gc = Gas_Chrom()

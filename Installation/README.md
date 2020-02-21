@@ -10,15 +10,6 @@
 | virtualenv | 20.0.4 |
 | pip | 18.1 |
 | wxPython | 4.0.6 |
-<<<<<<< HEAD
-=======
-| ADS1x15 library | ? | 
-
-### Auto Installation
-I have made a [bash script](https://github.com/cgreen18/Gas-Chromatography/blob/master/Installation/install.sh) that will automatically install virtualenv, create a Python3 virtual environment, and install wxPython and GPIO within that virtual environment. The following versions were used in this installation.
-
-
->>>>>>> e971c542bcecd3cccbac99199014ce00cb20cfba
 
 First, clone the whole repo (https://github.com/cgreen18/Gas-Chromatography) into your home directory and navigate to the Installation folder.
 ```
