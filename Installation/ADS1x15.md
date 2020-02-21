@@ -46,6 +46,10 @@ sudo raspi-config
 
 Navigate: **Interfacing Options** -> **SPI** -> Enable **Yes**
 
+```
+sudo reboot
+```
+
 Test SPI w/
 ```
 ls -l /dev/spidev*
