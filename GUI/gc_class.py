@@ -112,4 +112,4 @@ class Gas_Chrom:
         return self.chan.value
 
 if __name__ == '__main__':
-    gc = Gas_Chrom()
+    gc = Gas_Chrom(True)

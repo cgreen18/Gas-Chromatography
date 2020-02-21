@@ -1,15 +1,26 @@
 #!/bin/bash
 #install.sh
 
+
+echo "Install script to set up a new Raspberry Pi to collect gc data and run the gc suite upon startup."
+echo "Install instructions given at https://github.com/cgreen18/Gas-Chromatography/tree/master/Installation"
+echo "Tested on Raspberry Pi Model 3B+ w/ Raspbian 10 Buster"
+echo "20 February 2020 Conor Green"
+
+echo ""
+
+echo "Updating repos"
 cd ~
 sudo apt-get update
 
 echo "Installing and configuring virtualenv"
 
 # Installing virtualenv
-pip install virtualenv
+sudo apt-get install python3-venv
+sudo pip install virtualenv
 echo -e '\nexport PATH="/home/$USER/.local/bin:$PATH"' >> ~/.bashrc
-source "./home/pi/.bashrc"
+cd ~/
+source "./.bashrc"
 
 # Creating gc Py3 virtualenv
 python3 -m venv gc
@@ -23,6 +34,7 @@ echo "Installing dependencies"
 pip install -U pip
 
 # Install dependencies
+
 apt-get update
 pip install -U six wheel setuptools
 apt-get install build-essential tk-dev libncurses5-dev libncursesw5-dev libreadline6-dev libdb5.3-dev libgdbm-dev libsqlite3-dev libssl-dev libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev

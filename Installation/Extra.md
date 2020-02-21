@@ -5,3 +5,8 @@ For some reason numpy did not have "libf77blas.so.3". Stackoverflow recommended 
 ```
 sudo apt-get install libatlas-base-dev
 ```
+
+### matplotlib
+```
+pip3 install matplotlib
+```
