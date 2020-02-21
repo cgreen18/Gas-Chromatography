@@ -65,7 +65,7 @@ class Gas_Chrom:
         voltage_and_time =  np.zeros((num_pts , 2) ) #dtype=float )
 
         t_start = time.time()
-        for i in range(0,number_pts - 1):
+        for i in range(0,num_pts - 1):
             voltage_and_time[i][0] = self.get_voltage()
             t_curr = time.time()
             voltage_and_time[i][1] = t_curr - t_start
@@ -114,5 +114,7 @@ class Gas_Chrom:
 if __name__ == '__main__':
     gc = Gas_Chrom(True)
 
+    print("Collecting 50 data points")
     gc.coll_volt_const_pts_self(50)
+    print("Graphing")
     gc.graph_curr_data()
