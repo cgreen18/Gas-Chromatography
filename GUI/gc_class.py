@@ -4,9 +4,10 @@ Authors: Conor Green and Matt McPartlan
 Description: Mid-level abstraction that will do most of the work. User interaction as well as data processing.
 Usage: Call as main
 Version:
-1.0 - 26 January 2020 - Initial creation. Skeleton to outline work for later
-1.1 - 18 February 2020 - Initialized and created some methods for ADS1115 and numpy
-1.2 20 February 2020 - Added methods for data collection and organizing self variables
+1.0 - 26 January 20 - Initial creation. Skeleton to outline work for later
+1.1 - 18 February 20 - Initialized and created some methods for ADS1115 and numpy
+1.2 - 20 February 20 - Added methods for data collection and organizing self variables
+1.2t - 21 February 20 - Debugged and works in preliminary testing!
 '''
 
 # GPIO imports
