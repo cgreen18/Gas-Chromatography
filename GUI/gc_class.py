@@ -67,9 +67,7 @@ class Gas_Chrom:
         t_start = time.time()
         for i in range(0,num_pts):
             time.sleep(.01)
-            self.print_voltage()
             voltage_and_time[0][i] = self.get_voltage()
-            print(voltage_and_time[0][i])
             t_curr = time.time()
             voltage_and_time[1][i] = t_curr - t_start
 
