@@ -58,7 +58,7 @@ class Gas_Chrom:
 
     # Temporary graphing methods
     def graph_curr_data(self):
-        plt.figure
+        plt.figure()
         plt.plot(self.curr_data[:][0], self.curr_data[:][1])
         plt.show()
 
