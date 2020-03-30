@@ -50,5 +50,5 @@ tar xf wxPython-4.0.6.tar.gz
 cd wxPython-4.0.6
 pip3 install -r requirements.txt
 
-echo "Building wxPython. Will take a long time (~1-2 hrs)"
+echo "Building wxPython. Will take a long time ~2 hrs"
 python3 build.py build bdist_wheel --jobs=1 --gtk2
