@@ -13,11 +13,12 @@ import wx
 import gc_gui
 
 class MainApp(gc_gui.GCFrame):
-    def __init__(self, parent, **kwargs):
-        self.options = {'size':(1200,600) , 'config_panel_width':300}
-        self.options.update(kwargs)
+    def __init__(self, parent):
+        FRAME_SIZE = (1000,600)
+        SASH_SIZE = 300
 
-        gc_gui.GCFrame.__init__(self, parent, size = self.options['size'])
+        gc_gui.GCFrame.__init__(self, parent, frame_size = FRAME_SIZE, sash_size = SASH_SIZE)
+        #self becomes a GCFrame
 
         self.split_vert()
         self.panel_detector.draw()
@@ -25,15 +26,18 @@ class MainApp(gc_gui.GCFrame):
         self.set_up_menu_bar()
 
     def split_vert(self):
-        splitter = wx.SplitterWindow(self, wx.ID_ANY, style = wx.SP_BORDER, size = self.options['size'])
+
+        splitter = wx.SplitterWindow(self, id=wx.ID_ANY,pos=wx.DefaultPosition , size=self.options['frame_size'], style = wx.SP_BORDER, name='Diode Based Gas Chromatography' )
+
+        splitter.options = self.options
 
         self.panel_detector = DetectorPanel(splitter)
         self.panel_config = ControlPanel(splitter)
 
-        splitter.SplitVertically(self.panel_config , self.panel_detector, 300)# self.options['config_panel_width'])
+        splitter.SplitVertically(self.panel_config , self.panel_detector, self.options['sash_size'])
 
         self.SetSizer(wx.BoxSizer(wx.HORIZONTAL))
-        #self.GetSizer().Add(splitter, 1, wx.EXPAND)
+        self.GetSizer().Add(splitter, 1, wx.EXPAND)
 
     def set_up_menu_bar(self):
         menubar = wx.MenuBar()

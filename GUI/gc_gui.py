@@ -26,10 +26,9 @@ import wx.lib.plot as plot
 class GCFrame(wx.Frame):
     def __init__(self, parent, **kwargs):
         self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
-        self.constants.update(kwargs)
 
-        self.options = {'frame_size':(800,400)}
-
+        self.options = {'frame_size':(800,400), 'sash_size':300}
+        self.options.update(self.constants)
         self.options.update(kwargs)
 
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = self.options['frame_size'], style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
@@ -50,10 +49,10 @@ class DetectorPanel(wx.Panel):
     def __init__(self, parent):
         self.parent = parent
 
-        BODY_FONT_SIZE = self.parent.constants['BODY_FONT_SIZE']
-        HEADER_FONT_SIZE = self.parent.constants['HEADER_FONT_SIZE']
-        EXTRA_SPACE = self.parent.constants['EXTRA_SPACE']
-        BORDER = self.parent.constants['BORDER']
+        BODY_FONT_SIZE = self.parent.options['BODY_FONT_SIZE']
+        HEADER_FONT_SIZE = self.parent.options['HEADER_FONT_SIZE']
+        EXTRA_SPACE = self.parent.options['EXTRA_SPACE']
+        BORDER = self.parent.options['BORDER']
 
 
         header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
@@ -128,10 +127,10 @@ class ConfigPanel( wx.Panel ):
     def __init__( self, parent ):
         self.parent = parent
 
-        BODY_FONT_SIZE = self.parent.constants['BODY_FONT_SIZE']
-        HEADER_FONT_SIZE = self.parent.constants['HEADER_FONT_SIZE']
-        EXTRA_SPACE = self.parent.constants['EXTRA_SPACE']
-        BORDER = self.parent.constants['BORDER']
+        BODY_FONT_SIZE = self.parent.options['BODY_FONT_SIZE']
+        HEADER_FONT_SIZE = self.parent.options['HEADER_FONT_SIZE']
+        EXTRA_SPACE = self.parent.options['EXTRA_SPACE']
+        BORDER = self.parent.options['BORDER']
 
 
         wx.Panel.__init__ (self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, style = wx.TAB_TRAVERSAL )
