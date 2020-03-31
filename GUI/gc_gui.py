@@ -8,98 +8,202 @@ Version:
 1.1 - November 24 2019 - Implements numpy and plotting to window. Uses random numbers
 """
 
-import wx
-
 import numpy as np
-import wx.lib.plot as plot
+from numpy import arange, sin, pi
 
+import matplotlib
+matplotlib.use('WXAgg')
+
+from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
+from matplotlib.backends.backend_wx import NavigationToolbar2Wx
+from matplotlib.figure import Figure
+
+
+import wx
+import wx.lib.plot as plot
 ### Classes for the script
 
-# Class to define this specific GUI
-class GC_GUI(wx.Frame):
 
-    def __init__(self, *args , **kwargs ):
+#Frames
+class GCFrame(wx.Frame):
 
-        self.defaults = { 'window_size':(800,600) , 'title' : 'LMU EE GC DAQ App'}
+    def __init__(self, parent, **kwargs):
+        self.options = {'size':(800,400)}
 
-        self.frame = super(GC_GUI,self).__init__(*args , **kwargs)
+        self.options.update(kwargs)
 
-
-        self.setup()
-        self.Centre()
-
-    def setup(self):
-        #self.frame = wx.Frame(None, title="wx.lib.plot", id=-1, size=(410, 340))
-
-        print(type(self))
-        print(type(self.frame))
-
-        menubar = wx.MenuBar()
-        file_menu = wx.Menu()
-
-        self.panel = wx.Panel(self.frame,-1)
-
-        plotter = plot.PlotCanvas(self.panel)
-
-        plotter.SetEnableZoom(True)
-
-        # list of (x,y) data point tuples
-        data = [(1,2), (2,3), (3,5), (4,6), (5,8), (6,8), (12,10), (13,4)]
-        # draw points as a line
-        line = plot.PolyLine(data, colour='red', width=1)
-        # also draw markers, default colour is black and size is 2
-        # other shapes 'circle', 'cross', 'square', 'dot', 'plus'
-        marker = plot.PolyMarker(data, marker='triangle')
-        # set up text, axis and draw
-        gc = plot.PlotGraphics([line, marker], 'Line/Marker Graph', 'x axis', 'y axis')
-        plotter.Draw(gc, xAxis=(0,15), yAxis=(0,15))
-
-        self.Show(True)
-
-        self.button1 = wx.Button(self.panel,-1,'start', (8,72), (75,23))
-        self.button1.SetFont(wx.Font(8.25, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, 'Microsoft Sans Serif'))
-        self.button1.SetCursor(wx.Cursor(wx.CURSOR_DEFAULT))
-
-        self.Bind(wx.EVT_BUTTON,self.start_button_clicked,self.button1)
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = self.options['size'], style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+        self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
 
-        file_menu.Append(wx.ID_NEW, '&New')
-        file_menu.Append(wx.ID_OPEN, '&Open')
-        file_menu.Append(wx.ID_SAVE, '&Save')
-        file_menu.AppendSeparator()
-        file_item = file_menu.Append(wx.ID_EXIT, '&Quit' , 'Quit application')
-
-
-
-
-        menubar.Append(file_menu,'&File')
-
-        self.SetMenuBar(menubar)
-
-        self.Bind(wx.EVT_MENU, self.OnQuit,file_item)
-
-
-        self.SetSize(self.defaults['window_size'])
-        self.SetTitle(self.defaults['title'])
-        self.Centre()
-
+    def __del__(self):
+        pass
 
     def OnQuit(self , err):
         self.Close()
 
-    def start_button_clicked(self, err):
-        print('worx')
-### Methods for the script
-
-def main():
-    app = wx.App()
-
-    gc_gui = GC_GUI(None)
+    def main(self):
+        pass
 
 
-    gc_gui.Show()
+#Panels
+class DetectorPanel(wx.Panel):
+    def __init__(self, parent):
+        HEADER_FONT_SIZE = 16
+        EXTRA_SPACE = 25
+        BORDER = 10
 
-    app.MainLoop()
+        header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
+        header_font.SetPointSize(HEADER_FONT_SIZE)
 
-if __name__ == '__main__':
-    main()
+        wx.Panel.__init__(self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, style = wx.TAB_TRAVERSAL)
+
+        vbox = wx.BoxSizer(wx.VERTICAL)
+
+        str_det = wx.StaticText(self, label = 'Detector')
+        str_det.SetFont(header_font)
+
+        vbox.Add(str_det, border = BORDER)
+
+        vbox.Add((-1,EXTRA_SPACE))
+
+
+
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
+
+
+        vbox2 = wx.BoxSizer(wx.VERTICAL)
+
+
+
+        btn_ply = wx.Button(self, label = '=>', size = (50,50))
+        btn_paus = wx.Button(self, label = 'II', size = (50,50))
+        btn_stp = wx.Button(self, label = '[]', size = (50,50))
+
+        vbox2.Add(btn_ply, border = BORDER)
+        vbox2.Add((-1,EXTRA_SPACE))
+        vbox2.Add(btn_paus, border = BORDER)
+        vbox2.Add((-1,EXTRA_SPACE))
+        vbox2.Add(btn_stp, border = BORDER)
+        vbox2.Add((-1,EXTRA_SPACE))
+
+        btn_saveas = wx.Button(self, label = 'save as', size = (200,50))
+        btn_open = wx.Button(self,label= 'open',size = (200,50))
+
+        vbox2.Add(btn_saveas, border= BORDER)
+        vbox2.Add((-1,EXTRA_SPACE))
+        vbox2.Add(btn_open, border = BORDER)
+        vbox2.Add((-1,EXTRA_SPACE))
+
+
+        hbox.Add(vbox2, border = BORDER)
+
+        hbox.Add((EXTRA_SPACE, -1))
+
+        self.figure = Figure()
+        self.axes = self.figure.add_subplot(111)
+        self.canvas = FigureCanvas(self, -1, self.figure)
+
+
+        hbox.Add(self.canvas)
+
+        vbox.Add(hbox, border = BORDER)
+        self.SetSizer(vbox)
+        self.Fit()
+
+
+    def draw(self):
+        t = arange(0.0, 3.0, 0.01)
+        s = sin(2 * pi * t)
+        self.axes.plot(t, s)
+
+    def __del__(self):
+        pass
+
+class ConfigPanel( wx.Panel ):
+
+    def __init__( self, parent ):
+        BODY_FONT_SIZE = 11
+        HEADER_FONT_SIZE = 16
+        BORDER = 10
+        EXTRA_SPACE = 25
+
+
+        wx.Panel.__init__ (self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 100,100 ), style = wx.TAB_TRAVERSAL )
+
+        font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
+        font.SetPointSize(BODY_FONT_SIZE)
+        header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
+        header_font.SetPointSize(HEADER_FONT_SIZE)
+
+        vbox = wx.BoxSizer(wx.VERTICAL)
+
+        #Temperature
+        str_temp = wx.StaticText(self, label = 'Temperature')
+        str_temp.SetFont(header_font)
+
+
+        vbox.Add(str_temp, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP,border =BORDER)
+
+
+        vbox.Add((-1,EXTRA_SPACE))
+
+        #Oven temp
+        hbox_ov_set = wx.BoxSizer(wx.HORIZONTAL)
+        str_ov_set = wx.StaticText(self,label='Set Oven Temp.: ')
+        str_ov_set.SetFont(font)
+        hbox_ov_set.Add(str_ov_set)
+
+        tc_ov_set = wx.TextCtrl(self)
+        hbox_ov_set.Add(tc_ov_set, proportion=1)
+
+
+        vbox.Add(hbox_ov_set, flag=wx.LEFT|wx.TOP,border =BORDER)
+
+
+
+        hbox_ov_fdbk = wx.BoxSizer(wx.HORIZONTAL)
+        str_ov_fdbk = wx.StaticText(self, label = 'Oven Temp. Reading: ')
+        str_ov_fdbk.SetFont(font)
+        hbox_ov_fdbk.Add(str_ov_fdbk)
+
+        str_ov_fdbk_val = wx.StaticText(self, label = 'N/A')
+        str_ov_fdbk_val.SetFont(font)
+        hbox_ov_fdbk.Add(str_ov_fdbk_val)
+
+
+        vbox.Add(hbox_ov_fdbk, flag=wx.LEFT|wx.TOP,border =BORDER)
+
+
+        vbox.Add((-1,EXTRA_SPACE))
+
+        #Detector temp
+        hbox_det_set = wx.BoxSizer(wx.HORIZONTAL)
+        str_det_set = wx.StaticText(self, label = 'Set Detector Temp.: ')
+        str_det_set.SetFont(font)
+        hbox_det_set.Add(str_det_set)
+
+        tc_det_set = wx.TextCtrl(self)
+        hbox_det_set.Add(tc_det_set, proportion = 1)
+
+        vbox.Add(hbox_det_set, flag=wx.LEFT|wx.TOP,border =BORDER)
+
+        hbox_det_fdbk = wx.BoxSizer(wx.HORIZONTAL)
+        str_det_fdbk = wx.StaticText(self, label = 'Detector Temp. Reading: ')
+        str_det_fdbk.SetFont(font)
+        hbox_det_fdbk.Add(str_det_fdbk)
+
+        str_det_fdbk_val = wx.StaticText(self, label = 'N/A')
+        str_det_fdbk_val.SetFont(font)
+        hbox_det_fdbk.Add(str_det_fdbk_val)
+
+        vbox.Add(hbox_det_fdbk, flag=wx.LEFT|wx.TOP,border =BORDER)
+
+
+        self.SetSizer(vbox)
+
+    def __del__( self ):
+        pass
+        # Virtual event handlers, overide them in your derived class
+    def changeIntroPanel( self, event ):
+        event.Skip()
