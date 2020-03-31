@@ -87,12 +87,9 @@ class DetectorPanel(wx.Panel):
         vbox2.Add(btn_stp, border = BORDER)
         vbox2.Add((-1,EXTRA_SPACE))
 
-        btn_saveas = wx.Button(self, label = 'save as', size = (200,50))
-        btn_open = wx.Button(self,label= 'open',size = (200,50))
+        btn_clr = wx.Button(self, label = 'clear', size = (200,50))
 
-        vbox2.Add(btn_saveas, border= BORDER)
-        vbox2.Add((-1,EXTRA_SPACE))
-        vbox2.Add(btn_open, border = BORDER)
+        vbox2.Add(btn_clr, border= BORDER)
         vbox2.Add((-1,EXTRA_SPACE))
 
 
