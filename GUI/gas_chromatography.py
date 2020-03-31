@@ -20,6 +20,9 @@ class MainApp(gc_gui.GCFrame):
         gc_gui.GCFrame.__init__(self, parent, size = self.options['size'])
 
         self.split_vert()
+        self.panel_detector.draw()
+
+        self.set_up_menu_bar()
 
     def split_vert(self):
         splitter = wx.SplitterWindow(self, wx.ID_ANY, style = wx.SP_BORDER, size = self.options['size'])
@@ -32,6 +35,37 @@ class MainApp(gc_gui.GCFrame):
         self.SetSizer(wx.BoxSizer(wx.HORIZONTAL))
         #self.GetSizer().Add(splitter, 1, wx.EXPAND)
 
+    def set_up_menu_bar(self):
+        menubar = wx.MenuBar()
+
+        file_menu = wx.Menu()
+        file_menu.Append(wx.ID_NEW, '&New')
+        file_menu.Append(wx.ID_CLEAR, '&Clear')
+        file_menu.Append(wx.ID_OPEN, '&Open')
+        file_menu.Append(wx.ID_SAVE, '&Save')
+        file_menu.Append(wx.ID_SAVEAS, '&Save as')
+        file_menu.AppendSeparator()
+
+        file_menu.Append(wx.ID_PRINT, '&Print')
+        file_menu.AppendSeparator()
+
+        file_item = file_menu.Append(wx.ID_EXIT, '&Quit' , 'Quit application')
+        self.Bind(wx.EVT_MENU, self.on_quit,file_item)
+
+        menubar.Append(file_menu,'&File')
+
+        edit_menu = wx.Menu()
+        edit_menu.Append(wx.ID_PAGE_SETUP, '&Settings')
+
+        self.SetMenuBar(menubar)
+
+    def on_quit(self , err):
+        self.Close()
+
+    def clear_curr_data(self, err):
+        pass
+
+
 class DetectorPanel(gc_gui.DetectorPanel):
     def __init__(self, parent):
         gc_gui.DetectorPanel.__init__(self, parent)
@@ -41,7 +75,6 @@ class ControlPanel(gc_gui.ConfigPanel):
     def __init__(self, parent):
         gc_gui.ConfigPanel.__init__(self, parent)
         self.parent = parent
-
 
 def main():
     app = wx.App()

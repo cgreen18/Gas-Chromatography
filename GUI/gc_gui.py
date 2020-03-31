@@ -2,10 +2,11 @@
 Title: gc_gui.py
 Author: Conor Green & Matt McPartlan
 Description: Highest level script of wxPython based GUI application to perform data acquisition and display.
-Usage: Call from command line as main
+Usage: Instantiate classes GCFrame, DetectorPanel, and ConfigPanel from gas_chromatography.py
 Version:
 1.0 - November 24 2019 - Initial creation. All dependencies left in the script: will later be split into various scripts that are imported.
 1.1 - November 24 2019 - Implements numpy and plotting to window. Uses random numbers
+1.2 - 31 March 2020 - Old gas_chromatography.py -> gc_gui.py. This script defines the frame and panel classes that are put together in gas_chromatography.py. As of currently, it plots an example sin curve in the plotter but interfacing with the ADS1115 will be implemented when this is tested on a Raspberry Pi.
 """
 
 import numpy as np
@@ -18,21 +19,20 @@ from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wx import NavigationToolbar2Wx
 from matplotlib.figure import Figure
 
-
 import wx
 import wx.lib.plot as plot
-### Classes for the script
-
 
 #Frames
 class GCFrame(wx.Frame):
-
     def __init__(self, parent, **kwargs):
-        self.options = {'size':(800,400)}
+        self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
+        self.constants.update(kwargs)
+
+        self.options = {'frame_size':(800,400)}
 
         self.options.update(kwargs)
 
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = self.options['size'], style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = self.options['frame_size'], style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
 
@@ -45,16 +45,22 @@ class GCFrame(wx.Frame):
     def main(self):
         pass
 
-
 #Panels
 class DetectorPanel(wx.Panel):
     def __init__(self, parent):
-        HEADER_FONT_SIZE = 16
-        EXTRA_SPACE = 25
-        BORDER = 10
+        self.parent = parent
+
+        BODY_FONT_SIZE = self.parent.constants['BODY_FONT_SIZE']
+        HEADER_FONT_SIZE = self.parent.constants['HEADER_FONT_SIZE']
+        EXTRA_SPACE = self.parent.constants['EXTRA_SPACE']
+        BORDER = self.parent.constants['BORDER']
+
 
         header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
         header_font.SetPointSize(HEADER_FONT_SIZE)
+
+        font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
+        font.SetPointSize(BODY_FONT_SIZE)
 
         wx.Panel.__init__(self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, style = wx.TAB_TRAVERSAL)
 
@@ -63,7 +69,7 @@ class DetectorPanel(wx.Panel):
         str_det = wx.StaticText(self, label = 'Detector')
         str_det.SetFont(header_font)
 
-        vbox.Add(str_det, border = BORDER)
+        vbox.Add(str_det, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border = BORDER)
 
         vbox.Add((-1,EXTRA_SPACE))
 
@@ -120,13 +126,15 @@ class DetectorPanel(wx.Panel):
 class ConfigPanel( wx.Panel ):
 
     def __init__( self, parent ):
-        BODY_FONT_SIZE = 11
-        HEADER_FONT_SIZE = 16
-        BORDER = 10
-        EXTRA_SPACE = 25
+        self.parent = parent
+
+        BODY_FONT_SIZE = self.parent.constants['BODY_FONT_SIZE']
+        HEADER_FONT_SIZE = self.parent.constants['HEADER_FONT_SIZE']
+        EXTRA_SPACE = self.parent.constants['EXTRA_SPACE']
+        BORDER = self.parent.constants['BORDER']
 
 
-        wx.Panel.__init__ (self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 100,100 ), style = wx.TAB_TRAVERSAL )
+        wx.Panel.__init__ (self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, style = wx.TAB_TRAVERSAL )
 
         font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
         font.SetPointSize(BODY_FONT_SIZE)
@@ -204,3 +212,6 @@ class ConfigPanel( wx.Panel ):
         # Virtual event handlers, overide them in your derived class
     def changeIntroPanel( self, event ):
         event.Skip()
+
+if __name__ == '__main__':
+    pass
