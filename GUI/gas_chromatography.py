@@ -11,13 +11,17 @@ Version:
 
 import wx
 import gc_gui
+import yaml
 
 class MainApp(gc_gui.GCFrame):
     def __init__(self, parent):
-        FRAME_SIZE = (1000,600)
-        SASH_SIZE = 300
+        with open('config.yaml') as f:
+            data = yaml.load(f, Loader=yaml.FullLoader)
+            self.options = data
 
-        gc_gui.GCFrame.__init__(self, parent, frame_size = FRAME_SIZE, sash_size = SASH_SIZE)
+
+
+        gc_gui.GCFrame.__init__(self, parent, data)
         #self becomes a GCFrame
 
         self.split_vert()

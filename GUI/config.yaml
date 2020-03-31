@@ -1,0 +1,10 @@
+#Name: config.yaml
+#Usage: Import from gas_chromatography.py and use values to create GUI.
+
+BODY_FONT_SIZE: 11
+HEADER_FONT_SIZE: 18
+EXTRA_SPACE: 10
+BORDER: 10
+
+DEFAULT_FRAME_SIZE: !!python/tuple [800,400]
+DEFAULT_SASH_SIZE: 300
