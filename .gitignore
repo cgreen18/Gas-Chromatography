@@ -7,3 +7,8 @@
 #ignore the html for now
 
 *.html
+
+#ignore all test .png and .jpg files
+
+*.jpg
+*.png

@@ -15,17 +15,17 @@ from numpy import arange, sin, pi
 
 import matplotlib
 matplotlib.use('WXAgg')
-
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wx import NavigationToolbar2Wx
 from matplotlib.figure import Figure
+from matplotlib import pyplot as plt
 
 import wx
 import wx.lib.plot as plot
 
 import os
 
-import gc_class
+#import gc_class
 
 # Frames
 class GCFrame(wx.Frame):
@@ -42,6 +42,7 @@ class GCFrame(wx.Frame):
         self.split_vert()
         self.panel_detector.draw()
 
+
         self.set_up_menu_bar()
 
         '''
@@ -56,6 +57,9 @@ class GCFrame(wx.Frame):
     def main(self):
         pass
 
+    def get_figure(self):
+        return self.panel_detector.get_figure()
+
     # gc_class methods
     def update_curr_data(self):
         '''
@@ -65,7 +69,7 @@ class GCFrame(wx.Frame):
 
     def begin_data_coll(self):
         '''
-        
+
         '''
         pass
 
@@ -92,69 +96,50 @@ class GCFrame(wx.Frame):
         self.Close()
 
     def on_saveas(self, err):
-        saveasWindow = SaveasWindow(self, self.options)
+        saveas_gc_window = SaveasGC( self, self.options)
 
     def on_open(self, err):
-        openWindow = OpenWindow(self, self.options)
+        open_window = OpenWindow(self, self.options)
 
+    def on_png_save(self, err):
+        saveas_png_window = SaveasPNG(self, self.options)
+
+    def on_jpg_save(self, err):
+        saveas_jpg_window = SaveasJPG(self, self.options)
+
+#DirectoryWindow(s)
 class DirectoryWindow(wx.Frame):
     def __init__(self, parent, data):
-
         self.parent = parent
         self.cwd = os.getcwd()
+
         self.options = data
+        self.fonts = self.create_fonts()
 
         self.create_frame()
         self.update_cwd()
 
-    def create_frame(self):
-        BODY_FONT_SIZE = self.parent.options['BODY_FONT_SIZE']
-        HEADER_FONT_SIZE = self.parent.options['HEADER_FONT_SIZE']
-        EXTRA_SPACE = self.parent.options['EXTRA_SPACE']
-        BORDER = self.parent.options['BORDER']
-
+    def create_fonts(self):
         font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
-        font.SetPointSize(BODY_FONT_SIZE)
+        font.SetPointSize(self.options['BODY_FONT_SIZE'])
         header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
-        header_font.SetPointSize(HEADER_FONT_SIZE)
+        header_font.SetPointSize(self.options['HEADER_FONT_SIZE'])
 
+        return {'font':font,'header_font':header_font}
+
+    def create_frame(self):
         wx.Frame.__init__ ( self, self.parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = (600,600), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 
-        #self.SetBackgroundColour(wx.Colour(100,100,100))
-
         vbox = wx.BoxSizer(wx.VERTICAL)
-        vbox.Add((-1,EXTRA_SPACE))
+        vbox.Add((-1,self.options['EXTRA_SPACE']))
 
+        nav_hbox = self.create_nav_hbox()
 
-        nav_menu_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        nav_menu_hbox.Add((EXTRA_SPACE,-1))
+        vbox.Add(nav_hbox, border = self.options['BORDER'])
 
-        bmp = wx.Bitmap('images/btn_back_im_20p.png', wx.BITMAP_TYPE_ANY)
+        self.list_box = self.create_cwd_listbox()
 
-        self.btn_bck = wx.BitmapButton(self, id=wx.ID_ANY,bitmap=bmp, size = (45,40))
-        self.Bind(wx.EVT_BUTTON, self.bckbtn_click_evt, self.btn_bck)
-
-        nav_menu_hbox.Add(self.btn_bck)
-        #nav_menu_hbox.Add((EXTRA_SPACE, -1))
-        self.tc_cwd = wx.TextCtrl(self, value = self.cwd, pos=wx.DefaultPosition, size=(500,40))
-        self.tc_cwd.SetFont(font)
-
-        nav_menu_hbox.Add(self.tc_cwd, proportion=1, border = BORDER)
-
-        vbox.Add(nav_menu_hbox, border = BORDER)
-
-        self.cwd_list = os.listdir(self.cwd)
-
-        self.list_box = wx.ListBox(self, size = (550,400), choices = self.cwd_list, style=wx.LB_SINGLE)
-
-        self.Bind(wx.EVT_LISTBOX_DCLICK, self.basic_cwdlist_dclick_evt, self.list_box)
-
-        #hbox_buf = wx.BoxSizer(wx.HORIZONTAL)
-        #hbox_buf.Add((45+EXTRA_SPACE,-1))
-
-        #hbox_buf.Add(self.list_box,border=BORDER)
-
-        vbox.Add(self.list_box, border = BORDER)
+        vbox.Add(self.list_box, border = self.options['BORDER'])
 
         name_hbox = self.create_name_and_enter()
         vbox.Add(name_hbox)
@@ -162,6 +147,33 @@ class DirectoryWindow(wx.Frame):
         self.SetSizer(vbox)
         self.Centre()
         self.Show()
+
+    def create_nav_hbox(self):
+        nav_menu_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        nav_menu_hbox.Add((self.options['EXTRA_SPACE'],-1))
+
+        bmp = wx.Bitmap('.images/btn_back_im_20p.png', wx.BITMAP_TYPE_ANY)
+
+        self.btn_bck = wx.BitmapButton(self, id=wx.ID_ANY,bitmap=bmp, size = (45,40))
+        self.Bind(wx.EVT_BUTTON, self.bckbtn_click_evt, self.btn_bck)
+
+        nav_menu_hbox.Add(self.btn_bck)
+        #nav_menu_hbox.Add((EXTRA_SPACE, -1))
+        self.tc_cwd = wx.TextCtrl(self, value = self.cwd, pos=wx.DefaultPosition, size=(500,40))
+        self.tc_cwd.SetFont(self.fonts['font'])
+
+        nav_menu_hbox.Add(self.tc_cwd, proportion=1, border = self.options['BORDER'])
+
+        return nav_menu_hbox
+
+    def create_cwd_listbox(self):
+        self.cwd_list = os.listdir(self.cwd)
+
+        self.list_box = wx.ListBox(self, size = (550,400), choices = self.cwd_list, style=wx.LB_SINGLE)
+
+        self.Bind(wx.EVT_LISTBOX_DCLICK, self.basic_cwdlist_dclick_evt, self.list_box)
+
+        return self.list_box
 
     def create_name_and_enter(self):
         font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
@@ -175,7 +187,7 @@ class DirectoryWindow(wx.Frame):
         hbox.Add(self.tc_name, proportion=1, border= self.parent.options['BORDER'])
 
 
-        self.btn_entr = wx.Button(self, id=wx.ID_ANY, label=wx.EmptyString, size = (100,40))
+        self.btn_entr = wx.Button(self, id=wx.ID_ANY, label=wx.EmptyString, size = (150,40))
         self.Bind(wx.EVT_BUTTON, self.entrbtn_click_evt, self.btn_entr)
 
         hbox.Add(self.btn_entr)
@@ -207,7 +219,6 @@ class DirectoryWindow(wx.Frame):
 
         self.spec_cwdlist_dclick_evt(choice, filename, extension)
 
-    #Overridden by SaveasWindow or OpenWindow
     def spec_cwdlist_dclick_evt(self,  choice, filename, extension):
         pass
 
@@ -216,7 +227,6 @@ class DirectoryWindow(wx.Frame):
         self.cwd = os.getcwd()
         self.cwd_list = os.listdir(self.cwd)
         self.update_cwd()
-
 
     def update_cwd(self):
         self.list_box.Clear()
@@ -230,6 +240,65 @@ class DirectoryWindow(wx.Frame):
     def update_namectl_to_dclick(self, choice):
         self.tc_name.Clear()
         self.tc_name.write(choice)
+
+class SaveasWindow(DirectoryWindow):
+    def __init__(self, parent, data):
+        str = 'Save As'
+        DirectoryWindow.__init__(self,parent, data)
+        self.SetTitle(str)
+        self.btn_entr.SetLabel(str)
+
+    def entrbtn_click_evt(self, event):
+        pass
+
+class SaveasGC(SaveasWindow):
+    def __init__(self, parent, data):
+        pass
+
+class SaveasPNG(SaveasWindow):
+    def __init__(self, parent, data):
+        SaveasWindow.__init__(self, parent, data)
+
+        self.SetTitle('Save Current Figure As PNG')
+        self.btn_entr.SetLabel('Save as .png')
+        self.figure = self.parent.get_figure()
+
+    def entrbtn_click_evt(self, event):
+        name = self.tc_name.GetValue()
+        self.save_png(name)
+
+    def save_png(self, name):
+        if name[-4:] == '.png':
+            self.figure.savefig(name )
+        else:
+            self.figure.savefig(name + '.png')
+
+class SaveasJPG(SaveasWindow):
+    def __init__(self, parent, data):
+        SaveasWindow.__init__(self, parent, data)
+
+        self.SetTitle('Save Current Figure As JPEG')
+        self.btn_entr.SetLabel('Save as .jpg')
+        self.figure = self.parent.get_figure()
+
+    def entrbtn_click_evt(self, event):
+        name = self.tc_name.GetValue()
+        self.save_jpg(name)
+
+    def save_jpg(self, name):
+        if name[-4:] == '.jpg':
+            self.figure.savefig(name)
+        else:
+            self.figure.savefig(name + '.jpg')
+class OpenWindow(DirectoryWindow):
+    def __init__(self, parent, data):
+        str = 'Open GC File'
+        super().__init__( parent, data)
+        self.SetTitle(Open)
+        self.btn_entr.SetLabel(str)
+
+    def spec_cwdlist_dclick_evt(self,  choice, filename, extension):
+        pass
 
 #Panels
 class DetectorPanel(wx.Panel):
@@ -286,10 +355,7 @@ class DetectorPanel(wx.Panel):
 
         hbox.Add((self.EXTRA_SPACE, -1))
 
-        self.figure = Figure()
-        self.axes = self.figure.add_subplot(111)
-        self.canvas = FigureCanvas(self, -1, self.figure)
-
+        self.create_figure_()
 
         hbox.Add(self.canvas)
 
@@ -297,16 +363,21 @@ class DetectorPanel(wx.Panel):
         self.SetSizer(vbox)
         self.Fit()
 
+    def create_figure_(self):
+        self.figure = Figure()
+        self.axes = self.figure.add_subplot(111)
+        self.canvas = FigureCanvas(self, -1, self.figure)
+
     def create_control_box(self):
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
-        bmp = wx.Bitmap('images/play_btn_20p.png',wx.BITMAP_TYPE_ANY)
+        bmp = wx.Bitmap('.images/play_btn_20p.png',wx.BITMAP_TYPE_ANY)
         btn_ply = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
 
-        bmp = wx.Bitmap('images/paus_btn_20p.png',wx.BITMAP_TYPE_ANY)
+        bmp = wx.Bitmap('.images/paus_btn_20p.png',wx.BITMAP_TYPE_ANY)
         btn_paus = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
 
-        bmp = wx.Bitmap('images/stop_btn_20p.png',wx.BITMAP_TYPE_ANY)
+        bmp = wx.Bitmap('.images/stop_btn_20p.png',wx.BITMAP_TYPE_ANY)
         btn_stp = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
 
 
@@ -330,11 +401,13 @@ class DetectorPanel(wx.Panel):
 
         self.canvas.draw()
 
+    def get_figure(self):
+        return self.figure
+
     def __del__(self):
         pass
 
 class ControlPanel( wx.Panel ):
-
     def __init__( self, parent ):
         self.parent = parent
 
@@ -446,7 +519,20 @@ class GCMenuBar(wx.MenuBar):
     def create_grapher_menu(self):
         grapher_menu = wx.Menu()
 
-        grapher_menu.Append(wx.ID_ANY, '&Edit Axes...')
+        grapher_menu.Append(wx.ID_ANY, '&Edit Axes')
+
+        grapher_menu.AppendSeparator()
+
+        grapher_menu.Append(wx.ID_ANY, '&Save Image')
+
+        graph_menu_saveim = wx.Menu()
+        png_save = graph_menu_saveim.Append(wx.ID_ANY, '&.png')
+        self.parent.Bind(wx.EVT_MENU, self.parent.on_png_save, png_save)
+
+        jpg_save = graph_menu_saveim.Append(wx.ID_ANY,'&.jpg')
+        self.parent.Bind(wx.EVT_MENU, self.parent.on_jpg_save, jpg_save)
+
+        grapher_menu.Append(wx.ID_ANY, '&Save Image As...', graph_menu_saveim)
 
         return grapher_menu
 
@@ -471,6 +557,8 @@ class GCMenuBar(wx.MenuBar):
 
         item_open = file_menu.Append(wx.ID_OPEN, '&Open')
         self.parent.Bind(wx.EVT_MENU, self.parent.on_open, item_open)
+
+        file_menu.AppendSeparator()
 
         file_menu.Append(wx.ID_SAVE, '&Save')
 

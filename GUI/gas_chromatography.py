@@ -23,31 +23,9 @@ class MainApp(gc_gui.GCFrame):
             options = yaml.load(f, Loader=yaml.FullLoader)
             self.options = options
 
-
         gc_gui.GCFrame.__init__(self, parent, self.options)
-        #self becomes a GCFrame
 
-
-
-
-
-
-class SaveasWindow(gc_gui.DirectoryWindow):
-    def __init__(self, parent, data):
-        str = 'Save As'
-        super().__init__(parent, data)
-        self.SetTitle(str)
-        self.btn_entr.SetLabel(str)
-
-class OpenWindow(gc_gui.DirectoryWindow):
-    def __init__(self, parent, data):
-        str = 'Open'
-        super().__init__( parent, data)
-        self.SetTitle(Open)
-        self.btn_entr.SetLabel(str)
-
-    def spec_cwdlist_dclick_evt(self,  choice, filename, extension):
-        pass
+        self.parent = parent
 
 
 def main():
