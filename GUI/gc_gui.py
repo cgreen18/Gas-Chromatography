@@ -25,6 +25,8 @@ import wx
 import wx.lib.plot as plot
 
 import os
+import json
+from time import localtime, strftime
 
 #import gc_class
 
@@ -60,6 +62,9 @@ class GCFrame(wx.Frame):
 
     def get_figure(self):
         return self.panel_detector.get_figure()
+
+    def get_curr_data(self):
+        return self.panel_detector.get_curr_data()
 
     # gc_class methods
     def update_curr_data(self):
@@ -254,7 +259,37 @@ class SaveasWindow(DirectoryWindow):
 
 class SaveasGC(SaveasWindow):
     def __init__(self, parent, data):
-        pass
+        SaveasWindow.__init__(self, parent, data)
+
+        self.SetTitle('Save Session As GC')
+        self.btn_entr.SetLabel('Save as .gc')
+        #Get important parameters
+        self.curr_data = self.parent.get_curr_data()
+
+    def entrbtn_click_evt(self, event):
+        name = self.tc_name.GetValue()
+        self.save_gc(name)
+
+    def save_gc(self, name):
+        date = strftime('%d %m %Y', localtime())
+        time = strftime('%H:%M:%S',localtime())
+        curr_data = self.jsonify_curr_data(self.curr_data)
+
+        if name[-3:] != '.gc':
+            name = name + '.gc'
+
+        curr_session = {'Date': date, 'Time':time, 'Current Data': curr_data }
+
+        with open(name , 'w') as json_file:
+            json.dump(curr_session, json_file)
+
+    def jsonify_curr_data(self, data):
+        t = data['t']
+        s = data['s']
+        t_l = t.tolist()
+        s_l = s.tolist()
+        json_data = {'t':t_l,'s':s_l}
+        return json_data
 
 class SaveasPNG(SaveasWindow):
     def __init__(self, parent, data):
@@ -291,6 +326,7 @@ class SaveasJPG(SaveasWindow):
             self.figure.savefig(name)
         else:
             self.figure.savefig(name + '.jpg')
+
 class OpenWindow(DirectoryWindow):
     def __init__(self, parent, data):
         str = 'Open GC File'
@@ -394,6 +430,7 @@ class DetectorPanel(wx.Panel):
     def draw(self):
         t = arange(0.0, 3.0, 0.01)
         s = sin(2 * pi * t)
+        self.curr_data = {'t':t,'s':s}
         self.axes.plot(t, s)
         self.canvas.draw()
 
@@ -404,6 +441,9 @@ class DetectorPanel(wx.Panel):
 
     def get_figure(self):
         return self.figure
+
+    def get_curr_data(self):
+        return self.curr_data
 
     def __del__(self):
         pass

@@ -12,3 +12,7 @@
 
 *.jpg
 *.png
+
+#ignore GC file types
+
+*.gc
