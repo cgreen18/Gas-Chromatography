@@ -23,6 +23,8 @@ from matplotlib.figure import Figure
 import wx
 import wx.lib.plot as plot
 
+import os
+
 #Frames
 class GCFrame(wx.Frame):
     def __init__(self, parent, optiondict):
@@ -45,22 +47,157 @@ class GCFrame(wx.Frame):
     def main(self):
         pass
 
-#Panels
-class DetectorPanel(wx.Panel):
-    def __init__(self, parent):
-        self.parent = parent
+class DirectoryWindow(wx.Frame):
+    def __init__(self, parent, data):
 
+        self.parent = parent
+        self.title = 'Save As'
+        self.cwd = os.getcwd()
+
+
+        self.create_frame()
+        self.update_cwd()
+
+    def create_frame(self):
         BODY_FONT_SIZE = self.parent.options['BODY_FONT_SIZE']
         HEADER_FONT_SIZE = self.parent.options['HEADER_FONT_SIZE']
         EXTRA_SPACE = self.parent.options['EXTRA_SPACE']
         BORDER = self.parent.options['BORDER']
 
-
+        font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
+        font.SetPointSize(BODY_FONT_SIZE)
         header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
         header_font.SetPointSize(HEADER_FONT_SIZE)
 
+        wx.Frame.__init__ ( self, self.parent, id = wx.ID_ANY, title = self.title, pos = wx.DefaultPosition, size = (600,600), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+
+        #self.SetBackgroundColour(wx.Colour(100,100,100))
+
+        vbox = wx.BoxSizer(wx.VERTICAL)
+        vbox.Add((-1,EXTRA_SPACE))
+
+
+        nav_menu_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        nav_menu_hbox.Add((EXTRA_SPACE,-1))
+
+        bmp = wx.Bitmap('images/btn_back_im_20p.png', wx.BITMAP_TYPE_ANY)
+
+        self.btn_bck = wx.BitmapButton(self, id=wx.ID_ANY,bitmap=bmp, size = (45,40))
+        self.Bind(wx.EVT_BUTTON, self.bckbtn_click_evt, self.btn_bck)
+
+        nav_menu_hbox.Add(self.btn_bck)
+        #nav_menu_hbox.Add((EXTRA_SPACE, -1))
+        self.tc_cwd = wx.TextCtrl(self, value = self.cwd, pos=wx.DefaultPosition, size=(500,40))
+        self.tc_cwd.SetFont(font)
+
+        nav_menu_hbox.Add(self.tc_cwd, proportion=1, border = BORDER)
+
+        vbox.Add(nav_menu_hbox, border = BORDER)
+
+        self.cwd_list = os.listdir(self.cwd)
+
+        self.list_box = wx.ListBox(self, size = (-1,400), choices = self.cwd_list, style=wx.LB_SINGLE)
+
+        self.Bind(wx.EVT_LISTBOX_DCLICK, self.basic_cwdlist_dclick_evt, self.list_box)
+
+        hbox_buf = wx.BoxSizer(wx.HORIZONTAL)
+        hbox_buf.Add((45+EXTRA_SPACE,-1))
+
+        hbox_buf.Add(self.list_box,border=BORDER)
+
+        vbox.Add(hbox_buf)
+
+        name_hbox = self.create_name_and_enter()
+        vbox.Add(name_hbox)
+
+        self.SetSizer(vbox)
+        self.Centre()
+        self.Show()
+
+    def create_name_and_enter(self):
         font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
-        font.SetPointSize(BODY_FONT_SIZE)
+        font.SetPointSize(self.parent.options['BODY_FONT_SIZE'])
+
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.tc_name = wx.TextCtrl(self, value = wx.EmptyString, pos = wx.DefaultPosition, size = (400,40))
+        self.tc_name.SetFont(font)
+
+        hbox.Add(self.tc_name, proportion=1, border= self.parent.options['BORDER'])
+
+        bmp = wx.Bitmap('images/entr_btn_20p.png', wx.BITMAP_TYPE_ANY)
+
+        self.btn_entr = wx.BitmapButton(self, id=wx.ID_ANY,bitmap=bmp, size = (75,40))
+        self.Bind(wx.EVT_BUTTON, self.entrbtn_click_evt, self.btn_entr)
+
+        hbox.Add(self.btn_entr)
+
+        return hbox
+
+    def entrbtn_click_evt(self):
+        pass
+
+    def basic_cwdlist_dclick_evt(self, event):
+        index = event.GetSelection()
+        choice = self.cwd_list[index]
+
+        is_dir = os.path.isdir(choice)
+        if is_dir:
+            try:
+                os.chdir(choice)
+                self.cwd = os.getcwd()
+                self.cwd_list = os.listdir(self.cwd)
+                self.update_cwd()
+                return
+
+            except Exception:
+                pass
+
+        filename, extension = os.path.splitext(choice)
+
+        self.update_ctl_to_dclick(choice)
+
+        self.spec_cwdlist_dclick_evt(choice, filename, extension)
+
+    #Overridden by SaveasWindow or OpenWindow
+    def spec_cwdlist_dclick_evt(self,  choice, filename, extension):
+        pass
+
+    def bckbtn_click_evt(self, event):
+        os.chdir('..')
+        self.cwd = os.getcwd()
+        self.cwd_list = os.listdir(self.cwd)
+        self.update_cwd()
+
+
+    def update_cwd(self):
+        self.list_box.Clear()
+        self.list_box.Append(self.cwd_list)
+
+        self.tc_cwd.Clear()
+        self.tc_cwd.write(self.cwd)
+
+        self.Show()
+
+    def update_namectl_to_dclick(self, choice):
+        pass
+
+#Panels
+class DetectorPanel(wx.Panel):
+    def __init__(self, parent):
+        self.parent = parent
+
+        self.BODY_FONT_SIZE = self.parent.options['BODY_FONT_SIZE']
+        self.HEADER_FONT_SIZE = self.parent.options['HEADER_FONT_SIZE']
+        self.EXTRA_SPACE = self.parent.options['EXTRA_SPACE']
+        self.BORDER = self.parent.options['BORDER']
+
+
+        header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
+        header_font.SetPointSize(self.HEADER_FONT_SIZE)
+
+        font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
+        font.SetPointSize(self.BODY_FONT_SIZE)
 
         wx.Panel.__init__(self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, style = wx.TAB_TRAVERSAL)
 
@@ -69,17 +206,50 @@ class DetectorPanel(wx.Panel):
         str_det = wx.StaticText(self, label = 'Detector')
         str_det.SetFont(header_font)
 
-        vbox.Add(str_det, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border = BORDER)
+        vbox.Add(str_det, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border = self.BORDER)
 
-        vbox.Add((-1,EXTRA_SPACE))
+        vbox.Add((-1,self.EXTRA_SPACE))
 
 
 
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
-
         vbox2 = wx.BoxSizer(wx.VERTICAL)
 
+        hbox2 = self.create_control_box()
+
+        vbox2.Add(hbox2, border= self.BORDER)
+        vbox2.Add((-1,20))
+
+        self.btn_clr = wx.Button(self, label = 'clear', size = (200,50))
+        self.btn_clr.SetFont(font)
+        self.btn_clr.SetCursor(wx.Cursor(wx.CURSOR_DEFAULT))
+
+        self.Bind(wx.EVT_BUTTON,self.clear_plot_btn,self.btn_clr)
+
+
+
+        vbox2.Add(self.btn_clr, border= self.BORDER)
+        vbox2.Add((-1,self.EXTRA_SPACE))
+
+
+        hbox.Add(vbox2, border = self.BORDER)
+
+        hbox.Add((self.EXTRA_SPACE, -1))
+
+        self.figure = Figure()
+        self.axes = self.figure.add_subplot(111)
+        self.canvas = FigureCanvas(self, -1, self.figure)
+
+
+        hbox.Add(self.canvas)
+
+        vbox.Add(hbox, border = self.BORDER)
+        self.SetSizer(vbox)
+        self.Fit()
+
+    def create_control_box(self):
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
 
         bmp = wx.Bitmap('images/play_btn_20p.png',wx.BITMAP_TYPE_ANY)
         btn_ply = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
@@ -91,40 +261,14 @@ class DetectorPanel(wx.Panel):
         btn_stp = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
 
 
-        vbox2.Add(btn_ply, border = BORDER)
-        vbox2.Add((-1,EXTRA_SPACE))
-        vbox2.Add(btn_paus, border = BORDER)
-        vbox2.Add((-1,EXTRA_SPACE))
-        vbox2.Add(btn_stp, border = BORDER)
-        vbox2.Add((-1,EXTRA_SPACE))
+        hbox.Add(btn_ply, border = self.BORDER)
+        hbox.Add((self.EXTRA_SPACE,-1))
+        hbox.Add(btn_paus, border = self.BORDER)
+        hbox.Add((self.EXTRA_SPACE,-1))
+        hbox.Add(btn_stp, border = self.BORDER)
+        hbox.Add((self.EXTRA_SPACE,-1))
 
-        self.btn_clr = wx.Button(self, label = 'clear', size = (200,50))
-        self.btn_clr.SetFont(font)
-        self.btn_clr.SetCursor(wx.Cursor(wx.CURSOR_DEFAULT))
-
-        self.Bind(wx.EVT_BUTTON,self.clear_plot_btn,self.btn_clr)
-
-
-
-        vbox2.Add(self.btn_clr, border= BORDER)
-        vbox2.Add((-1,EXTRA_SPACE))
-
-
-        hbox.Add(vbox2, border = BORDER)
-
-        hbox.Add((EXTRA_SPACE, -1))
-
-        self.figure = Figure()
-        self.axes = self.figure.add_subplot(111)
-        self.canvas = FigureCanvas(self, -1, self.figure)
-
-
-        hbox.Add(self.canvas)
-
-        vbox.Add(hbox, border = BORDER)
-        self.SetSizer(vbox)
-        self.Fit()
-
+        return hbox
 
     def draw(self):
         t = arange(0.0, 3.0, 0.01)

@@ -63,96 +63,47 @@ class MainApp(gc_gui.GCFrame):
         saveasWindow = SaveasWindow(self, self.options)
         #saveasWindow.show()
 
-class SaveasWindow(wx.Frame):
+
+
+
+class SaveasWindow(gc_gui.DirectoryWindow):
+
     def __init__(self, parent, data):
-        self.parent = parent
-        self.title = 'Save As'
-        self.cwd = os.getcwd()
+        print(self)
+        print(parent)
+        super().__init__( parent, data)
+
+    def spec_cwdlist_dclick_evt(self, choice, filename, extension):
+        pass
 
 
-        self.create_frame()
-        self.update_cwd_menu()
-
-    def create_frame(self):
-        BODY_FONT_SIZE = self.parent.options['BODY_FONT_SIZE']
-        HEADER_FONT_SIZE = self.parent.options['HEADER_FONT_SIZE']
-        EXTRA_SPACE = self.parent.options['EXTRA_SPACE']
-        BORDER = self.parent.options['BORDER']
-
-        font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
-        font.SetPointSize(BODY_FONT_SIZE)
-        header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
-        header_font.SetPointSize(HEADER_FONT_SIZE)
-
-        wx.Frame.__init__ ( self, self.parent, id = wx.ID_ANY, title = self.title, pos = wx.DefaultPosition, size = (600,400), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
-
-        #self.SetBackgroundColour(wx.Colour(100,100,100))
-
-        vbox = wx.BoxSizer(wx.VERTICAL)
-        vbox.Add((-1,EXTRA_SPACE))
 
 
-        nav_menu_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        nav_menu_hbox.Add((EXTRA_SPACE,-1))
+class OpenWindow(gc_gui.DirectoryWindow):
+    def __init__(self, parent, data):
+        print(self)
+        print(parent)
+        super().__init__( parent, data)
 
-        bmp = wx.Bitmap('images/btn_back_im_20p.png', wx.BITMAP_TYPE_ANY)
-
-        self.btn_bck = wx.BitmapButton(self, id=wx.ID_ANY,bitmap=bmp, size = (45,40))
-        self.Bind(wx.EVT_BUTTON, self.bckbtn_click_evt, self.btn_bck)
-
-        nav_menu_hbox.Add(self.btn_bck)
-        #nav_menu_hbox.Add((EXTRA_SPACE, -1))
-        tc_cwd = wx.TextCtrl(self, value = self.cwd, pos=wx.DefaultPosition, size=(500,40))
-        tc_cwd.SetFont(font)
-
-        nav_menu_hbox.Add(tc_cwd, proportion=1, border = BORDER)
-
-        vbox.Add(nav_menu_hbox, border = BORDER)
-
-        self.cwd_list = os.listdir(self.cwd)
-
-        self.list_box = wx.ListBox(self, size = (-1,400), choices = self.cwd_list, style=wx.LB_SINGLE)
-
-        self.Bind(wx.EVT_LISTBOX_DCLICK, self.cdwlist_dclick_evt, self.list_box)
-
-        hbox_buf = wx.BoxSizer(wx.HORIZONTAL)
-        hbox_buf.Add((45+EXTRA_SPACE,-1))
-
-        hbox_buf.Add(self.list_box,border=BORDER)
-
-        vbox.Add(hbox_buf)
-
-        self.SetSizer(vbox)
-        self.Centre()
-        self.Show()
-
-    def cdwlist_dclick_evt(self, event):
+    def cwdlist_dclick_evt(self, event):
+        print('overridden')
         index = event.GetSelection()
         choice = self.cwd_list[index]
 
-        try:
-            os.chdir(choice)
-            self.cwd = os.getcwd()
-            self.cwd_list = os.listdir(self.cwd)
-            self.update_cwd_menu()
+        is_dir = os.path.isdir(choice)
+        if is_dir:
+            try:
+                os.chdir(choice)
+                self.cwd = os.getcwd()
+                self.cwd_list = os.listdir(self.cwd)
+                self.update_cwd_menu()
+                return
 
-        except Exception:
-            pass
+            except Exception:
+                pass
 
-    def bckbtn_click_evt(self, event):
-        os.chdir('..')
-        self.cwd = os.getcwd()
-        self.cwd_list = os.listdir(self.cwd)
-        self.update_cwd_menu()
+        filename, extension = os.path.splitext(choice)
 
-    def update_cwd_menu(self):
-        print("to updatea")
-        print(self.cwd_list)
-        self.list_box.Clear()
-        self.list_box.Append(self.cwd_list)
-
-        #self.list_box.choices = self.cwd_list
-        self.Show()
 
 
 class DetectorPanel(gc_gui.DetectorPanel):
