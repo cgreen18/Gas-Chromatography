@@ -34,7 +34,7 @@ class GCFrame(wx.Frame):
         self.options.update(self.constants)
         self.options.update(optiondict)
 
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = self.options['frame_size'], style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = self.options['DEFAULT_FRAME_SIZE'], style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
 
@@ -53,7 +53,7 @@ class DirectoryWindow(wx.Frame):
         self.parent = parent
         self.title = 'Save As'
         self.cwd = os.getcwd()
-
+        self.options = data
 
         self.create_frame()
         self.update_cwd()
@@ -69,7 +69,7 @@ class DirectoryWindow(wx.Frame):
         header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
         header_font.SetPointSize(HEADER_FONT_SIZE)
 
-        wx.Frame.__init__ ( self, self.parent, id = wx.ID_ANY, title = self.title, pos = wx.DefaultPosition, size = (600,600), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+        wx.Frame.__init__ ( self, self.parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = (600,600), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 
         #self.SetBackgroundColour(wx.Colour(100,100,100))
 
@@ -96,16 +96,16 @@ class DirectoryWindow(wx.Frame):
 
         self.cwd_list = os.listdir(self.cwd)
 
-        self.list_box = wx.ListBox(self, size = (-1,400), choices = self.cwd_list, style=wx.LB_SINGLE)
+        self.list_box = wx.ListBox(self, size = (550,400), choices = self.cwd_list, style=wx.LB_SINGLE)
 
         self.Bind(wx.EVT_LISTBOX_DCLICK, self.basic_cwdlist_dclick_evt, self.list_box)
 
-        hbox_buf = wx.BoxSizer(wx.HORIZONTAL)
-        hbox_buf.Add((45+EXTRA_SPACE,-1))
+        #hbox_buf = wx.BoxSizer(wx.HORIZONTAL)
+        #hbox_buf.Add((45+EXTRA_SPACE,-1))
 
-        hbox_buf.Add(self.list_box,border=BORDER)
+        #hbox_buf.Add(self.list_box,border=BORDER)
 
-        vbox.Add(hbox_buf)
+        vbox.Add(self.list_box, border = BORDER)
 
         name_hbox = self.create_name_and_enter()
         vbox.Add(name_hbox)
@@ -155,7 +155,7 @@ class DirectoryWindow(wx.Frame):
 
         filename, extension = os.path.splitext(choice)
 
-        self.update_ctl_to_dclick(choice)
+        self.update_namectl_to_dclick(choice)
 
         self.spec_cwdlist_dclick_evt(choice, filename, extension)
 
@@ -180,7 +180,8 @@ class DirectoryWindow(wx.Frame):
         self.Show()
 
     def update_namectl_to_dclick(self, choice):
-        pass
+        self.tc_name.Clear()
+        self.tc_name.write(choice)
 
 #Panels
 class DetectorPanel(wx.Panel):
@@ -419,7 +420,10 @@ class GCMenuBar(wx.MenuBar):
         file_menu = wx.Menu()
         file_menu.Append(wx.ID_NEW, '&New')
         file_menu.Append(wx.ID_CLEAR, '&Clear')
-        file_menu.Append(wx.ID_OPEN, '&Open')
+
+        item_open = file_menu.Append(wx.ID_OPEN, '&Open')
+        self.parent.Bind(wx.EVT_MENU, self.parent.on_open, item_open)
+
         file_menu.Append(wx.ID_SAVE, '&Save')
 
         item_saveas =file_menu.Append( wx.ID_SAVEAS, '&Save as' )

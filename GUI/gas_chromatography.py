@@ -8,6 +8,7 @@ Version:
 1.1 - 20 February 2020 - Import and create gc_class Gas_Chrom object.
 1.2 - 30 March 2020 - Complete overhaul. Utilizes frame and panel classes created in gc_gui and smashes them together using the SplitterWindow.
 1.3 - 30 March 2020 - Added Save As window that navigates directories and updates listbox.
+1.4 - 31 March 2020 - Added Open window, similar to Save As. Both inherit new window class.
 '''
 
 import wx
@@ -22,11 +23,7 @@ class MainApp(gc_gui.GCFrame):
             self.options = data
 
 
-        print(self)
-        print(parent)
-        print(gc_gui.GCFrame)
-
-        gc_gui.GCFrame.__init__(self, parent, data)
+        gc_gui.GCFrame.__init__(self, parent, self.options)
         #self becomes a GCFrame
 
         self.split_vert()
@@ -53,58 +50,28 @@ class MainApp(gc_gui.GCFrame):
 
         self.SetMenuBar(menubar)
 
-
-
+    # Menu events
     def on_quit(self , err):
         self.Close()
 
     def on_saveas(self, err):
-        print("here")
         saveasWindow = SaveasWindow(self, self.options)
-        #saveasWindow.show()
 
-
-
+    def on_open(self, err):
+        openWindow = OpenWindow(self, self.options)
 
 class SaveasWindow(gc_gui.DirectoryWindow):
-
     def __init__(self, parent, data):
-        print(self)
-        print(parent)
-        super().__init__( parent, data)
-
-    def spec_cwdlist_dclick_evt(self, choice, filename, extension):
-        pass
-
-
-
+        super().__init__(parent, data)
+        self.SetTitle('Save As')
 
 class OpenWindow(gc_gui.DirectoryWindow):
     def __init__(self, parent, data):
-        print(self)
-        print(parent)
         super().__init__( parent, data)
+        self.SetTitle('Open')
 
-    def cwdlist_dclick_evt(self, event):
-        print('overridden')
-        index = event.GetSelection()
-        choice = self.cwd_list[index]
-
-        is_dir = os.path.isdir(choice)
-        if is_dir:
-            try:
-                os.chdir(choice)
-                self.cwd = os.getcwd()
-                self.cwd_list = os.listdir(self.cwd)
-                self.update_cwd_menu()
-                return
-
-            except Exception:
-                pass
-
-        filename, extension = os.path.splitext(choice)
-
-
+    def spec_cwdlist_dclick_evt(self,  choice, filename, extension):
+        pass
 
 class DetectorPanel(gc_gui.DetectorPanel):
     def __init__(self, parent):
