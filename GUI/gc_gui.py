@@ -25,7 +25,9 @@ import wx.lib.plot as plot
 
 import os
 
-#Frames
+import gc_class
+
+# Frames
 class GCFrame(wx.Frame):
     def __init__(self, parent, optiondict):
         self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
@@ -37,21 +39,68 @@ class GCFrame(wx.Frame):
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = self.options['DEFAULT_FRAME_SIZE'], style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
+        self.split_vert()
+        self.panel_detector.draw()
+
+        self.set_up_menu_bar()
+
+        '''
+        #single_ended=True
+        gc = gc_class(True)
+        self.curr_data = gc.get_curr_data
+        '''
 
     def __del__(self):
         pass
 
-    def OnQuit(self , err):
-        self.Close()
-
     def main(self):
         pass
+
+    # gc_class methods
+    def update_curr_data(self):
+        '''
+
+        '''
+        pass
+
+    def begin_data_coll(self):
+        '''
+        
+        '''
+        pass
+
+    def split_vert(self):
+        splitter = wx.SplitterWindow(self, id=wx.ID_ANY,pos=wx.DefaultPosition , size=self.options['frame_size'], style = wx.SP_BORDER, name='Diode Based Gas Chromatography' )
+
+        splitter.options = self.options
+
+        self.panel_detector = DetectorPanel(splitter)
+        self.panel_config = ControlPanel(splitter)
+
+        splitter.SplitVertically(self.panel_config , self.panel_detector, self.options['sash_size'])
+
+        self.SetSizer(wx.BoxSizer(wx.HORIZONTAL))
+        self.GetSizer().Add(splitter, 1, wx.EXPAND)
+
+    def set_up_menu_bar(self):
+        menubar = GCMenuBar(self)
+
+        self.SetMenuBar(menubar)
+
+    # Menu events
+    def on_quit(self , err):
+        self.Close()
+
+    def on_saveas(self, err):
+        saveasWindow = SaveasWindow(self, self.options)
+
+    def on_open(self, err):
+        openWindow = OpenWindow(self, self.options)
 
 class DirectoryWindow(wx.Frame):
     def __init__(self, parent, data):
 
         self.parent = parent
-        self.title = 'Save As'
         self.cwd = os.getcwd()
         self.options = data
 
@@ -125,16 +174,15 @@ class DirectoryWindow(wx.Frame):
 
         hbox.Add(self.tc_name, proportion=1, border= self.parent.options['BORDER'])
 
-        bmp = wx.Bitmap('images/entr_btn_20p.png', wx.BITMAP_TYPE_ANY)
 
-        self.btn_entr = wx.BitmapButton(self, id=wx.ID_ANY,bitmap=bmp, size = (75,40))
+        self.btn_entr = wx.Button(self, id=wx.ID_ANY, label=wx.EmptyString, size = (100,40))
         self.Bind(wx.EVT_BUTTON, self.entrbtn_click_evt, self.btn_entr)
 
         hbox.Add(self.btn_entr)
 
         return hbox
 
-    def entrbtn_click_evt(self):
+    def entrbtn_click_evt(self, event):
         pass
 
     def basic_cwdlist_dclick_evt(self, event):
@@ -285,7 +333,7 @@ class DetectorPanel(wx.Panel):
     def __del__(self):
         pass
 
-class ConfigPanel( wx.Panel ):
+class ControlPanel( wx.Panel ):
 
     def __init__( self, parent ):
         self.parent = parent

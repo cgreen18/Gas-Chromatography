@@ -80,6 +80,9 @@ class Gas_Chrom:
         self.curr_data = self.coll_volt_const_pts(num_pts)
         print(self.curr_data)
 
+    def get_curr_data(self):
+        return self.curr_data
+
 
     # ADS1115 Methods
     def reinit_ADS(self):

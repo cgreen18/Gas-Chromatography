@@ -12,79 +12,43 @@ Version:
 '''
 
 import wx
-import gc_gui
 import yaml
 import os
+
+import gc_gui
 
 class MainApp(gc_gui.GCFrame):
     def __init__(self, parent):
         with open('config.yaml') as f:
-            data = yaml.load(f, Loader=yaml.FullLoader)
-            self.options = data
+            options = yaml.load(f, Loader=yaml.FullLoader)
+            self.options = options
 
 
         gc_gui.GCFrame.__init__(self, parent, self.options)
         #self becomes a GCFrame
 
-        self.split_vert()
-        self.panel_detector.draw()
 
-        self.set_up_menu_bar()
 
-    def split_vert(self):
 
-        splitter = wx.SplitterWindow(self, id=wx.ID_ANY,pos=wx.DefaultPosition , size=self.options['frame_size'], style = wx.SP_BORDER, name='Diode Based Gas Chromatography' )
 
-        splitter.options = self.options
-
-        self.panel_detector = DetectorPanel(splitter)
-        self.panel_config = ControlPanel(splitter)
-
-        splitter.SplitVertically(self.panel_config , self.panel_detector, self.options['sash_size'])
-
-        self.SetSizer(wx.BoxSizer(wx.HORIZONTAL))
-        self.GetSizer().Add(splitter, 1, wx.EXPAND)
-
-    def set_up_menu_bar(self):
-        menubar = gc_gui.GCMenuBar(self)
-
-        self.SetMenuBar(menubar)
-
-    # Menu events
-    def on_quit(self , err):
-        self.Close()
-
-    def on_saveas(self, err):
-        saveasWindow = SaveasWindow(self, self.options)
-
-    def on_open(self, err):
-        openWindow = OpenWindow(self, self.options)
 
 class SaveasWindow(gc_gui.DirectoryWindow):
     def __init__(self, parent, data):
+        str = 'Save As'
         super().__init__(parent, data)
-        self.SetTitle('Save As')
+        self.SetTitle(str)
+        self.btn_entr.SetLabel(str)
 
 class OpenWindow(gc_gui.DirectoryWindow):
     def __init__(self, parent, data):
+        str = 'Open'
         super().__init__( parent, data)
-        self.SetTitle('Open')
+        self.SetTitle(Open)
+        self.btn_entr.SetLabel(str)
 
     def spec_cwdlist_dclick_evt(self,  choice, filename, extension):
         pass
 
-class DetectorPanel(gc_gui.DetectorPanel):
-    def __init__(self, parent):
-        gc_gui.DetectorPanel.__init__(self, parent)
-        self.parent = parent
-
-    def clear_curr_data(self):
-        self.clear_curr_data()
-
-class ControlPanel(gc_gui.ConfigPanel):
-    def __init__(self, parent):
-        gc_gui.ConfigPanel.__init__(self, parent)
-        self.parent = parent
 
 def main():
     app = wx.App()
