@@ -7,7 +7,7 @@ Version:
 1.0 - November 24 2019 - Initial creation. All dependencies left in the script: will later be split into various scripts that are imported.
 1.1 - November 24 2019 - Implements numpy and plotting to window. Uses random numbers
 1.2 - 31 March 2020 - Old gas_chromatography.py -> gc_gui.py. This script defines the frame and panel classes that are put together in gas_chromatography.py. As of currently, it plots an example sin curve in the plotter but interfacing with the ADS1115 will be implemented when this is tested on a Raspberry Pi.
-1.3 - 31 March 2020 - Added images to buttons.
+1.3 - 31 March 2020 - Added images to buttons. Added more menu options.
 """
 
 import numpy as np
@@ -229,6 +229,68 @@ class ConfigPanel( wx.Panel ):
         # Virtual event handlers, overide them in your derived class
     def changeIntroPanel( self, event ):
         event.Skip()
+
+# Menus
+class GCMenuBar(wx.MenuBar):
+
+    def __init__(self, parent):
+        wx.MenuBar.__init__(self)
+        self.parent = parent
+
+
+        file_menu = self.create_file_menu()
+        self.Append(file_menu,'&File')
+
+        edit_menu = self.create_edit_menu()
+        self.Append(edit_menu,'&Edit')
+
+        data_menu = self.create_data_menu()
+        self.Append(data_menu,'&Data')
+
+        grapher_menu = self.create_grapher_menu()
+        self.Append(grapher_menu, '&Grapher')
+
+    def create_grapher_menu(self):
+        grapher_menu = wx.Menu()
+
+        grapher_menu.Append(wx.ID_ANY, '&Edit Axes...')
+
+        return grapher_menu
+
+    def create_data_menu(self):
+        data_menu = wx.Menu()
+
+        data_menu.Append(wx.ID_ANY, '&Previous Set')
+        data_menu.Append(wx.ID_ANY, '&Operations...')
+
+        return data_menu
+
+    def create_edit_menu(self):
+        edit_menu = wx.Menu()
+        edit_menu.Append(wx.ID_PAGE_SETUP, '&Settings')
+
+        return edit_menu
+
+    def create_file_menu(self):
+        file_menu = wx.Menu()
+        file_menu.Append(wx.ID_NEW, '&New')
+        file_menu.Append(wx.ID_CLEAR, '&Clear')
+        file_menu.Append(wx.ID_OPEN, '&Open')
+        file_menu.Append(wx.ID_SAVE, '&Save')
+
+        item_saveas =file_menu.Append( wx.ID_SAVEAS, '&Save as' )
+
+        self.parent.Bind(wx.EVT_MENU, self.parent.on_saveas, item_saveas)
+
+        file_menu.AppendSeparator()
+
+        file_menu.Append(wx.ID_PRINT, '&Print')
+        file_menu.AppendSeparator()
+
+        item_quit = file_menu.Append(wx.ID_EXIT, '&Quit' , 'Quit application')
+        self.parent.Bind(wx.EVT_MENU, self.parent.on_quit,item_quit)
+
+        return file_menu
 
 if __name__ == '__main__':
     pass

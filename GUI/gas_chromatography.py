@@ -49,31 +49,11 @@ class MainApp(gc_gui.GCFrame):
         self.GetSizer().Add(splitter, 1, wx.EXPAND)
 
     def set_up_menu_bar(self):
-        menubar = wx.MenuBar()
-
-        file_menu = wx.Menu()
-        file_menu.Append(wx.ID_NEW, '&New')
-        file_menu.Append(wx.ID_CLEAR, '&Clear')
-        file_menu.Append(wx.ID_OPEN, '&Open')
-        file_menu.Append(wx.ID_SAVE, '&Save')
-
-        item_saveas =file_menu.Append( wx.ID_SAVEAS, '&Save as' )
-        self.Bind(wx.EVT_MENU, self.on_saveas, item_saveas)
-
-        file_menu.AppendSeparator()
-
-        file_menu.Append(wx.ID_PRINT, '&Print')
-        file_menu.AppendSeparator()
-
-        item_quit = file_menu.Append(wx.ID_EXIT, '&Quit' , 'Quit application')
-        self.Bind(wx.EVT_MENU, self.on_quit,item_quit)
-
-        menubar.Append(file_menu,'&File')
-
-        edit_menu = wx.Menu()
-        edit_menu.Append(wx.ID_PAGE_SETUP, '&Settings')
+        menubar = gc_gui.GCMenuBar(self)
 
         self.SetMenuBar(menubar)
+
+
 
     def on_quit(self , err):
         self.Close()
@@ -173,7 +153,6 @@ class SaveasWindow(wx.Frame):
 
         #self.list_box.choices = self.cwd_list
         self.Show()
-
 
 
 class DetectorPanel(gc_gui.DetectorPanel):
