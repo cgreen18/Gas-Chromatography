@@ -92,9 +92,15 @@ class DetectorPanel(wx.Panel):
         vbox2.Add(btn_stp, border = BORDER)
         vbox2.Add((-1,EXTRA_SPACE))
 
-        btn_clr = wx.Button(self, label = 'clear', size = (200,50))
+        self.btn_clr = wx.Button(self, label = 'clear', size = (200,50))
+        self.btn_clr.SetFont(font)
+        self.btn_clr.SetCursor(wx.Cursor(wx.CURSOR_DEFAULT))
 
-        vbox2.Add(btn_clr, border= BORDER)
+        self.Bind(wx.EVT_BUTTON,self.clear_plot_btn,self.btn_clr)
+
+
+
+        vbox2.Add(self.btn_clr, border= BORDER)
         vbox2.Add((-1,EXTRA_SPACE))
 
 
@@ -118,6 +124,12 @@ class DetectorPanel(wx.Panel):
         t = arange(0.0, 3.0, 0.01)
         s = sin(2 * pi * t)
         self.axes.plot(t, s)
+        self.canvas.draw()
+
+    def clear_plot_btn(self, event):
+        self.axes.cla()
+
+        self.canvas.draw()
 
     def __del__(self):
         pass

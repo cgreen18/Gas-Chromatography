@@ -28,7 +28,7 @@ def main():
 
     for i in range(0,1000):
         print(chan.voltage)
-        time.sleep(.1)
+        time.sleep(1)
 
 def single_ended():
     chan = AnalogIn(ads, ADS.P0)  #channel 1. For others use another pin

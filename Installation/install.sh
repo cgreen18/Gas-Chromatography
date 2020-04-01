@@ -5,7 +5,7 @@
 echo "Install script to set up a new Raspberry Pi to collect gc data and run the gc suite upon startup."
 echo "Install instructions given at https://github.com/cgreen18/Gas-Chromatography/tree/master/Installation"
 echo "Tested on Raspberry Pi Model 3B+ w/ Raspbian 10 Buster"
-echo "20 February 2020 Conor Green"
+echo "20 February 2020 Conor Green and Matt McPartlan"
 
 echo ""
 
@@ -23,9 +23,10 @@ cd ~/
 source "./.bashrc"
 
 # Creating gc Py3 virtualenv
-python3 -m venv gc
+cd ./home/pi/
+python3 -m venv .gc_venv
 # Enter virtualenv
-source "./home/pi/gc/bin/activate"
+source "/home/$USER/.gc_venv/bin/activate"
 
 
 echo "Installing dependencies"
@@ -40,11 +41,12 @@ apt-get install dpkg-dev build-essential libjpeg-dev libtiff-dev libsdl1.2-dev l
 
 
 echo "Acquiring wxPython4.0.6"
+echo "Large download might take a while on slower processors or networks."
 
 # Get wxPython 4.0.6
-wget https://files.pythonhosted.org/packages/9a/a1/9c081e04798eb134b63def3db121a6e4436e1d84e76692503deef8e75423/wxPython-4.0.6.tar.gz -P /home/pi
+#wget https://files.pythonhosted.org/packages/9a/a1/9c081e04798eb134b63def3db121a6e4436e1d84e76692503deef8e75423/wxPython-4.0.6.tar.gz -P /home/pi
 cd /home/pi
-tar xf wxPython-4.0.6.tar.gz
+tar -xf wxPython-4.0.6.tar.gz
 
 cd wxPython-4.0.6
 pip3 install -r requirements.txt
