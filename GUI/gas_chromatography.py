@@ -13,7 +13,6 @@ Version:
 import wx
 import gc_gui
 import yaml
-
 import os
 
 class MainApp(gc_gui.GCFrame):

@@ -7,6 +7,7 @@ Version:
 1.0 - November 24 2019 - Initial creation. All dependencies left in the script: will later be split into various scripts that are imported.
 1.1 - November 24 2019 - Implements numpy and plotting to window. Uses random numbers
 1.2 - 31 March 2020 - Old gas_chromatography.py -> gc_gui.py. This script defines the frame and panel classes that are put together in gas_chromatography.py. As of currently, it plots an example sin curve in the plotter but interfacing with the ADS1115 will be implemented when this is tested on a Raspberry Pi.
+1.3 - 31 March 2020 - Added images to buttons.
 """
 
 import numpy as np
@@ -80,10 +81,15 @@ class DetectorPanel(wx.Panel):
         vbox2 = wx.BoxSizer(wx.VERTICAL)
 
 
+        bmp = wx.Bitmap('images/play_btn_20p.png',wx.BITMAP_TYPE_ANY)
+        btn_ply = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
 
-        btn_ply = wx.Button(self, label = '=>', size = (50,50))
-        btn_paus = wx.Button(self, label = 'II', size = (50,50))
-        btn_stp = wx.Button(self, label = '[]', size = (50,50))
+        bmp = wx.Bitmap('images/paus_btn_20p.png',wx.BITMAP_TYPE_ANY)
+        btn_paus = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
+
+        bmp = wx.Bitmap('images/stop_btn_20p.png',wx.BITMAP_TYPE_ANY)
+        btn_stp = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
+
 
         vbox2.Add(btn_ply, border = BORDER)
         vbox2.Add((-1,EXTRA_SPACE))
