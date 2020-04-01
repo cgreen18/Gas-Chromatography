@@ -25,7 +25,7 @@ import wx
 import wx.lib.plot as plot
 
 import os
-import json
+import codecs, json
 from time import localtime, strftime
 
 #import gc_class
@@ -273,23 +273,41 @@ class SaveasGC(SaveasWindow):
     def save_gc(self, name):
         date = strftime('%d %m %Y', localtime())
         time = strftime('%H:%M:%S',localtime())
-        curr_data = self.jsonify_curr_data(self.curr_data)
+
+        curr_data = self.jsonify_data(self.curr_data)
+
+        print(curr_data)
 
         if name[-3:] != '.gc':
             name = name + '.gc'
 
-        curr_session = {'Date': date, 'Time':time, 'Current Data': curr_data }
+        # Format of JSON .gc filetype
+        curr_session = {
+        'Date' : date ,
+        'Time' : time ,
+        'Current Data' : curr_data ,
+         'Previous Data': None
+        }
 
-        with open(name , 'w') as json_file:
-            json.dump(curr_session, json_file)
+        with codecs.open(name , 'w', encoding='utf-8') as json_file:
+            json.dump(curr_session, json_file, separators =(',',':'),indent=4)
 
-    def jsonify_curr_data(self, data):
-        t = data['t']
-        s = data['s']
-        t_l = t.tolist()
-        s_l = s.tolist()
-        json_data = {'t':t_l,'s':s_l}
-        return json_data
+    '''
+    dict(numpys)->dict(lists)
+    '''
+    def jsonify_data(self, numpy_dict):
+        json_dict = {}
+        json_dict.update((key,val.tolist()) for key,val in numpy_dict.items()  )
+
+        return json_dict
+
+    '''
+    dict(lists)->dict(numpys)
+    '''
+    def reverse_jsonify(self, json_dict):
+        numpy_dict = {}
+        numpy_dict.update((key, np.array(val)) for key,val in json_dict.items() )
+        return numpy_dict
 
 class SaveasPNG(SaveasWindow):
     def __init__(self, parent, data):
@@ -336,6 +354,7 @@ class OpenWindow(DirectoryWindow):
 
     def spec_cwdlist_dclick_evt(self,  choice, filename, extension):
         pass
+
 
 #Panels
 class DetectorPanel(wx.Panel):
