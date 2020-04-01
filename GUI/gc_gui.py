@@ -8,6 +8,7 @@ Version:
 1.1 - November 24 2019 - Implements numpy and plotting to window. Uses random numbers
 1.2 - 31 March 2020 - Old gas_chromatography.py -> gc_gui.py. This script defines the frame and panel classes that are put together in gas_chromatography.py. As of currently, it plots an example sin curve in the plotter but interfacing with the ADS1115 will be implemented when this is tested on a Raspberry Pi.
 1.3 - 31 March 2020 - Added images to buttons. Added more menu options.
+1.4 - 31 March 2020 - Save current figure as .png or .jpg
 """
 
 import numpy as np
