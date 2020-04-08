@@ -2,7 +2,7 @@
 #install.sh
 
 
-echo "Install script to set up a new Raspberry Pi to collect gc data and run the gc suite upon startup."
+echo "Install script to install the required dependencies for Gas-Chromatography on a new Raspberry Pi."
 echo "Install instructions given at https://github.com/cgreen18/Gas-Chromatography/tree/master/Installation"
 echo "Tested on Raspberry Pi Model 3B+ w/ Raspbian 10 Buster"
 echo "8 April 2020 Conor Green and Matt McPartlan"
