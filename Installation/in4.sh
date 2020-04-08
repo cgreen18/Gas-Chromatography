@@ -8,5 +8,12 @@ echo "Large download might take a while on slower processors or networks."
 # cd /home/pi
 # tar -xf wxPython-4.0.6.tar.gz
 
-cd /home/pi/wxPython-4.0.6
-pip3 install -r requirements.txt
+# cd /home/pi/wxPython-4.0.6
+# pip3 install -r requirements.txt
+
+echo "Building wxPython. Will take a long time ~2 hrs"
+
+
+source "/home/pi/.gc_venv/bin/activate"
+
+python3 build.py build bdist_wheel --jobs=1 --gtk2
