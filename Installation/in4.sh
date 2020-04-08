@@ -16,4 +16,6 @@ echo "Building wxPython. Will take a long time ~2 hrs"
 
 source "/home/pi/.gc_venv/bin/activate"
 
+cd /home/pi/wxPython-4.0.6
+
 python3 build.py build bdist_wheel --jobs=1 --gtk2
