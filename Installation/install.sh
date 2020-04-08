@@ -26,7 +26,7 @@ source "./.bashrc"
 cd ./home/pi/
 python3 -m venv .gc_venv
 # Enter virtualenv
-source "/home/$USER/.gc_venv/bin/activate"
+source "/home/pi/.gc_venv/bin/activate"
 
 
 echo "Installing dependencies"
@@ -44,7 +44,7 @@ echo "Acquiring wxPython4.0.6"
 echo "Large download might take a while on slower processors or networks."
 
 # Get wxPython 4.0.6
-#wget https://files.pythonhosted.org/packages/9a/a1/9c081e04798eb134b63def3db121a6e4436e1d84e76692503deef8e75423/wxPython-4.0.6.tar.gz -P /home/pi
+wget https://files.pythonhosted.org/packages/9a/a1/9c081e04798eb134b63def3db121a6e4436e1d84e76692503deef8e75423/wxPython-4.0.6.tar.gz -P /home/pi
 cd /home/pi
 tar -xf wxPython-4.0.6.tar.gz
 
