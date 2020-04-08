@@ -5,13 +5,13 @@
 echo "Install script to set up a new Raspberry Pi to collect gc data and run the gc suite upon startup."
 echo "Install instructions given at https://github.com/cgreen18/Gas-Chromatography/tree/master/Installation"
 echo "Tested on Raspberry Pi Model 3B+ w/ Raspbian 10 Buster"
-echo "20 February 2020 Conor Green and Matt McPartlan"
+echo "8 April 2020 Conor Green and Matt McPartlan"
 
 echo ""
 
 echo "Updating repos"
 cd ~
-#sudo apt-get update
+sudo apt-get update
 
 echo "Installing and configuring virtualenv"
 

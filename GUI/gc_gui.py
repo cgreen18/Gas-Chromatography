@@ -30,6 +30,9 @@ from time import localtime, strftime
 
 #import gc_class
 
+
+## TODO: Prompt keyobard when typing in temperature
+
 # Frames
 class GCFrame(wx.Frame):
     def __init__(self, parent, optiondict):

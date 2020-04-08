@@ -17,6 +17,11 @@ import os
 
 import gc_gui
 
+'''
+self - MainApp object
+param: self.options - the UI defeaults and current settings
+param: self.parent - the parent wxPython object, in this case None (main call of MainApp(None))
+'''
 class MainApp(gc_gui.GCFrame):
     def __init__(self, parent):
         with open('config.yaml') as f:
