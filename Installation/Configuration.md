@@ -1,5 +1,5 @@
 # Enable I2C, SPI and print README and run gas_chromatography.py at startup
-###### Requires root privileges
+Requires root privileges
 
 ### GUI raspi-config
 Enter raspi-config and manually enable serial, I2C, and SPI.
@@ -27,9 +27,12 @@ sudo raspi-config nonint do_spi 0
 ### Autorun gas_chromatography.py at startup
 Add the following commands to your .bashrc (~/.bashrc).
 Yes, it's a little weird to put this in the .bashrc but your computer is probably dedicated to GC. Otherwise, use a tasking daemon to initialize whenever or simply call manually.
-###### Change these values:
-<path_to_Gas-Chromatography_repo> is the absolute path in your computer to the Gas-Chromatography repository.
-<path_to_gc_virtual_environment> is the absolute path to the python3 virtual environment to run the program.
+
+Change these values:
+###### <path_to_Gas-Chromatography_repo>
+is the absolute path in your computer to the Gas-Chromatography repository.
+###### <path_to_gc_virtual_environment>
+is the absolute path to the python3 virtual environment to run the program.
 
 ```
 source "<path_to_gc_virtual_environment>/bin/activate"
