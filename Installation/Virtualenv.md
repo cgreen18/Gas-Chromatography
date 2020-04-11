@@ -25,10 +25,3 @@ system-site-packages flag is passed because I found an error about some library 
 ```
 python3 -m venv --system-site-packages .gc_venv
 ```
-
-Update pip and tools for building a wheel (for use later)
-
-```
-pip install -U pip
-pip install -U six wheel setuptools
-```
