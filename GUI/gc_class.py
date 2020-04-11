@@ -3,6 +3,8 @@ Name: gc_class.py
 Authors: Conor Green and Matt McPartlan
 Description: Mid-level abstraction that will do most of the work. User interaction as well as data processing.
 Usage: Call as main
+Copyright: Uses free library created by Adafruit and/or Carter Nelson at MIT. See code at: Adafruit [repo](https://github.com/adafruit/Adafruit_CircuitPython_ADS1x15/tree/master/adafruit_ads1x15)
+        : Copyright is written in README of [ADS1x11.md](https://github.com/cgreen18/Gas-Chromatography/blob/master/Installation/ADS1x15.md)
 Version:
 1.0 - 26 January 20 - Initial creation. Skeleton to outline work for later
 1.1 - 18 February 20 - Initialized and created some methods for ADS1115 and numpy

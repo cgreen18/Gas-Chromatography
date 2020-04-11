@@ -1,5 +1,5 @@
 # Setting up wxPython
-From blog post on[wxPython Wiki](https://wxpython.org/blog/2017-08-17-builds-for-linux-with-pip/index.html)
+From blog post on [wxPython Wiki](https://wxpython.org/blog/2017-08-17-builds-for-linux-with-pip/index.html)
 
 ### Get latest wxPython
 ```
