@@ -11,10 +11,16 @@ Matt has written a great explanation and justification for this project in the d
 
 ## Additional Requirements
 * [Graphical user interface (GUI)](https://github.com/cgreen18/Gas-Chromatography/tree/master/GUI)
-* Auto-injector
+* ~~Auto-injector~~
 
-## Gow-mac Detector
-Our current prototype uses the shell of an old Gow-mac GC.
+## Installation
+There are automatic installation and configuration scripts, install.sh and config.sh, respectively, located in the [Installation Folder](https://github.com/cgreen18/Gas-Chromatography/tree/master/Installation)
+
+## Current Prototype
+IMAGE MISSING
+
+## Old Prototype
+The shell of an old Gow-mac GC.
 ![Gow-mac_Taken_Apart](https://github.com/cgreen18/Gas-Chromatography/blob/master/images/Galmac.jpg)
 
 ## Team Member Biographies
