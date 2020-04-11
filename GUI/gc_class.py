@@ -9,7 +9,7 @@ Version:
 1.0 - 26 January 20 - Initial creation. Skeleton to outline work for later
 1.1 - 18 February 20 - Initialized and created some methods for ADS1115 and numpy
 1.2 - 20 February 20 - Added methods for data collection and organizing self variables
-1.2t - 21 February 20 - Debugged and works in preliminary testing!
+1.3 - 21 February 20 - Debugged and works in preliminary testing!
 '''
 
 # GPIO imports
@@ -17,6 +17,9 @@ import board
 import busio
 import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
+
+# Multiprocessing
+from multiprocessing import Process, Pipe
 
 # Extra
 import time
@@ -28,10 +31,9 @@ import matplotlib.pyplot as plt
 class Gas_Chrom:
     # TODO:
     # Default single ended and make differential a keyword arg
-    # Default P0 and P1 but allow arguments
 
     def __init__(self, single_ended):
-        self.__version__ = '1.0'
+        self.__version__ = '1.3'
         self.__authors__ = 'Conor Green and Matt McPartlan'
 
 
@@ -50,12 +52,44 @@ class Gas_Chrom:
 
         #Numpy/data
         self.curr_data = np.array([])
-        self.prev_runs = [self.curr_data]
+        self.prev_runs = None
         self.run_num = 0
 
 
     def main(self):
         pass
+
+    def end_data_coll(self):
+        self.allow_coll_data = False
+
+    def begin_data_coll(self, child_conn, ref_rt):
+        self.allow_coll_data = True
+        self.coll_indefinite_data(now, child_conn , ref_rt)
+
+    def coll_indefinite_data(self, conn, refresh_rate):
+        sampling_period = refresh_rate
+        epsilon = 0.001 #sec
+
+        volt_and_time =  np.zeros((2 , 1) ) #dtype=float )
+
+        t_start = time.time()
+        while self.allow_coll_data:
+            t_last = volt_and_time[1][i-1]
+
+            t_curr = time.time()
+
+            #TODO: Clean up that logic
+            while (t_curr - epsilon -t_last > sampling_period) or (t_curr + epsilon - t_last < sampling_period):
+                time.sleep(.0001)
+                t_curr = time.time()
+            #Past loop therefore sample
+            volt_and_time[0][i] = self.get_voltage()
+            volt_and_time[1][i] = t_curr - t_last
+            self.curr_data = volt_and_time
+
+            conn.send(self.curr_data)
+            conn.close()
+
 
     # Temporary graphing methods
     def graph_curr_data(self):
@@ -100,12 +134,6 @@ class Gas_Chrom:
         self.single_ended = single_ended
 
         self.reinit_ADS()
-
-    # TODO:
-    # Finish
-    def set_pins(self, pin1, *args):
-        #self.port0 =
-        pass
 
     def print_voltage(self):
         print(self.chan.voltage)
