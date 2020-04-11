@@ -1,5 +1,5 @@
 # Setting up wxPython
-From [wxPython blog post](https://wxpython.org/blog/2017-08-17-builds-for-linux-with-pip/index.html)
+From blog post on[wxPython Wiki](https://wxpython.org/blog/2017-08-17-builds-for-linux-with-pip/index.html)
 
 ### Get latest wxPython
 ```
@@ -13,7 +13,7 @@ pip wheel -v wxPython-4.0.7.post2.tar.gz  2>&1 | tee build.log
 ```
 
 # OR
-Follow [this post](https://wiki.wxpython.org/BuildWxPythonOnRaspberryPi)
+Follow this post on [wxPython Wiki](https://wiki.wxpython.org/BuildWxPythonOnRaspberryPi)
 
 ### Exact commands used
 ```

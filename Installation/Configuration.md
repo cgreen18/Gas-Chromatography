@@ -34,6 +34,7 @@ is the absolute path in your computer to the Gas-Chromatography repository.
 ###### <path_to_gc_virtual_environment>
 is the absolute path to the python3 virtual environment to run the program.
 
+At the bottom of your .bashrc put
 ```
 source "<path_to_gc_virtual_environment>/bin/activate"
 cd <path_to_Gas-Chromatography_repo>/GUI
