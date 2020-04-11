@@ -3,9 +3,9 @@ With Python 2 depreciated, it's important to assure Python 3 is used.
 ### Virtual Environment
 
 Install virtualenv
-'''
+```
 pip install virtualenv
-'''
+```
 
 Test that virtualenv setup the executable correctly by typing
 
