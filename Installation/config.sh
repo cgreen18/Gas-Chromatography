@@ -3,7 +3,7 @@
 
 printf "%-120s\n" "-------------------------------------------------------------------------------------------------------------------"
 printf "%-120s\n" "| Configuration script to install the required dependencies for Gas-Chromatography on a new Raspberry Pi."
-#printf "%-120s\n" "| Instructions given at https://github.com/cgreen18/Gas-Chromatography/tree/master/"
+printf "%-120s\n" "| Instructions given at https://github.com/cgreen18/Gas-Chromatography/blob/master/Installation/Configuration.md"
 printf "%-120s\n" "| Tested on Raspberry Pi Model 3B+ w/ Raspbian 10 Buster"
 printf "%-120s\n" "| Functions as intended as of 10 April 2020"
 printf "%-120s\n" "| Conor Green and Matt McPartlan"

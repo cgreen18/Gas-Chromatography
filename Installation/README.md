@@ -12,6 +12,7 @@
 | wxPython | 4.0.6 |
 
 ### Installation Wizard
+###### Requires root privileges
 First, clone the whole repo (https://github.com/cgreen18/Gas-Chromatography.git) into your home directory and navigate to the Installation folder.
 ```
 cd ~
