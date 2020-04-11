@@ -69,7 +69,7 @@ printf "\nInstalling requirements\n"
 cd /home/pi/wxPython-4.0.6
 pip3 install -r requirements.txt
 
-printf "\nBuilding wxPython. Will take a long time ~2 hrs\n"
+printf "\nBuilding wxPython. Will take a long time ~4 hrs\n"
 python3 build.py build bdist_wheel --jobs=1 --gtk2
 
 printf "\nInstalling final libraries: atlas, matplotlib, PyYAML"

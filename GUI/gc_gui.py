@@ -52,9 +52,8 @@ class GCFrame(wx.Frame):
         self.set_up_menu_bar()
 
         '''
-        #single_ended=True
+        single_ended=True
         gc = gc_class(True)
-        self.curr_data = gc.get_curr_data
         '''
 
     def __del__(self):
@@ -76,11 +75,18 @@ class GCFrame(wx.Frame):
         '''
         pass
 
-    def begin_data_coll(self):
-        '''
+    def end_data_coll(self):
+        self.run = False
+        self.proc.join()
 
-        '''
-        pass
+    def begin_data_coll(self):
+        self.run = True
+
+        parent_conn, child_conn = Pipe()
+        self.proc = Process(target = , args=())
+        self.proc.start()
+
+        # TODO: Sample recv based on sampling_time
 
     def split_vert(self):
         splitter = wx.SplitterWindow(self, id=wx.ID_ANY,pos=wx.DefaultPosition , size=self.options['frame_size'], style = wx.SP_BORDER, name='Diode Based Gas Chromatography' )

@@ -59,6 +59,7 @@ class Gas_Chrom:
     def main(self):
         pass
 
+    # Can be called concurrently with the indefinite data collection
     def end_data_coll(self):
         self.allow_coll_data = False
 
