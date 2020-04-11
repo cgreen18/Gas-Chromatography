@@ -12,6 +12,6 @@ pip3 install matplotlib
 ```
 
 ### PyYAML
-'''
+```
 pip3 install pyyaml
-'''
+```
