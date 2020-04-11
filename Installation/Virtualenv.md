@@ -21,9 +21,9 @@ source .bashrc
 ```
 
 ### Build Python 3 environment
-
+system-site-packages flag is passed because I found an error about some library missing in the venv but it was present in the system shared python files.
 ```
-python3 -m venv gc
+python3 -m venv --system-site-packages .gc_venv
 ```
 
 Update pip and tools for building a wheel (for use later)
