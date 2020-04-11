@@ -19,10 +19,16 @@ git clone https://github.com/cgreen18/Gas-Chromatography.git
 cd Gas-Chromatography/Installation
 ```
 
-Add executable permissions to the install script, ./install, and run the install script as root.
+Add executable permissions to the install script, ./install.sh, and run the install script as root.
 ```
 chmod +x ./install.sh
 sudo ./install.sh
+```
+
+Add executable permissions to the configuration script, ./config.sh, and run the install script as root.
+```
+chmod +x ./config.sh
+sudo ./config.sh
 ```
 
 ### Manual Installation and Configuring
