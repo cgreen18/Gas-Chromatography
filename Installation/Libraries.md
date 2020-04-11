@@ -1,4 +1,5 @@
-### Extra Libraries
+# Extra Libraries
+### Important: All these must be install while the virtual environment is active
 ```
 source /home/pi/.gc_venv/bin/activate
 ```
