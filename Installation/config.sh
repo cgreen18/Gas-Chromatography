@@ -24,7 +24,7 @@ printf "\n ""Enabling Serial in raspi-config"
 raspi-config nonint do_serial 0
 cat /boot/cmdline.txt
 
-printf "Enabling SCI and SPI in raspi-config\n"
+printf "Enabling I2C and SPI in raspi-config\n"
 # Enable SPI and SCI from raspi-config
 raspi-config nonint do_i2c 0
 raspi-config nonint do_spi 0
