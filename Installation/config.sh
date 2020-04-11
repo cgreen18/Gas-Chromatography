@@ -15,7 +15,7 @@ printf "\n\n\n\n\n\n\n\n\n"
 
 # Root privileges check
 if (( $EUID != 0 )); then
-    printf "Please run as root (i.e. sudo ./install.sh)\n"
+    printf "Please run as root (i.e. sudo ./config.sh)\n"
     exit
 fi
 # to configure auto-start programs and allow SPI/SCI
