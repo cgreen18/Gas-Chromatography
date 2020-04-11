@@ -1,4 +1,4 @@
-# Folder for instructions on installation
+# Installation Wizard
 ### Hardware and Software
 **Hardware**: Raspberry Pi Model 3B+ (armv71 32bit)
 
