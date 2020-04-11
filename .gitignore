@@ -1,6 +1,9 @@
 #test files
 *_test.py
 
+#old files
+*_old.py
+
 #no pyc
 *.pyc
 
