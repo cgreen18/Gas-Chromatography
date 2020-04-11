@@ -11,6 +11,7 @@
 | pip | 18.1 |
 | wxPython | 4.0.6 |
 
+### Automatic Installation
 First, clone the whole repo (https://github.com/cgreen18/Gas-Chromatography.git) into your home directory and navigate to the Installation folder.
 ```
 cd ~
