@@ -55,22 +55,34 @@ pip install -U pip
 # Install dependencies
 pip install -U six wheel setuptools
 apt-get -y install build-essential tk-dev libncurses5-dev libncursesw5-dev libreadline6-dev libdb5.3-dev libgdbm-dev libsqlite3-dev libssl-dev libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev
-apt-get -y install dpkg-dev build-essential libjpeg-dev libtiff-dev libsdl1.2-dev libgstreamer-plugins-base0.10-dev libnotify-dev freeglut3 freeglut3-dev libwebkitgtk-dev
+sleep 10s
+apt-get -y install dpkg-dev build-essential libjpeg-dev libtiff-dev libsdl1.2-dev libgstreamer-plugins-base0.10-dev libnotify-dev freeglut3 freeglut3-dev libwebkitgtk-dev libghc-gtk3-dev libwxgtk3.0-gtk3-dev
+sleep 10s
+apt-get -y install python3.7-dev
+sleep 10s
 
 printf "\nAcquiring wxPython4.0.6 (requires internet connection)\n"
 # Get wxPython 4.0.6 to /home/pi
-wget https://files.pythonhosted.org/packages/9a/a1/9c081e04798eb134b63def3db121a6e4436e1d84e76692503deef8e75423/wxPython-4.0.6.tar.gz -P /home/pi
+wget https://files.pythonhosted.org/packages/b9/8b/31267dd6d026a082faed35ec8d97522c0236f2e083bf15aff64d982215e1/wxPython-4.0.7.post2.tar.gz
+sleep 10s
+
 cd /home/pi
 
 printf "\nUnpacking wxPython tar\n"
-tar -xf wxPython-4.0.6.tar.gz
+tar -xf wxPython-4.0.7.post2.tar.gz
+sleep 10s
 
 printf "\nInstalling requirements\n"
-cd /home/pi/wxPython-4.0.6
+cd /home/pi/wxPython-4.0.7.post2
 pip3 install -r requirements.txt
+sleep 10s
 
 printf "\nBuilding wxPython. Will take a long time ~4 hrs\n"
-python3 build.py build bdist_wheel --jobs=1 --gtk2
+sleep 10s
+sleep 10s
+
+python3 build.py build bdist_wheel
+sleep 10s
 
 printf "\nInstalling final libraries: atlas, matplotlib, PyYAML"
 printf "Installing libatlas\n"
