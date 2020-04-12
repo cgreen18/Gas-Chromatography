@@ -20,21 +20,22 @@ sleep 10s
 printf "\n\n\n\n\n\n\n\n\n"
 
 
-
+echo -e "\x1B[31Errors if /home/pi/ does not exist\e[0m"
 echo "Theres a general issue with \$USER becoming 'root' as opposed to 'pi'."
-echo "This was fixed by hardcoding 'pi' user. There will be errors if the user is not pi and therefore no /home/pi/ directory."
+echo "This was fixed by hardcoding 'pi' user."
+echo "There will be errors if the user is not 'pi' and there is no /home/pi/ directory."
 echo "If you can fix this, please merge request or email me."
 
 sleep 5s
 
 printf "\n\n\n\n\n\n\n"
 
-printf "\nUpdating repos\n"
+echo -e "\e[4mUpdating repos\e[0m"
 
 cd ~
 sudo apt-get update
 
-printf "\nInstalling and configuring virtual environments\n"
+echo -e "\e[4mInstalling and configuring virtual environments\e[0m"
 # Installing virtualenv
 sudo apt-get install python3-venv
 sudo pip install virtualenv
@@ -43,13 +44,13 @@ echo -e '\nexport PATH="/home/pi/.local/bin:$PATH"' >> /home/pi/.bashrc
 source "/home/pi/.bashrc"
 
 
-printf "\nCreating virtual environment: .gc_venv\n"
+echo -e "\e[4mCreating virtual environment: .gc_venv\e[0m"
 # Creating gc Py3 virtualenv
 cd /home/pi/
 python3 -m venv --system-site-packages .gc_venv
 source "/home/pi/.gc_venv/bin/activate"
 
-printf "\nInstalling dependencies\n"
+echo -e "\e[4mInstalling dependencies\e[0m"
 # Upgrade pip
 pip install -U pip
 # Install dependencies
@@ -61,35 +62,32 @@ sleep 10s
 apt-get -y install python3.7-dev
 sleep 10s
 
-printf "\nAcquiring wxPython4.0.6 (requires internet connection)\n"
+echo -e "\e[4mAcquiring wxPython4.0.6 (requires internet connection)\e[0m"
 # Get wxPython 4.0.6 to /home/pi
 wget https://files.pythonhosted.org/packages/b9/8b/31267dd6d026a082faed35ec8d97522c0236f2e083bf15aff64d982215e1/wxPython-4.0.7.post2.tar.gz
-sleep 10s
 
 cd /home/pi
 
-printf "\nUnpacking wxPython tar\n"
+echo -e "\e[4mUnpacking wxPython tar\e[0m"
 tar -xf wxPython-4.0.7.post2.tar.gz
-sleep 10s
 
-printf "\nInstalling requirements\n"
+echo -e "\e[4mInstalling requirements\e[0m"
 cd /home/pi/wxPython-4.0.7.post2
 pip3 install -r requirements.txt
-sleep 10s
 
-printf "\nBuilding wxPython. Will take a long time ~4 hrs\n"
+echo -e "\e[4mBuilding wxPython. Will take a long time ~4 hrs\e[0m"
 sleep 10s
 sleep 10s
 
 python3 build.py build bdist_wheel
 sleep 10s
 
-printf "\nInstalling final libraries: atlas, matplotlib, PyYAML"
-printf "Installing libatlas\n"
+echo -e "\e[4mInstalling final libraries: atlas, matplotlib, PyYAML\e[0m"
+echo -e "\e[4mInstalling libatlas\e[0m"
 apt-get install libatlas-base-dev
 
-printf "\nInstalling matplotlib\n"
+echo -e "\e[4mInstalling matplotlib\e[0m"
 pip3 install matplotlib
 
-printf "\nInstalling PyYAML\n"
+echo -e "\e[4mInstalling PyYAML\e[0m"
 pip3 install pyyaml
