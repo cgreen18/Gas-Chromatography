@@ -21,9 +21,9 @@ printf "\n\n\n\n\n\n\n\n\n"
 
 
 
-printf "Theres a general issue with \$USER becoming 'root' as opposed to 'pi'."
-printf "This was fixed by hardcoding 'pi' user. There will be errors if the user is not pi and therefore no /home/pi/ directory."
-printf "If you can fix this, please merge request or email me."
+echo "Theres a general issue with \$USER becoming 'root' as opposed to 'pi'."
+echo "This was fixed by hardcoding 'pi' user. There will be errors if the user is not pi and therefore no /home/pi/ directory."
+echo "If you can fix this, please merge request or email me."
 
 sleep 5s
 
@@ -45,7 +45,7 @@ source "/home/pi/.bashrc"
 
 printf "\nCreating virtual environment: .gc_venv\n"
 # Creating gc Py3 virtualenv
-cd ./home/pi/
+cd /home/pi/
 python3 -m venv --system-site-packages .gc_venv
 source "/home/pi/.gc_venv/bin/activate"
 
