@@ -1,6 +1,12 @@
 #!/bin/bash
 #install.sh
 
+# Root privileges check
+if (( $EUID != 0 )); then
+    printf "\n""Please run as root (i.e. sudo ./install.sh)"
+    exit
+fi
+
 printf "%-120s\n" "-------------------------------------------------------------------------------------------------------------------"
 printf "%-120s\n" "| Installation script to install the required dependencies for Gas-Chromatography on a new Raspberry Pi."
 printf "%-120s\n" "| Instructions given at https://github.com/cgreen18/Gas-Chromatography/tree/master/Installation"
@@ -13,11 +19,7 @@ sleep 10s
 
 printf "\n\n\n\n\n\n\n\n\n"
 
-# Root privileges check
-if (( $EUID != 0 )); then
-    printf "Please run as root (i.e. sudo ./install.sh)"
-    exit
-fi
+
 
 printf "Theres a general issue with \$USER becoming 'root' as opposed to 'pi'."
 printf "This was fixed by hardcoding 'pi' user. There will be errors if the user is not pi and therefore no /home/pi/ directory."
@@ -28,8 +30,6 @@ sleep 5s
 printf "\n\n\n\n\n\n\n"
 
 printf "\nUpdating repos\n"
-
-exit
 
 cd ~
 sudo apt-get update
