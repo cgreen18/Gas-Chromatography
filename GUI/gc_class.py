@@ -41,14 +41,17 @@ class Gas_Chrom:
         self.i2c = busio.I2C(board.SCL , board.SDA)
         self.ads = ADS.ADS1115(self.i2c)
 
+
         self.single_ended = single_ended # T/F
         self.port0 = ADS.P0 # Later allow user input
         self.port1 = ADS.P1
+
 
         if single_ended:
             self.chan = AnalogIn(self.ads , self.port0)
         else:
             self.chan = AnalogIn(self.ads, self.port0 , self.port1)
+
 
         #Numpy/data
         self.curr_data = np.array([])

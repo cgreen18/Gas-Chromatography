@@ -27,9 +27,11 @@ import wx.lib.plot as plot
 import os
 import codecs, json
 from time import localtime, strftime
+import time
 
-#import gc_class
+from gc_class_test import Gas_Chrom as GC
 
+from multiprocessing import Process, Pipe
 
 ## TODO: Prompt keyobard when typing in temperature
 
@@ -38,7 +40,7 @@ class GCFrame(wx.Frame):
     def __init__(self, parent, optiondict):
         self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
 
-        self.options = {'frame_size':(800,400), 'sash_size':300, 'refresh_rate':5}
+        self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':20, 'plot_refresh_rate':2, 'single_ended':True}
         self.options.update(self.constants)
         self.options.update(optiondict)
 
@@ -46,15 +48,15 @@ class GCFrame(wx.Frame):
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
         self.split_vert()
-        self.panel_detector.draw()
+        #self.panel_detector.draw()
 
 
         self.set_up_menu_bar()
 
-        '''
-        single_ended=True
-        gc = gc_class(True)
-        '''
+        se = self.options['single_ended']
+        self.gc = GC(se)
+        self.gc.testvar = "Hello"
+
 
     def __del__(self):
         pass
@@ -66,32 +68,64 @@ class GCFrame(wx.Frame):
         return self.panel_detector.get_figure()
 
     def get_curr_data(self):
-        return self.panel_detector.get_curr_data()
+        return self.gc.get_curr_data()
 
     # gc_class methods
     def update_curr_data(self):
         '''
 
         '''
+
         pass
 
+
+
+
     def end_data_coll(self):
-        self.run = False
+        self.gc.end_data_coll()
+        self.receive_data()
+        self.data_coll_child_conn.close()
+        print(self.curr_data)
         self.proc.join()
 
     def begin_data_coll(self):
         self.run = True
+        self.establish_connection()
 
-        parent_conn, child_conn = Pipe()
-        self.proc = Process(target = , args=())
         self.proc.start()
 
-        # TODO: Sample recv based on sampling_time
+        while not self.data_coll_parent_conn.poll(1):
+            print("---")
+        caught_gc = self.data_coll_parent_conn.recv()
+
+        self.gc = caught_gc
+
+
+    def establish_connection(self):
+        rr = self.options['data_samp_rate']
+
+        parent_conn, child_conn = Pipe()
+        self.data_coll_parent_conn = parent_conn
+        self.data_coll_child_conn = child_conn
+        targ = self.gc.begin_data_coll
+
+        self.proc = Process(target = targ, args=(child_conn, rr))
+
+
+    def receive_data(self):
+        print("in rec func")
+        while not self.data_coll_parent_conn.poll(1):
+            print("-")
+        for item in self.data_coll_parent_conn.recv():
+            print(item)
+
+        if self.run:
+
+            self.curr_data = self.data_coll_parent_conn.recv()
+
 
     def split_vert(self):
-        splitter = wx.SplitterWindow(self, id=wx.ID_ANY,pos=wx.DefaultPosition , size=self.options['frame_size'], style = wx.SP_BORDER, name='Diode Based Gas Chromatography' )
-
-        splitter.options = self.options
+        splitter = GCSplitter(self)
 
         self.panel_detector = DetectorPanel(splitter)
         self.panel_config = ControlPanel(splitter)
@@ -121,6 +155,23 @@ class GCFrame(wx.Frame):
 
     def on_jpg_save(self, err):
         saveas_jpg_window = SaveasJPG(self, self.options)
+
+# Multiprocessing
+class GCPipe(Pipe):
+    def __init__():
+
+
+
+# SplitterWindow
+class GCSplitter(wx.SplitterWindow):
+    '''
+    parent is GCFrame
+    '''
+    def __init__(self, parent):
+        self.options = parent.options
+        self.parent = parent
+        wx.SplitterWindow.__init__(self, parent, id=wx.ID_ANY,pos=wx.DefaultPosition , size=self.options['frame_size'], style = wx.SP_BORDER, name='Diode Based Gas Chromatography' )
+
 
 #DirectoryWindow(s)
 class DirectoryWindow(wx.Frame):
@@ -364,69 +415,100 @@ class OpenWindow(DirectoryWindow):
     def spec_cwdlist_dclick_evt(self,  choice, filename, extension):
         pass
 
-
 #Panels
 class DetectorPanel(wx.Panel):
     def __init__(self, parent):
         self.parent = parent
+        self.gcframe = parent.parent
 
-        self.BODY_FONT_SIZE = self.parent.options['BODY_FONT_SIZE']
-        self.HEADER_FONT_SIZE = self.parent.options['HEADER_FONT_SIZE']
-        self.EXTRA_SPACE = self.parent.options['EXTRA_SPACE']
-        self.BORDER = self.parent.options['BORDER']
-
-
-        header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
-        header_font.SetPointSize(self.HEADER_FONT_SIZE)
-
-        font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
-        font.SetPointSize(self.BODY_FONT_SIZE)
+        self.options = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
+        self.fonts = self.create_fonts()
 
         wx.Panel.__init__(self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, style = wx.TAB_TRAVERSAL)
+
+        self.create_panel()
+
+
+    def create_panel(self):
+        f = self.fonts['font']
+        hf = self.fonts['header_font']
+        b = self.options['BORDER']
+        es = self.options['EXTRA_SPACE']
+        bfs = self.options['BODY_FONT_SIZE']
 
         vbox = wx.BoxSizer(wx.VERTICAL)
 
         str_det = wx.StaticText(self, label = 'Detector')
-        str_det.SetFont(header_font)
+        str_det.SetFont(hf)
 
-        vbox.Add(str_det, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border = self.BORDER)
+        vbox.Add(str_det, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border = b)
 
-        vbox.Add((-1,self.EXTRA_SPACE))
+        vbox.Add((-1,es))
 
 
 
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
-        vbox2 = wx.BoxSizer(wx.VERTICAL)
+        self.vbox2 = wx.BoxSizer(wx.VERTICAL)
 
         hbox2 = self.create_control_box()
 
-        vbox2.Add(hbox2, border= self.BORDER)
-        vbox2.Add((-1,20))
+        self.vbox2.Add(hbox2, border=b)
+        self.vbox2.Add((-1,20))
 
-        self.btn_clr = wx.Button(self, label = 'clear', size = (200,50))
-        self.btn_clr.SetFont(font)
-        self.btn_clr.SetCursor(wx.Cursor(wx.CURSOR_DEFAULT))
-
-        self.Bind(wx.EVT_BUTTON,self.clear_plot_btn,self.btn_clr)
+        self.create_plot_btn_()
+        self.create_clr_btn_()
 
 
+        hbox.Add(self.vbox2, border = b)
 
-        vbox2.Add(self.btn_clr, border= self.BORDER)
-        vbox2.Add((-1,self.EXTRA_SPACE))
-
-
-        hbox.Add(vbox2, border = self.BORDER)
-
-        hbox.Add((self.EXTRA_SPACE, -1))
+        hbox.Add((es, -1))
 
         self.create_figure_()
 
         hbox.Add(self.canvas)
 
-        vbox.Add(hbox, border = self.BORDER)
+        vbox.Add(hbox, border = b)
         self.SetSizer(vbox)
         self.Fit()
+
+    def create_plot_btn_(self):
+        f = self.fonts['font']
+        b = self.options['BORDER']
+        es = self.options['EXTRA_SPACE']
+
+
+        self.btn_plot = wx.Button(self, label = 'plot', size = (200,50))
+        self.btn_plot.SetFont(f)
+        self.btn_plot.SetCursor(wx.Cursor(wx.CURSOR_DEFAULT))
+
+        self.Bind(wx.EVT_BUTTON, self.plot_btn_evt,self.btn_plot)
+
+        self.vbox2.Add(self.btn_plot, border= b)
+        self.vbox2.Add((-1,es))
+
+    def create_clr_btn_(self):
+        f = self.fonts['font']
+        b = self.options['BORDER']
+        es = self.options['EXTRA_SPACE']
+
+
+        self.btn_clr = wx.Button(self, label = 'clear', size = (200,50))
+        self.btn_clr.SetFont(f)
+        self.btn_clr.SetCursor(wx.Cursor(wx.CURSOR_DEFAULT))
+
+        self.Bind(wx.EVT_BUTTON,self.clear_plot_btn_evt,self.btn_clr)
+
+        self.vbox2.Add(self.btn_clr, border= b)
+        self.vbox2.Add((-1,es))
+
+    def create_fonts(self):
+        font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
+        font.SetPointSize(self.options['BODY_FONT_SIZE'])
+        header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
+        header_font.SetPointSize(self.options['HEADER_FONT_SIZE'])
+
+        return {'font':font,'header_font':header_font}
 
     def create_figure_(self):
         self.figure = Figure()
@@ -434,37 +516,52 @@ class DetectorPanel(wx.Panel):
         self.canvas = FigureCanvas(self, -1, self.figure)
 
     def create_control_box(self):
+
+        b = self.options['BORDER']
+        es = self.options['EXTRA_SPACE']
+
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
         bmp = wx.Bitmap('.images/play_btn_20p.png',wx.BITMAP_TYPE_ANY)
-        btn_ply = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
+        self.btn_ply = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
+        self.Bind(wx.EVT_BUTTON, self.ply_btn_evt, self.btn_ply)
 
         bmp = wx.Bitmap('.images/paus_btn_20p.png',wx.BITMAP_TYPE_ANY)
         btn_paus = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
 
         bmp = wx.Bitmap('.images/stop_btn_20p.png',wx.BITMAP_TYPE_ANY)
-        btn_stp = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
+        self.btn_stp = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
+        self.Bind(wx.EVT_BUTTON, self.stp_btn_evt, self.btn_stp)
 
-
-        hbox.Add(btn_ply, border = self.BORDER)
-        hbox.Add((self.EXTRA_SPACE,-1))
-        hbox.Add(btn_paus, border = self.BORDER)
-        hbox.Add((self.EXTRA_SPACE,-1))
-        hbox.Add(btn_stp, border = self.BORDER)
-        hbox.Add((self.EXTRA_SPACE,-1))
+        hbox.Add(self.btn_ply, border = b)
+        hbox.Add((es,-1))
+        hbox.Add(btn_paus, border =b)
+        hbox.Add((es,-1))
+        hbox.Add(self.btn_stp, border =b)
+        hbox.Add((es,-1))
 
         return hbox
 
     def draw(self):
-        t = arange(0.0, 3.0, 0.01)
-        s = sin(2 * pi * t)
-        self.curr_data = {'t':t,'s':s}
-        self.axes.plot(t, s)
+        self.axes.plot(self.curr_data[0], self.curr_data[1])
         self.canvas.draw()
 
-    def clear_plot_btn(self, event):
-        self.axes.cla()
+    def ply_btn_evt(self, event):
+        self.gcframe.begin_data_coll()
 
+    def stp_btn_evt(self, event):
+        self.gcframe.end_data_coll()
+
+    def plot_btn_evt(self, event):
+        self.gcframe.receive_data()
+        self.update_curr_data()
+        self.draw()
+
+    def update_curr_data(self):
+        self.curr_data = self.gcframe.curr_data
+
+    def clear_plot_btn_evt(self, event):
+        self.axes.cla()
         self.canvas.draw()
 
     def get_figure(self):
