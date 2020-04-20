@@ -98,6 +98,7 @@ class GCFrame(wx.Frame):
         t_last = time.time()
 
         while True:
+            t_curr = time.time()
             while (t_curr - epsilon -t_last > sampling_period) or (t_curr + epsilon - t_last < sampling_period):
                 time.sleep(.0001)
                 t_curr = time.time()
