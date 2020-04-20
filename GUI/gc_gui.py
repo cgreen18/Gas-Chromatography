@@ -111,6 +111,9 @@ class GCFrame(wx.Frame):
             #self.thread_data = np.append(self.thread_data, new, axis=1)
 
     def on_stop_btn(self):
+        print("On stop, data_rover is: ")
+        print(self.data_rover_process)
+
         self.data_rover_process.kill()
         self.data_rover_process.join()
         v_dt_t = np.array((self.v,self.dt,self.t))
