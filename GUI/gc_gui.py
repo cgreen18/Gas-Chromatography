@@ -29,7 +29,7 @@ import codecs, json
 from time import localtime, strftime
 import time
 
-from gc_class_test import Gas_Chrom as GC
+from gc_class import Gas_Chrom as GC
 
 from GCMulti import GCProcess
 
