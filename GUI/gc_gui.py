@@ -85,7 +85,7 @@ class GCFrame(wx.Frame):
 
         targ = self.collect
 
-        self.data_rover_process = mp.Process(target = targ, name = 'data_rover', args = (self, sp, ep, self.v , self.dt, self.t) )
+        self.data_rover_process = mp.Process(target = targ, name = 'data_rover', args = (sp, ep, self.v , self.dt, self.t) )
         self.data_rover_process.start()
         print("Object")
         print(self.data_rover_process)
