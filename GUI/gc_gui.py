@@ -31,8 +31,6 @@ import time
 
 from gc_class import Gas_Chrom as GC
 
-from GCMulti import GCProcess
-
 from threading import Thread
 
 import multiprocessing as mp

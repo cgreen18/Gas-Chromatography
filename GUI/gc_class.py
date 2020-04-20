@@ -95,7 +95,7 @@ class Gas_Chrom:
     def set_curr_data(self, data):
         self.curr_data = data
 
-        
+
     # ADS1115 Methods
     def reinit_ADS(self):
         self.i2c = busio.I2C(board.SCL , board.SDA)
