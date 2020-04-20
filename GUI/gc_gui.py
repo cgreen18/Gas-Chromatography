@@ -79,9 +79,9 @@ class GCFrame(wx.Frame):
         sp = 1 / rr
         ep = self.options['epsilon_time']
 
-        self.v = mp.Array('f', lock=False)
-        self.dt = mp.Array('f', lock=False)
-        self.t = mp.Array('f', lock=False)
+        self.v = mp.Array('f', 1, lock=False)
+        self.dt = mp.Array('f', 1, lock=False)
+        self.t = mp.Array('f', 1, lock=False)
 
         targ = self.collect
 
