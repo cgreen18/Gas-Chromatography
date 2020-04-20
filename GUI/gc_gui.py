@@ -118,7 +118,7 @@ class GCFrame(wx.Frame):
         print("Type")
         print(type(self.data_rover_process))
 
-        self.data_rover_process.terminate()
+        #self.data_rover_process.terminate()
         self.data_rover_process.join()
         v_dt_t = np.array((self.v,self.dt,self.t))
         print(v_dt_t)
