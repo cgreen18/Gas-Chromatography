@@ -86,6 +86,7 @@ class GCFrame(wx.Frame):
         targ = self.collect
 
         self.data_rover_process = mp.Process(target = targ, name = 'data_rover', args = (self, sp, ep, self.v , self.dt, self.t) )
+        self.data_rover_process.start()
         print("Object")
         print(self.data_rover_process)
         print("Type")
@@ -118,7 +119,7 @@ class GCFrame(wx.Frame):
         print("Type")
         print(type(self.data_rover_process))
 
-        #self.data_rover_process.terminate()
+        self.data_rover_process.terminate()
         self.data_rover_process.join()
         v_dt_t = np.array((self.v,self.dt,self.t))
         print(v_dt_t)
