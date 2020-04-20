@@ -35,6 +35,8 @@ from threading import Thread
 
 import multiprocessing as mp
 
+imdir = 'images'
+
 ## TODO: Prompt keyobard when typing in temperature
 
 # Frames
