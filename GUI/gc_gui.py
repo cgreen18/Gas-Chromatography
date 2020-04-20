@@ -86,6 +86,9 @@ class GCFrame(wx.Frame):
         targ = self.collect
 
         self.data_rover_process = mp.Process(target = targ, args = (self, sp, ep, self.v , self.dt, self.t) )
+        print(self.data_rover_process)
+        print(self.data_rover_process.target)
+
         #data_rover_thread = GCThread( args = ( self, sp, ep ) )
 
     def collect(self, sampling_period, epsilon, volt_ref, delta_time_ref, time_ref):
@@ -100,8 +103,12 @@ class GCFrame(wx.Frame):
             dt = t_curr - t_last
             t = t_curr
 
-            new = np.array((v,dt,t)).reshape(3,1)
-            self.thread_data = np.append(self.thread_data, new, axis=1)
+            volt_ref.append(v)
+            delta_time_ref.append(dt)
+            time_ref.append(t)
+
+            #new = np.array((v,dt,t)).reshape(3,1)
+            #self.thread_data = np.append(self.thread_data, new, axis=1)
 
     def on_stop_btn(self):
         self.data_rover_process.kill()
