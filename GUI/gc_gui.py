@@ -86,8 +86,10 @@ class GCFrame(wx.Frame):
         targ = self.collect
 
         self.data_rover_process = mp.Process(target = targ, name = 'data_rover', args = (self, sp, ep, self.v , self.dt, self.t) )
+        print("Object")
         print(self.data_rover_process)
-
+        print("Type")
+        print(type(self.data_rover_process))
 
         #data_rover_thread = GCThread( args = ( self, sp, ep ) )
 
@@ -113,6 +115,8 @@ class GCFrame(wx.Frame):
     def on_stop_btn(self):
         print("On stop, data_rover is: ")
         print(self.data_rover_process)
+        print("Type")
+        print(type(self.data_rover_process))
 
         self.data_rover_process.kill()
         self.data_rover_process.join()
