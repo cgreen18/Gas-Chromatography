@@ -85,9 +85,9 @@ class GCFrame(wx.Frame):
 
         targ = self.collect
 
-        self.data_rover_process = mp.Process(target = targ, args = (self, sp, ep, self.v , self.dt, self.t) )
+        self.data_rover_process = mp.Process(target = targ, name = 'data_rover', args = (self, sp, ep, self.v , self.dt, self.t) )
         print(self.data_rover_process)
-        print(self.data_rover_process.target)
+
 
         #data_rover_thread = GCThread( args = ( self, sp, ep ) )
 
