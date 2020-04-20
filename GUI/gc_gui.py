@@ -147,7 +147,7 @@ class GCFrame(wx.Frame):
         saveas_jpg_window = SaveasJPG(self, self.options)
 
 
-class GCThread(threading.Thread):
+class GCThread(Thread):
     def __init__(self, gc, *args, **kwargs):
         super(GCThread, self).__init__(*args, **kwargs)
         self.gc = gc
