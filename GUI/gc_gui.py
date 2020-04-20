@@ -31,7 +31,11 @@ import time
 
 from gc_class_test import Gas_Chrom as GC
 
-from multiprocessing import Process, Pipe
+from GCMulti import GCProcess
+
+from threading import Thread
+
+import multiprocessing as mp
 
 ## TODO: Prompt keyobard when typing in temperature
 
@@ -39,24 +43,20 @@ from multiprocessing import Process, Pipe
 class GCFrame(wx.Frame):
     def __init__(self, parent, optiondict):
         self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
-
-        self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':20, 'plot_refresh_rate':2, 'single_ended':True}
+        self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':20,
+                        'epsilon_time':.001: 'plot_refresh_rate':2, 'single_ended':True}
         self.options.update(self.constants)
+
         self.options.update(optiondict)
 
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = self.options['DEFAULT_FRAME_SIZE'], style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
-        self.split_vert()
-        #self.panel_detector.draw()
-
-
-        self.set_up_menu_bar()
+        self.build_figure_()
 
         se = self.options['single_ended']
         self.gc = GC(se)
-        self.gc.testvar = "Hello"
-
+        self.parent = parent
 
     def __del__(self):
         pass
@@ -72,59 +72,52 @@ class GCFrame(wx.Frame):
 
     # gc_class methods
     def update_curr_data(self):
-        '''
-
-        '''
-
         pass
 
-
-
-
-    def end_data_coll(self):
-        self.gc.end_data_coll()
-        self.receive_data()
-        self.data_coll_child_conn.close()
-        print(self.curr_data)
-        self.proc.join()
-
-    def begin_data_coll(self):
-        self.run = True
-        self.establish_connection()
-
-        self.proc.start()
-
-        while not self.data_coll_parent_conn.poll(1):
-            print("---")
-        caught_gc = self.data_coll_parent_conn.recv()
-
-        self.gc = caught_gc
-
-
-    def establish_connection(self):
+    def on_play_btn(self):
         rr = self.options['data_samp_rate']
+        sp = 1 / rr
+        ep = self.options['epsilon_time']
 
-        parent_conn, child_conn = Pipe()
-        self.data_coll_parent_conn = parent_conn
-        self.data_coll_child_conn = child_conn
-        targ = self.gc.begin_data_coll
+        self.v = mp.Array('f', lock=False)
+        self.dt = mp.Array('f', lock=False)
+        self.t = mp.Array('f', lock=False)
 
-        self.proc = Process(target = targ, args=(child_conn, rr))
+        targ = self.collect
+
+        self.data_rover_process = mp.Process(target = targ, args = (self, sp, ep, self.v , self.dt, self.t) )
+        #data_rover_thread = GCThread( args = ( self, sp, ep ) )
+
+    def collect(self, sampling_period, epsilon, volt_ref, delta_time_ref, time_ref):
+        t_last = time.time()
+
+        while True:
+            while (t_curr - epsilon -t_last > sampling_period) or (t_curr + epsilon - t_last < sampling_period):
+                time.sleep(.0001)
+                t_curr = time.time()
+
+            v = self.gc.get_voltage()
+            dt = t_curr - t_last
+            t = t_curr
+
+            new = np.array((v,dt,t)).reshape(3,1)
+            self.thread_data = np.append(self.thread_data, new, axis=1)
+
+    def on_stop_btn(self):
+        self.data_rover_process.kill()
+        self.data_rover_process.join()
+        v_dt_t = np.array((self.v,self.dt,self.t))
+        print(v_dt_t)
+        self.curr_data = v_dt_t
+        self.data_rover_process.close()
 
 
-    def receive_data(self):
-        print("in rec func")
-        while not self.data_coll_parent_conn.poll(1):
-            print("-")
-        for item in self.data_coll_parent_conn.recv():
-            print(item)
+    # Formatting
+    def build_figure_(self):
+        self.split_vert_()
+        self.set_up_menu_bar_()
 
-        if self.run:
-
-            self.curr_data = self.data_coll_parent_conn.recv()
-
-
-    def split_vert(self):
+    def split_vert_(self):
         splitter = GCSplitter(self)
 
         self.panel_detector = DetectorPanel(splitter)
@@ -135,9 +128,8 @@ class GCFrame(wx.Frame):
         self.SetSizer(wx.BoxSizer(wx.HORIZONTAL))
         self.GetSizer().Add(splitter, 1, wx.EXPAND)
 
-    def set_up_menu_bar(self):
+    def set_up_menu_bar_(self):
         menubar = GCMenuBar(self)
-
         self.SetMenuBar(menubar)
 
     # Menu events
@@ -156,10 +148,34 @@ class GCFrame(wx.Frame):
     def on_jpg_save(self, err):
         saveas_jpg_window = SaveasJPG(self, self.options)
 
-# Multiprocessing
-class GCPipe(Pipe):
-    def __init__():
 
+class GCThread(threading.Thread):
+    def __init__(self, gc, *args, **kwargs):
+        super(GCThread, self).__init__(*args, **kwargs)
+        self.gc = gc
+        self._stop_event = threading.Event()
+        self.thread_data = np.zeros((gc.dims, 1))
+
+    def stop(self):
+        self._stop_event.set()
+
+    def stopped(self):
+        return self._stop_event.is_set()
+
+    def run(self, sampling_period, epsilon):
+        t_last = time.time()
+
+        while True:
+            while (t_curr - epsilon -t_last > sampling_period) or (t_curr + epsilon - t_last < sampling_period):
+                time.sleep(.0001)
+                t_curr = time.time()
+
+            v = self.gc.get_voltage()
+            dt = t_curr - t_last
+            t = t_curr
+
+            new = np.array((v,dt,t)).reshape(3,1)
+            self.thread_data = np.append(self.thread_data, new, axis=1)
 
 
 # SplitterWindow
@@ -171,7 +187,6 @@ class GCSplitter(wx.SplitterWindow):
         self.options = parent.options
         self.parent = parent
         wx.SplitterWindow.__init__(self, parent, id=wx.ID_ANY,pos=wx.DefaultPosition , size=self.options['frame_size'], style = wx.SP_BORDER, name='Diode Based Gas Chromatography' )
-
 
 #DirectoryWindow(s)
 class DirectoryWindow(wx.Frame):
@@ -482,7 +497,7 @@ class DetectorPanel(wx.Panel):
         self.btn_plot.SetFont(f)
         self.btn_plot.SetCursor(wx.Cursor(wx.CURSOR_DEFAULT))
 
-        self.Bind(wx.EVT_BUTTON, self.plot_btn_evt,self.btn_plot)
+        #self.Bind(wx.EVT_BUTTON, self.plot_btn_evt,self.btn_plot)
 
         self.vbox2.Add(self.btn_plot, border= b)
         self.vbox2.Add((-1,es))
@@ -547,15 +562,16 @@ class DetectorPanel(wx.Panel):
         self.canvas.draw()
 
     def ply_btn_evt(self, event):
-        self.gcframe.begin_data_coll()
+        self.gcframe.on_play_btn()
 
     def stp_btn_evt(self, event):
-        self.gcframe.end_data_coll()
+        self.gcframe.on_stop_btn()
 
     def plot_btn_evt(self, event):
-        self.gcframe.receive_data()
-        self.update_curr_data()
-        self.draw()
+        pass
+        # self.gcframe.plot_btn()
+        # self.update_curr_data()
+        # self.draw()
 
     def update_curr_data(self):
         self.curr_data = self.gcframe.curr_data

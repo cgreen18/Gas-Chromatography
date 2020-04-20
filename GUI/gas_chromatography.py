@@ -30,9 +30,6 @@ class MainApp(gc_gui.GCFrame):
 
         gc_gui.GCFrame.__init__(self, parent, self.options)
 
-        self.parent = parent
-
-
 def main():
     app = wx.App()
     window = MainApp(None)

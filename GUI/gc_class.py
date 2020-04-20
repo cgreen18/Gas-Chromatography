@@ -55,6 +55,7 @@ class Gas_Chrom:
 
         #Numpy/data
         self.curr_data = np.array([])
+        self.dims = 3 #voltage, dt, t
         self.prev_runs = None
         self.run_num = 0
 
@@ -62,55 +63,23 @@ class Gas_Chrom:
     def main(self):
         pass
 
-    # Can be called concurrently with the indefinite data collection
-    def end_data_coll(self):
-        self.allow_coll_data = False
-
-    def begin_data_coll(self, child_conn, ref_rt):
-        self.allow_coll_data = True
-        self.coll_indefinite_data(now, child_conn , ref_rt)
-
-    def coll_indefinite_data(self, conn, refresh_rate):
-        sampling_period = refresh_rate
-        epsilon = 0.001 #sec
-
-        volt_and_time =  np.zeros((2 , 1) ) #dtype=float )
-
-        t_start = time.time()
-        while self.allow_coll_data:
-            t_last = volt_and_time[1][i-1]
-
-            t_curr = time.time()
-
-            #TODO: Clean up that logic
-            while (t_curr - epsilon -t_last > sampling_period) or (t_curr + epsilon - t_last < sampling_period):
-                time.sleep(.0001)
-                t_curr = time.time()
-            #Past loop therefore sample
-            volt_and_time[0][i] = self.get_voltage()
-            volt_and_time[1][i] = t_curr - t_last
-            self.curr_data = volt_and_time
-
-            conn.send(self.curr_data)
-            conn.close()
-
-
     # Temporary graphing methods
-    def graph_curr_data(self):
+    def graph_curr_data_on_popup(self):
         plt.figure()
         plt.scatter(self.curr_data[1][:], self.curr_data[0][:])
         plt.show()
 
     # Numpy/data methods
     def coll_volt_const_pts(self , num_pts):
-        voltage_and_time =  np.zeros((2 , num_pts ) ) #dtype=float )
+        v_dt_t =  np.zeros((self.dims , num_pts ) ) #dtype=float )
 
         t_start = time.time()
         for i in range(0,num_pts):
             time.sleep(.01)
-            voltage_and_time[0][i] = self.get_voltage()
+            v_dt_t[0][i] = self.get_voltage()
             t_curr = time.time()
-            voltage_and_time[1][i] = t_curr - t_start
+            v_dt_t[1][i] = t_curr - t_start
+            v_dt_t[2][i] = t_curr
 
         return voltage_and_time
 
@@ -123,7 +92,10 @@ class Gas_Chrom:
     def get_curr_data(self):
         return self.curr_data
 
+    def set_curr_data(self, data):
+        self.curr_data = data
 
+        
     # ADS1115 Methods
     def reinit_ADS(self):
         self.i2c = busio.I2C(board.SCL , board.SDA)
