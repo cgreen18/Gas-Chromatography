@@ -233,7 +233,7 @@ class DirectoryWindow(wx.Frame):
         nav_menu_hbox = wx.BoxSizer(wx.HORIZONTAL)
         nav_menu_hbox.Add((self.options['EXTRA_SPACE'],-1))
 
-        bmp = wx.Bitmap('.images/btn_back_im_20p.png', wx.BITMAP_TYPE_ANY)
+        bmp = wx.Bitmap(imdir + '/btn_back_im_20p.png', wx.BITMAP_TYPE_ANY)
 
         self.btn_bck = wx.BitmapButton(self, id=wx.ID_ANY,bitmap=bmp, size = (45,40))
         self.Bind(wx.EVT_BUTTON, self.bckbtn_click_evt, self.btn_bck)
@@ -537,14 +537,14 @@ class DetectorPanel(wx.Panel):
 
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
-        bmp = wx.Bitmap('.images/play_btn_20p.png',wx.BITMAP_TYPE_ANY)
+        bmp = wx.Bitmap(imdir + '/play_btn_20p.png',wx.BITMAP_TYPE_ANY)
         self.btn_ply = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
         self.Bind(wx.EVT_BUTTON, self.ply_btn_evt, self.btn_ply)
 
-        bmp = wx.Bitmap('.images/paus_btn_20p.png',wx.BITMAP_TYPE_ANY)
+        bmp = wx.Bitmap(imdir + '/paus_btn_20p.png',wx.BITMAP_TYPE_ANY)
         btn_paus = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
 
-        bmp = wx.Bitmap('.images/stop_btn_20p.png',wx.BITMAP_TYPE_ANY)
+        bmp = wx.Bitmap(imdir + '/stop_btn_20p.png',wx.BITMAP_TYPE_ANY)
         self.btn_stp = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
         self.Bind(wx.EVT_BUTTON, self.stp_btn_evt, self.btn_stp)
 
