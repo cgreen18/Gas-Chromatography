@@ -44,7 +44,7 @@ class GCFrame(wx.Frame):
     def __init__(self, parent, optiondict):
         self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
         self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':20,
-                        'epsilon_time':.001: 'plot_refresh_rate':2, 'single_ended':True}
+                        'epsilon_time':.001, 'plot_refresh_rate':2, 'single_ended':True}
         self.options.update(self.constants)
 
         self.options.update(optiondict)
