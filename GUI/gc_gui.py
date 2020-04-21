@@ -690,8 +690,9 @@ class DetectorPanel(wx.Panel):
         return hbox
 
     def draw(self):
-        self.axes.plot(self.curr_data[2], self.curr_data[0])
-        self.canvas.draw()
+        if self.curr_data.size != 0:
+            self.axes.plot(self.curr_data[2], self.curr_data[0])
+            self.canvas.draw()
 
     def ply_btn_evt(self, event):
         self.gcframe.on_play_btn()
@@ -704,8 +705,9 @@ class DetectorPanel(wx.Panel):
 
     def update_curr_data(self):
         self.curr_data = self.gcframe.curr_data
-        init_time = self.curr_data[2][0]
-        self.curr_data[2] = self.curr_data[2] - init_time
+        if self.curr_data.size != 0:
+            init_time = self.curr_data[2][0]
+            self.curr_data[2] = self.curr_data[2] - init_time
 
     def clear_plot_btn_evt(self, event):
         self.gcframe.on_clr_btn()
