@@ -161,7 +161,7 @@ class GCThread(Thread):
         self.gc = gc
         self._stop_event = threading.Event()
 
-        print(_stop_event)
+        print(self._stop_event.is_set())
 
         #empty_arr = np.zeros((gc.dims, 1))
         self.thread_data = empty_arr
@@ -189,7 +189,9 @@ class GCThread(Thread):
             while (t_curr - epsilon -t_last > sampling_period) or (t_curr + epsilon - t_last < sampling_period):
                 time.sleep(.001)
                 t_curr = time.time()
+                print('-')
 
+            print('------------')
             with self.condition:
 
                 v = self.gc.get_voltage()
