@@ -31,8 +31,8 @@ import time
 
 from gc_class import Gas_Chrom as GC
 
+import threading
 from threading import Thread
-
 import multiprocessing as mp
 
 from ctypes import Structure, c_float
