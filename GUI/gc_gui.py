@@ -82,35 +82,45 @@ class GCFrame(wx.Frame):
         ep = self.options['epsilon_time']
 
         data_arr = np.zeros((self.gc.dims, 1))
+
         self.curr_data = data_arr
+        self.curr_data_lock = threading.Lock()
 
         self.gc_lock = threading.Lock()
         self.gc_cond = threading.Condition(self.gc_lock)
 
-        self.data_rover_thread = GCThread(self.gc, self.curr_data, self.gc_cond, args = ( sp, ep ) )
+        self.data_rover_thread = GCThread(self.gc, self.gc_cond, args = ( sp, ep ) )
+
+        rsp = self.options['plot_refresh_rate']
+
+        self.receiver_thread = GCReceiver(self.gc_cond, self.curr_data, self.curr_data_lock, args = ( rsp, ep ))
 
         self.data_rover_thread.start()
+        self.receiver_thread.start()
 
         self.running= True
 
-        self.receive(sp, ep)
 
-
-    def receive(self, sampling_period, epsilon):
-        t_last = time.time()
+    def receive(self):
         while self.running:
-            t_curr= time.time()
             time.sleep(.1)
 
             with self.gc_cond:
                 while not self.data_rover_thread.is_avail():
                     self.gc_cond.wait()
-                print('\n\nData point available: ')
-                print(self.data_rover_thread.thread_data)
+                self.curr_data_lock.acquire()
+                self.curr_data = np.copy(data_rover_thread.thread_data)
+                self.curr_data_lock.release()
+
 
     def on_stop_btn(self):
         self.data_rover_thread.stop()
+        self.receiver_thread.stop()
+
         self.data_rover_thread.join()
+        self.receiver_thread.join()
+
+
         print("\n\n____STOPPED_____\n")
         print('\n\ncurr_data is: ')
         print(self.curr_data)
@@ -152,11 +162,46 @@ class GCFrame(wx.Frame):
     def on_jpg_save(self, err):
         saveas_jpg_window = SaveasJPG(self, self.options)
 
+class GCPlotter(Thread):
+
+    def __init__(self):
+        pass
+
+class GCReceiver(Thread):
+
+    def __init__(self, condition, curr_data, lock, *args, **kwargs):
+        super(GCReceiver, self).__init__()
+
+        self.sp = kwargs['args'][0]
+        self.ep = kwargs['args'][1]
+
+        self._stop_event = threading.Event()
+
+        def stop(self):
+            self._stop_event.set()
+
+        def stopped(self):
+            return self._stop_event.is_set()
+
+        def run(self):
+            sampling_period = self.sp
+            epsilon = self.ep
+
+            t_last = time.time()
+            while not self._stop_event.is_set():
+                t_curr= time.time()
+                while (t_curr - epsilon -t_last > sampling_period):
+                    time.sleep(.01)
+                    t_curr = time.time()
+
+                self.gc_cond.wait()
+                with self.gc_cond:
+                    self.curr_data_lock.acquire()
+                    self.curr_data = np.copy(data_rover_thread.thread_data)
+                    self.curr_data_lock.release()
 
 class GCThread(Thread):
-    def __init__(self, gc, empty_arr, condition, *args, **kwargs):
-        print(gc)
-
+    def __init__(self, gc, condition, *args, **kwargs):
         super(GCThread, self).__init__()
 
         self.sp = kwargs['args'][0]
@@ -164,10 +209,7 @@ class GCThread(Thread):
         self.gc = gc
         self._stop_event = threading.Event()
 
-        print(self._stop_event.is_set())
-
-        #empty_arr = np.zeros((gc.dims, 1))
-        self.thread_data = empty_arr
+        self.thread_data = np.zeros((gc.dims, 1))
 
         self.condition = condition
         self.avail = False
@@ -189,7 +231,7 @@ class GCThread(Thread):
 
         while not self._stop_event.is_set():
             t_curr= time.time()
-            while (t_curr - epsilon -t_last > sampling_period) and (t_curr + epsilon - t_last < sampling_period):
+            while (t_curr - epsilon -t_last > sampling_period):
                 time.sleep(.01)
                 t_curr = time.time()
 
