@@ -87,7 +87,7 @@ class GCFrame(wx.Frame):
         self.gc_lock = threading.Lock()
         self.gc_cond = threading.Condition(self.gc_lock)
 
-        self.data_rover_thread = GCThread(self.gc, self.curr_data, self.gc_cond, args = ( self, sp, ep ) )
+        self.data_rover_thread = GCThread(self.gc, self.curr_data, self.gc_cond, args = ( sp, ep ) )
 
         self.data_rover_thread.start()
 
@@ -151,7 +151,10 @@ class GCThread(Thread):
         print(empty_arr)
         print(condition)
         print(args)
+        print(*args)
         print(kwargs)
+        print(**kwargs)
+        print(kwargs['args'])
         print("end")
         super(GCThread, self).__init__(*args, **kwargs)
         self.gc = gc
