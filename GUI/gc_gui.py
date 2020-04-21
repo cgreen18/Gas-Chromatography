@@ -91,16 +91,19 @@ class GCFrame(wx.Frame):
 
         self.data_rover_thread.start()
 
+        self.running= True
+
         self.receive(sp, ep)
 
 
     def receive(self, sampling_period, epsilon):
-        with self.gc_cond:
-            while not self.data_rover_thread.is_avail():
-                self.gc_cond.wait()
-            print('\n\nData point available: ')
-            print(self.curr_data)
-            print('\nThat was curr_data\n\n')
+        while self.running():
+            with self.gc_cond:
+                while not self.data_rover_thread.is_avail():
+                    self.gc_cond.wait()
+                print('\n\nData point available: ')
+                print(self.curr_data)
+                print('\nThat was curr_data\n\n')
 
     def on_stop_btn(self):
         self.data_rover_thread.stop()
