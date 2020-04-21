@@ -106,26 +106,19 @@ class GCFrame(wx.Frame):
         self.stop_data_coll()
 
     def stop_data_coll(self):
-
         self.receiver_thread.stop()
-
         self.receiver_thread.join()
 
-        print('rec join')
-
         self.data_rover_thread.stop()
-
         self.data_rover_thread.join()
-
-        print('data join')
-
 
         self.running = False
 
-    def on_plot(self):
+    def on_plot_btn(self):
         if self.running:
             self.stop_data_coll()
 
+        print('plot')
         self.panel_detector.update_curr_data()
         self.panel_detector.draw()
 
@@ -658,10 +651,7 @@ class DetectorPanel(wx.Panel):
         self.gcframe.on_stop_btn()
 
     def plot_btn_evt(self, event):
-        pass
-        # self.gcframe.plot_btn()
-        # self.update_curr_data()
-        # self.draw()
+        self.gcframe.on_plot_btn()
 
     def update_curr_data(self):
         self.curr_data = self.gcframe.curr_data
