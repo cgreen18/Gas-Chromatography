@@ -264,6 +264,7 @@ class GCThread(Thread):
 
                 #self.avail = True
                 self.condition.notify_all()
+                print('notified?')
 
 
 # SplitterWindow
