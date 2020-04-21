@@ -187,29 +187,29 @@ class GCPlotter(Thread):
 
         self._stop_event = threading.Event()
 
-        def stop(self):
-            self._stop_event.set()
+    def stop(self):
+        self._stop_event.set()
 
-        def stopped(self):
-            return self._stop_event.is_set()
+    def stopped(self):
+        return self._stop_event.is_set()
 
-        def run(self):
-            sampling_period = self.sp
-            epsilon = self.ep
+    def run(self):
+        sampling_period = self.sp
+        epsilon = self.ep
 
-            t_last = time.time()
-            while not self._stop_event.is_set():
-                t_curr= time.time()
-                while (t_curr - epsilon -t_last < sampling_period):
-                    time.sleep(.1)
-                    t_curr = time.time()
+        t_last = time.time()
+        while not self._stop_event.is_set():
+            t_curr= time.time()
+            while (t_curr - epsilon -t_last < sampling_period):
+                time.sleep(.1)
+                t_curr = time.time()
 
-                t_last = t_curr
+            t_last = t_curr
 
-                with self.frame.curr_data_lock:
-                    print('acquired_plot')
-                    self.frame.panel_detector.update_curr_data()
-                    self.frame.panel_detector.draw()
+            with self.frame.curr_data_lock:
+                print('acquired_plot')
+                self.frame.panel_detector.update_curr_data()
+                self.frame.panel_detector.draw()
 
 
 
