@@ -244,16 +244,12 @@ class GCThread(Thread):
         epsilon = self.ep
 
         while not self._stop_event.is_set():
-            print('before wait')
             t_curr= time.time()
             while (t_curr - epsilon -t_last < sampling_period):
                 time.sleep(.01)
                 t_curr = time.time()
 
-            print('-')
-
             with self.condition:
-                print('-----')
                 v = self.gc.get_voltage()
                 dt = t_curr - t_last
                 t = t_curr
