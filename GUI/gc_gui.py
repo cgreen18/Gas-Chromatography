@@ -1,8 +1,8 @@
 """
 Title: gc_gui.py
 Author: Conor Green & Matt McPartlan
-Description: Highest level script of wxPython based GUI application to perform data acquisition and display.
-Usage: Instantiate classes GCFrame, DetectorPanel, and ConfigPanel from gas_chromatography.py
+Description: Mid-level abstraction of GUI application to perform data acquisition and display. Defines GUI and threading classes and instantiates GC object.
+Usage: Instantiate GCFrame object from gas_chromatography.py
 Version:
 1.0 - November 24 2019 - Initial creation. All dependencies left in the script: will later be split into various scripts that are imported.
 1.1 - November 24 2019 - Implements numpy and plotting to window. Uses random numbers
@@ -30,7 +30,7 @@ import codecs, json
 from time import localtime, strftime
 import time
 
-from gc_class import Gas_Chrom as GC
+from gc_class import GC
 
 import threading
 from threading import Thread
@@ -46,8 +46,8 @@ imdir = 'images'
 class GCFrame(wx.Frame):
     def __init__(self, parent, optiondict):
         self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
-        self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':5,
-                        'epsilon_time':0.001, 'plot_refresh_rate':2, 'single_ended':True}
+        self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':5.0,
+                        'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0, 'single_ended':True}
         self.options.update(self.constants)
 
         self.options.update(optiondict)
@@ -56,6 +56,12 @@ class GCFrame(wx.Frame):
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
         self.build_figure_()
+
+        sp = 1 / self.options['temp_refresh_rate']
+        ep = self.options['epsilon_time']
+
+        # TODO: Temperature thread
+        #self.temperature_thread = GCTemperature( self, SERIAL_CONN, type = provider, args = (sp, ep))
 
         se = self.options['single_ended']
         self.gc = GC(se)
@@ -91,7 +97,7 @@ class GCFrame(wx.Frame):
         self.gc_lock = threading.Lock()
         self.gc_cond = threading.Condition(self.gc_lock)
 
-        self.data_rover_thread = GCThread(self.gc, self.gc_cond, args = ( sp, ep ) )
+        self.data_rover_thread = GCData(self.gc, self.gc_cond, args = ( sp, ep ) )
 
         rsp = self.options['plot_refresh_rate']
 
@@ -175,6 +181,46 @@ class GCFrame(wx.Frame):
     def on_jpg_save(self, err):
         saveas_jpg_window = SaveasJPG(self, self.options)
 
+
+class GCTemperature(Thread):
+
+    def __init__(self, frame, *args, **kwargs):
+        super(GCTemperature, self).__init__()
+
+        self.frame = frame
+
+        self.sp = kwargs['args'][0]
+        self.ep = kwargs['args'][1]
+
+        self._stop_event = threading.Event()
+
+    def stop(self):
+        self._stop_event.set()
+
+    def stopped(self):
+        return self._stop_event.is_set()
+
+    def run(self):
+        pass
+
+        sampling_period = self.sp
+        epsilon = self.ep
+
+        t_last = time.time()
+        while not self._stop_event.is_set():
+            t_curr= time.time()
+            while (t_curr - epsilon -t_last < sampling_period):
+                time.sleep(.1)
+                t_curr = time.time()
+
+            t_last = t_curr
+
+            with self.frame.curr_data_lock:
+                print('acquired_plot')
+                self.frame.panel_detector.update_curr_data()
+                self.frame.panel_detector.draw()
+
+
 class GCPlotter(Thread):
 
     def __init__(self, frame, *args, **kwargs):
@@ -210,10 +256,6 @@ class GCPlotter(Thread):
                 print('acquired_plot')
                 self.frame.panel_detector.update_curr_data()
                 self.frame.panel_detector.draw()
-
-
-
-
 
 class GCReceiver(Thread):
 
@@ -264,9 +306,9 @@ class GCReceiver(Thread):
                 else:
                   print("waiting timeout...")
 
-class GCThread(Thread):
+class GCData(Thread):
     def __init__(self, gc, condition, *args, **kwargs):
-        super(GCThread, self).__init__()
+        super(GCData, self).__init__()
 
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]

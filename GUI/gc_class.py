@@ -29,7 +29,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 
-class Gas_Chrom:
+class GC:
     # TODO:
     # Default single ended and make differential a keyword arg
 
@@ -124,9 +124,12 @@ class Gas_Chrom:
         return self.chan.value
 
 if __name__ == '__main__':
+    pass
+    '''
     gc = Gas_Chrom(True)
 
     print("Collecting 1000 data points")
     gc.coll_volt_const_pts_self(1000)
     print("Graphing")
     gc.graph_curr_data()
+    '''
