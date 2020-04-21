@@ -115,6 +115,7 @@ class GCFrame(wx.Frame):
 
     def on_stop_btn(self):
         self.data_rover_thread.stop()
+
         self.receiver_thread.stop()
 
         self.data_rover_thread.join()
@@ -172,12 +173,15 @@ class GCReceiver(Thread):
     def __init__(self, condition, curr_data, lock, *args, **kwargs):
         super(GCReceiver, self).__init__()
 
+        print(self.stop)
+
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]
 
         self._stop_event = threading.Event()
 
         def stop(self):
+            print('stop defined')
             self._stop_event.set()
 
         def stopped(self):
