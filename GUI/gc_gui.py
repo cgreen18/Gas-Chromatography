@@ -259,7 +259,6 @@ class GCThread(Thread):
                 self.thread_data = np.append(self.thread_data, new, axis=1)
 
                 self.condition.notify_all()
-                self.condition.release()
 
 
 # SplitterWindow
