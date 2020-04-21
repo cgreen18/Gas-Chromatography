@@ -203,11 +203,10 @@ class GCReceiver(Thread):
             print('-----------')
 
             self.gc_cond.wait()
-            with self.gc_cond:
-                print('Receiver has cond')
-                self.curr_data_lock.acquire()
-                self.curr_data = np.copy(data_rover_thread.thread_data)
-                self.curr_data_lock.release()
+            print('Receiver has cond')
+            self.curr_data_lock.acquire()
+            self.curr_data = np.copy(data_rover_thread.thread_data)
+            self.curr_data_lock.release()
 
 class GCThread(Thread):
     def __init__(self, gc, condition, *args, **kwargs):
