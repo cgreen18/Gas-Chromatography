@@ -97,7 +97,7 @@ class GCFrame(wx.Frame):
 
 
     def receive(self, sampling_period, epsilon):
-        while self.running():
+        while self.running:
             with self.gc_cond:
                 while not self.data_rover_thread.is_avail():
                     self.gc_cond.wait()
