@@ -173,7 +173,7 @@ class GCReceiver(Thread):
     def __init__(self, condition, curr_data, lock, *args, **kwargs):
         super(GCReceiver, self).__init__()
 
-        print(self.stop)
+
 
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]
@@ -207,6 +207,8 @@ class GCReceiver(Thread):
 class GCThread(Thread):
     def __init__(self, gc, condition, *args, **kwargs):
         super(GCThread, self).__init__()
+
+        print(self.stop)
 
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]
