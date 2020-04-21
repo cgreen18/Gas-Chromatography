@@ -147,6 +147,7 @@ class GCFrame(wx.Frame):
 
 class GCThread(Thread):
     def __init__(self, gc, empty_arr, condition, *args, **kwargs):
+        print(args)
         super(GCThread, self).__init__(*args, **kwargs)
         self.gc = gc
         self._stop_event = threading.Event()
