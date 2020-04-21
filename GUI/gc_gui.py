@@ -203,6 +203,8 @@ class GCReceiver(Thread):
             print('-----------')
 
             with self.gc_cond:
+                print(self.gc_cond)
+
                 val = self.gc_cond.wait(.001)
                 if val:
                   print("notification received about item production...")
@@ -264,6 +266,7 @@ class GCThread(Thread):
 
                 #self.avail = True
                 self.condition.notify_all()
+                print(self.condition)
                 print('notified?')
 
 
