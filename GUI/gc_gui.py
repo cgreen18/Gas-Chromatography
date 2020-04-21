@@ -172,7 +172,7 @@ class GCPlotter(Thread):
 
 class GCReceiver(Thread):
 
-    def __init__(self, frame, condition, curr_data, lock, *args, **kwargs):
+    def __init__(self, frame, condition, *args, **kwargs):
         super(GCReceiver, self).__init__()
 
         self.frame = frame
