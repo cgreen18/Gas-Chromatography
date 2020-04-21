@@ -202,11 +202,12 @@ class GCReceiver(Thread):
             t_last = t_curr
             with self.gc_cond:
                 val = self.gc_cond.wait(1)
-                
+
                 if val:
                   print("notification received about item production...")
                   self.gc_cond.acquire()
                   self.curr_data_lock.acquire()
+                  print('acquired')
                   self.curr_data = np.copy(data_rover_thread.thread_data)
                   self.gc_cond.release()
                   self.curr_data_lock.release()
@@ -258,7 +259,7 @@ class GCThread(Thread):
 
                 new = np.array((v,dt,t)).reshape(3,1)
                 self.thread_data = np.append(self.thread_data, new, axis=1)
-
+                print('new daata')
                 self.condition.notify_all()
 
 
