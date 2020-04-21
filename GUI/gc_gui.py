@@ -580,7 +580,7 @@ class DetectorPanel(wx.Panel):
         self.btn_plot.SetFont(f)
         self.btn_plot.SetCursor(wx.Cursor(wx.CURSOR_DEFAULT))
 
-        #self.Bind(wx.EVT_BUTTON, self.plot_btn_evt,self.btn_plot)
+        self.Bind(wx.EVT_BUTTON, self.plot_btn_evt,self.btn_plot)
 
         self.vbox2.Add(self.btn_plot, border= b)
         self.vbox2.Add((-1,es))
