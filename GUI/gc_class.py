@@ -18,6 +18,7 @@ import busio
 import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 
+
 # Multiprocessing
 from multiprocessing import Process, Pipe
 
@@ -36,11 +37,9 @@ class Gas_Chrom:
         self.__version__ = '1.3'
         self.__authors__ = 'Conor Green and Matt McPartlan'
 
-
         #ADS1115
         self.i2c = busio.I2C(board.SCL , board.SDA)
         self.ads = ADS.ADS1115(self.i2c)
-
 
         self.single_ended = single_ended # T/F
         self.port0 = ADS.P0 # Later allow user input

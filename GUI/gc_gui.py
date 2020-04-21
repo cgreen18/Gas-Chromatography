@@ -61,6 +61,12 @@ class GCFrame(wx.Frame):
         self.gc = GC(se)
         self.parent = parent
 
+        self.curr_data = np.zeros((self.gc.dims,0))
+        self.curr_data_lock = threading.Lock()
+
+        self.prev_data = []
+        self.run_number = 0
+
     def __del__(self):
         pass
 
@@ -82,11 +88,6 @@ class GCFrame(wx.Frame):
         sp = 1 / rr
         ep = self.options['epsilon_time']
 
-        data_arr = np.zeros((self.gc.dims, 1))
-
-        self.curr_data = data_arr
-        self.curr_data_lock = threading.Lock()
-
         self.gc_lock = threading.Lock()
         self.gc_cond = threading.Condition(self.gc_lock)
 
@@ -99,6 +100,10 @@ class GCFrame(wx.Frame):
         self.data_rover_thread.start()
         self.receiver_thread.start()
 
+        self.plotter_thread = GCPlotter(self, args=(rsp,ep))
+
+        self.plotter_thread.start()
+
         self.running= True
 
 
@@ -106,11 +111,16 @@ class GCFrame(wx.Frame):
         self.stop_data_coll()
 
     def stop_data_coll(self):
+        self.plotter_thread.stop()
+        self.plotter_thread.join()
+
         self.receiver_thread.stop()
         self.receiver_thread.join()
 
         self.data_rover_thread.stop()
         self.data_rover_thread.join()
+
+
 
         self.running = False
 
@@ -121,6 +131,12 @@ class GCFrame(wx.Frame):
         print('plot')
         self.panel_detector.update_curr_data()
         self.panel_detector.draw()
+
+    def on_clr_btn(self):
+        if self.run_number > 0:
+            self.prev_data.append(self.curr_data)
+
+        self.curr_data = np.zeros((self.gc.dims,0))
 
 
     # Formatting
@@ -161,8 +177,43 @@ class GCFrame(wx.Frame):
 
 class GCPlotter(Thread):
 
-    def __init__(self):
-        pass
+    def __init__(self, frame, *args, **kwargs):
+        super(GCPlotter, self).__init__()
+
+        self.frame
+
+        self.sp = kwargs['args'][0]
+        self.ep = kwargs['args'][1]
+
+        self._stop_event = threading.Event()
+
+        def stop(self):
+            self._stop_event.set()
+
+        def stopped(self):
+            return self._stop_event.is_set()
+
+        def run(self):
+            sampling_period = self.sp
+            epsilon = self.ep
+
+            t_last = time.time()
+            while not self._stop_event.is_set():
+                t_curr= time.time()
+                while (t_curr - epsilon -t_last < sampling_period):
+                    time.sleep(.1)
+                    t_curr = time.time()
+
+                t_last = t_curr
+
+                with self.frame.curr_data_lock:
+                    print('acquired_plot')
+                    self.frame.panel_detector.update_curr_data()
+                    self.frame.panel_detector.draw()
+
+
+
+
 
 class GCReceiver(Thread):
 
@@ -657,6 +708,7 @@ class DetectorPanel(wx.Panel):
         self.curr_data[2] = self.curr_data[2] - init_time
 
     def clear_plot_btn_evt(self, event):
+        self.gcframe.on_clr_btn()
         self.axes.cla()
         self.canvas.draw()
 
