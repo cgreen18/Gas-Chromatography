@@ -109,9 +109,11 @@ class GCFrame(wx.Frame):
 
         self.receiver_thread.stop()
 
+        self.receiver_thread.join()
+
         self.data_rover_thread.stop()
 
-        self.receiver_thread.join()
+
 
         self.data_rover_thread.join()
 
