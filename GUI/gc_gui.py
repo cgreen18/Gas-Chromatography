@@ -46,7 +46,7 @@ class GCFrame(wx.Frame):
     def __init__(self, parent, optiondict):
         self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
         self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':20,
-                        'epsilon_time':.001, 'plot_refresh_rate':2, 'single_ended':True}
+                        'epsilon_time':0.001, 'plot_refresh_rate':2, 'single_ended':True}
         self.options.update(self.constants)
 
         self.options.update(optiondict)
@@ -100,9 +100,7 @@ class GCFrame(wx.Frame):
         t_last = time.time()
         while self.running:
             t_curr= time.time()
-            while (t_curr - epsilon -t_last > sampling_period) or (t_curr + epsilon - t_last < sampling_period):
-                time.sleep(.01)
-                t_curr = time.time()
+            time.sleep(.1)
 
             with self.gc_cond:
                 while not self.data_rover_thread.is_avail():
@@ -193,7 +191,7 @@ class GCThread(Thread):
         while not self._stop_event.is_set():
             t_curr= time.time()
             while (t_curr - epsilon -t_last > sampling_period) or (t_curr + epsilon - t_last < sampling_period):
-                time.sleep(.001)
+                time.sleep(.01)
                 t_curr = time.time()
                 print('-')
 
