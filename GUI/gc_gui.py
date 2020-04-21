@@ -221,6 +221,7 @@ class GCThread(Thread):
         self.avail = False
 
     def stop(self):
+        print('stop defined')
         self._stop_event.set()
 
     def stopped(self):
