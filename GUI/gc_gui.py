@@ -116,11 +116,11 @@ class GCFrame(wx.Frame):
         self.running = False
 
     def on_plot(self):
-        pass
         if self.running:
             self.stop_data_coll()
 
-        #self.panel_detector
+        self.panel_detector.update_curr_data()
+        self.panel_detector.draw()
 
 
     # Formatting
