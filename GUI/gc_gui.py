@@ -199,6 +199,7 @@ class GCReceiver(Thread):
                 time.sleep(.01)
                 t_curr = time.time()
 
+            t_last = t_curr
             print('-------')
 
             self.gc_cond.wait()
@@ -251,6 +252,7 @@ class GCThread(Thread):
                 v = self.gc.get_voltage()
                 dt = t_curr - t_last
                 t = t_curr
+                t_last = t_curr
 
                 new = np.array((v,dt,t)).reshape(3,1)
                 self.thread_data = np.append(self.thread_data, new, axis=1)
