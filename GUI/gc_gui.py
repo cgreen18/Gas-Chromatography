@@ -206,6 +206,7 @@ class GCReceiver(Thread):
                 if val:
                   print("notification received about item production...")
                   self.gc_cond.acquire()
+                  print('gc_cond acquired')
                   self.curr_data_lock.acquire()
                   print('acquired')
                   self.curr_data = np.copy(data_rover_thread.thread_data)
