@@ -240,9 +240,11 @@ class GCThread(Thread):
                 time.sleep(.01)
                 t_curr = time.time()
 
-
+            print('-')
             with self.condition:
+
                 self.condition.acquire()
+                print('-----')
                 v = self.gc.get_voltage()
                 dt = t_curr - t_last
                 t = t_curr
