@@ -180,7 +180,7 @@ class GCPlotter(Thread):
     def __init__(self, frame, *args, **kwargs):
         super(GCPlotter, self).__init__()
 
-        self.frame
+        self.frame = frame
 
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]
