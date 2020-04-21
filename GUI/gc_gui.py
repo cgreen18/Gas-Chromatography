@@ -106,12 +106,15 @@ class GCFrame(wx.Frame):
         self.stop_data_coll()
 
     def stop_data_coll(self):
-        self.data_rover_thread.stop()
 
         self.receiver_thread.stop()
 
-        self.data_rover_thread.join()
+        self.data_rover_thread.stop()
+
         self.receiver_thread.join()
+
+        self.data_rover_thread.join()
+
 
         self.running = False
 
