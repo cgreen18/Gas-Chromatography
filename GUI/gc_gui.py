@@ -91,6 +91,8 @@ class GCFrame(wx.Frame):
 
         self.data_rover_thread.start()
 
+        self.receive(sp, ep)
+
 
     def receive(self, sampling_period, epsilon):
         with self.gc_cond:
