@@ -202,15 +202,15 @@ class GCReceiver(Thread):
             t_last = t_curr
             print('-----------')
 
-
-            val = self.gc_cond.wait(.001)
-            if val:
-              print("notification received about item production...")
-              self.curr_data_lock.acquire()
-              self.curr_data = np.copy(data_rover_thread.thread_data)
-              self.curr_data_lock.release()
-            else:
-              print("waiting timeout...")
+            with self.gc_cond:
+                val = self.gc_cond.wait(.001)
+                if val:
+                  print("notification received about item production...")
+                  self.curr_data_lock.acquire()
+                  self.curr_data = np.copy(data_rover_thread.thread_data)
+                  self.curr_data_lock.release()
+                else:
+                  print("waiting timeout...")
 
 
 
@@ -252,19 +252,18 @@ class GCThread(Thread):
 
             print('-')
 
-            self.condition.acquire()
-            print('-----')
-            v = self.gc.get_voltage()
-            dt = t_curr - t_last
-            t = t_curr
-            t_last = t_curr
+            with self.condition:
+                print('-----')
+                v = self.gc.get_voltage()
+                dt = t_curr - t_last
+                t = t_curr
+                t_last = t_curr
 
-            new = np.array((v,dt,t)).reshape(3,1)
-            self.thread_data = np.append(self.thread_data, new, axis=1)
+                new = np.array((v,dt,t)).reshape(3,1)
+                self.thread_data = np.append(self.thread_data, new, axis=1)
 
-            #self.avail = True
-            self.condition.notify_all()
-            self.condition.release()
+                #self.avail = True
+                self.condition.notify_all()
 
 
 # SplitterWindow
