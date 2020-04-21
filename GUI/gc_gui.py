@@ -9,6 +9,7 @@ Version:
 1.2 - 31 March 2020 - Old gas_chromatography.py -> gc_gui.py. This script defines the frame and panel classes that are put together in gas_chromatography.py. As of currently, it plots an example sin curve in the plotter but interfacing with the ADS1115 will be implemented when this is tested on a Raspberry Pi.
 1.3 - 31 March 2020 - Added images to buttons. Added more menu options.
 1.4 - 31 March 2020 - Save current figure as .png or .jpg
+1.5 - 21 April 2020 - FINALLY got threading working.
 """
 
 import numpy as np
@@ -101,33 +102,26 @@ class GCFrame(wx.Frame):
         self.running= True
 
 
-    def receive(self):
-        while self.running:
-            time.sleep(.1)
-
-            with self.gc_cond:
-                while not self.data_rover_thread.is_avail():
-                    self.gc_cond.wait()
-                self.curr_data_lock.acquire()
-                self.curr_data = np.copy(data_rover_thread.thread_data)
-                self.curr_data_lock.release()
-
-
     def on_stop_btn(self):
-        self.data_rover_thread.stop()
+        self.stop_data_coll()
 
-        #self.curr_data = self.receiver_thread.curr_data
+    def stop_data_coll(self):
+        self.data_rover_thread.stop()
 
         self.receiver_thread.stop()
 
         self.data_rover_thread.join()
         self.receiver_thread.join()
 
+        self.running = False
 
-        print("\n\n____STOPPED_____\n")
-        print('\n\ncurr_data is: ')
-        print(self.curr_data)
-        print('\n\n')
+    def on_plot(self):
+        pass
+        if self.running:
+            self.stop_data_coll()
+
+        #self.panel_detector
+
 
     # Formatting
     def build_figure_(self):
@@ -220,8 +214,6 @@ class GCReceiver(Thread):
 
                 else:
                   print("waiting timeout...")
-
-
 
 class GCThread(Thread):
     def __init__(self, gc, condition, *args, **kwargs):
