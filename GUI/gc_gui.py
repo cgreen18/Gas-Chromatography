@@ -151,9 +151,16 @@ class GCThread(Thread):
         print(empty_arr)
         print(condition)
         print(args)
-        print(kwargs['args'])
+        print(kwargs['args'][0])
         print("end")
-        super(GCThread, self).__init__( args= kwargs['args'])
+
+
+
+        super(GCThread, self).__init__( self)
+        print(self)
+
+        self.sp = kwargs['args'][0]
+        self.ep = kwargs['args'][1]
         self.gc = gc
         self._stop_event = threading.Event()
 
@@ -172,8 +179,11 @@ class GCThread(Thread):
     def is_avail(self):
         return self.avail
 
-    def run(self, sampling_period, epsilon):
+    def run(self):
         t_last = time.time()
+
+        sampling_period = self.sp
+         epsilon = self.ep
 
         while not self._stop_event.is_set():
             while (t_curr - epsilon -t_last > sampling_period) or (t_curr + epsilon - t_last < sampling_period):
