@@ -105,9 +105,9 @@ class GCFrame(wx.Frame):
             with self.gc_cond:
                 while not self.data_rover_thread.is_avail():
                     self.gc_cond.wait()
-                # print('\n\nData point available: ')
-                # print(self.curr_data)
-                # print('\nThat was curr_data\n\n')
+                print('\n\nData point available: ')
+                print(self.curr_data)
+                print('\nThat was curr_data\n\n')
 
     def on_stop_btn(self):
         self.data_rover_thread.stop()
@@ -193,9 +193,7 @@ class GCThread(Thread):
             while (t_curr - epsilon -t_last > sampling_period) and (t_curr + epsilon - t_last < sampling_period):
                 time.sleep(.01)
                 t_curr = time.time()
-                print('-')
 
-            print('---------------')
 
             with self.condition:
 
@@ -205,8 +203,6 @@ class GCThread(Thread):
 
                 new = np.array((v,dt,t)).reshape(3,1)
                 self.thread_data = np.append(self.thread_data, new, axis=1)
-
-                print(self.thread_data)
 
                 self.avail = True
                 self.condition.notify()
