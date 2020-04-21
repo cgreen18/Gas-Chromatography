@@ -116,7 +116,7 @@ class GCFrame(wx.Frame):
     def on_stop_btn(self):
         self.data_rover_thread.stop()
 
-        self.curr_data = self.receiver_thread.curr_data
+        #self.curr_data = self.receiver_thread.curr_data
 
         self.receiver_thread.stop()
 
