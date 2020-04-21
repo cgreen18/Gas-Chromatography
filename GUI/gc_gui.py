@@ -151,12 +151,9 @@ class GCThread(Thread):
         print(empty_arr)
         print(condition)
         print(args)
-        print(*args)
-        print(kwargs)
-        print(**kwargs)
         print(kwargs['args'])
         print("end")
-        super(GCThread, self).__init__(*args, **kwargs)
+        super(GCThread, self).__init__(kwargs['args'])
         self.gc = gc
         self._stop_event = threading.Event()
 
