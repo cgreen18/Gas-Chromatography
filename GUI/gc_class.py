@@ -55,7 +55,7 @@ class Gas_Chrom:
 
         #Numpy/data
         self.dims = 3
-        self.curr_data = np.zeros((self.dims, 1))
+        self.curr_data = np.zeros((self.dims, 0))
          #voltage, dt, t
         self.prev_runs = None
         self.run_num = 0

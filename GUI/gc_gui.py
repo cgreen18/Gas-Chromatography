@@ -222,8 +222,6 @@ class GCThread(Thread):
         self.gc = gc
         self._stop_event = threading.Event()
 
-        self.thread_data = np.zeros((gc.dims, 1))
-
         self.condition = condition
         self.avail = False
 
@@ -641,7 +639,7 @@ class DetectorPanel(wx.Panel):
         return hbox
 
     def draw(self):
-        self.axes.plot(self.curr_data[0], self.curr_data[1])
+        self.axes.plot(self.curr_data[2], self.curr_data[0])
         self.canvas.draw()
 
     def ply_btn_evt(self, event):
@@ -655,6 +653,9 @@ class DetectorPanel(wx.Panel):
 
     def update_curr_data(self):
         self.curr_data = self.gcframe.curr_data
+        init_time = self.curr_data[2][0]
+        for abs_time_pt in self.curr_data[2]:
+            abs_time_pt = abs_time_pt - init_time
 
     def clear_plot_btn_evt(self, event):
         self.axes.cla()
