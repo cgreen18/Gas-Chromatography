@@ -178,6 +178,10 @@ class GCReceiver(Thread):
 
         self._stop_event = threading.Event()
 
+        self.gc_cond = condition
+        self.curr_data = curr_data
+        self.curr_data_lock = lock
+
     def stop(self):
         self._stop_event.set()
 
