@@ -116,6 +116,8 @@ class GCFrame(wx.Frame):
     def on_stop_btn(self):
         self.data_rover_thread.stop()
 
+        self.curr_data =
+
         self.receiver_thread.stop()
 
         self.data_rover_thread.join()
@@ -209,7 +211,7 @@ class GCReceiver(Thread):
                   print('gc_cond acquired')
                   self.curr_data_lock.acquire()
                   print('acquired')
-                  self.curr_data = np.copy(self.data_rover_thread.thread_data)
+                  self.curr_data = np.copy(self.gc.curr_data)
                   self.gc_cond.release()
                   self.curr_data_lock.release()
                 else:
@@ -259,7 +261,7 @@ class GCThread(Thread):
                 t_last = t_curr
 
                 new = np.array((v,dt,t)).reshape(3,1)
-                self.thread_data = np.append(self.thread_data, new, axis=1)
+                self.gc.curr_data = np.append(self.gc.curr_data, new, axis=1)
                 print('new daata')
                 self.condition.notify_all()
 
