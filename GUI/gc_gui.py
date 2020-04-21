@@ -183,7 +183,7 @@ class GCThread(Thread):
         t_last = time.time()
 
         sampling_period = self.sp
-         epsilon = self.ep
+        epsilon = self.ep
 
         while not self._stop_event.is_set():
             while (t_curr - epsilon -t_last > sampling_period) or (t_curr + epsilon - t_last < sampling_period):
