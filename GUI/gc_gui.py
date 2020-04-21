@@ -35,6 +35,8 @@ from threading import Thread
 
 import multiprocessing as mp
 
+from ctypes import Structure, c_float
+
 imdir = 'images'
 
 ## TODO: Prompt keyobard when typing in temperature
@@ -79,54 +81,32 @@ class GCFrame(wx.Frame):
         sp = 1 / rr
         ep = self.options['epsilon_time']
 
-        self.v = mp.Array('f', 1, lock=False)
-        self.dt = mp.Array('f', 1, lock=False)
-        self.t = mp.Array('f', 1, lock=False)
+        data_arr = np.zeros((self.gc.dims, 1))
+        self.curr_data = data_arr
 
-        targ = self.collect
+        self.gc_lock = threading.Lock()
+        self.gc_cond = threading.Condition(self.gc_lock)
 
-        self.data_rover_process = mp.Process(target = targ, name = 'data_rover', args = (sp, ep, self.v , self.dt, self.t) )
-        self.data_rover_process.start()
-        print("Object")
-        print(self.data_rover_process)
-        print("Type")
-        print(type(self.data_rover_process))
+        self.data_rover_thread = GCThread(self.gc, self.curr_data, self.gc_cond, args = ( self, sp, ep ) )
 
-        #data_rover_thread = GCThread( args = ( self, sp, ep ) )
+        self.data_rover_thread.start()
 
-    def collect(self, sampling_period, epsilon, volt_ref, delta_time_ref, time_ref):
-        t_last = time.time()
 
-        while True:
-            t_curr = time.time()
-            while (t_curr - epsilon -t_last > sampling_period) or (t_curr + epsilon - t_last < sampling_period):
-                time.sleep(.0001)
-                t_curr = time.time()
-
-            v = self.gc.get_voltage()
-            dt = t_curr - t_last
-            t = t_curr
-
-            volt_ref.append(v)
-            delta_time_ref.append(dt)
-            time_ref.append(t)
-
-            #new = np.array((v,dt,t)).reshape(3,1)
-            #self.thread_data = np.append(self.thread_data, new, axis=1)
+    def receive(self, sampling_period, epsilon):
+        with self.gc_cond:
+            while not self.data_rover_thread.is_avail():
+                self.gc_cond.wait()
+            print('\n\nData point available: ')
+            print(self.curr_data)
+            print('\nThat was curr_data\n\n')
 
     def on_stop_btn(self):
-        print("On stop, data_rover is: ")
-        print(self.data_rover_process)
-        print("Type")
-        print(type(self.data_rover_process))
-
-        self.data_rover_process.terminate()
-        self.data_rover_process.join()
-        v_dt_t = np.array((self.v,self.dt,self.t))
-        print(v_dt_t)
-        self.curr_data = v_dt_t
-        self.data_rover_process.close()
-
+        self.data_rover_thread.stop()
+        self.data_rover_thread.join()
+        print("\n\n____STOPPED_____\n")
+        print('\n\ncurr_data is: ')
+        print(self.curr_data)
+        print('\n\n')
 
     # Formatting
     def build_figure_(self):
@@ -166,11 +146,16 @@ class GCFrame(wx.Frame):
 
 
 class GCThread(Thread):
-    def __init__(self, gc, *args, **kwargs):
+    def __init__(self, gc, empty_arr, condition, *args, **kwargs):
         super(GCThread, self).__init__(*args, **kwargs)
         self.gc = gc
         self._stop_event = threading.Event()
-        self.thread_data = np.zeros((gc.dims, 1))
+
+        #empty_arr = np.zeros((gc.dims, 1))
+        self.thread_data = empty_arr
+
+        self.condition = condition
+        self.avail = False
 
     def stop(self):
         self._stop_event.set()
@@ -178,20 +163,28 @@ class GCThread(Thread):
     def stopped(self):
         return self._stop_event.is_set()
 
+    def is_avail(self):
+        return self.avail
+
     def run(self, sampling_period, epsilon):
         t_last = time.time()
 
-        while True:
+        while not self._stop_event.is_set():
             while (t_curr - epsilon -t_last > sampling_period) or (t_curr + epsilon - t_last < sampling_period):
-                time.sleep(.0001)
+                time.sleep(.001)
                 t_curr = time.time()
 
-            v = self.gc.get_voltage()
-            dt = t_curr - t_last
-            t = t_curr
+            with self.condition:
 
-            new = np.array((v,dt,t)).reshape(3,1)
-            self.thread_data = np.append(self.thread_data, new, axis=1)
+                v = self.gc.get_voltage()
+                dt = t_curr - t_last
+                t = t_curr
+
+                new = np.array((v,dt,t)).reshape(3,1)
+                self.thread_data = np.append(self.thread_data, new, axis=1)
+
+                self.avail = True
+                self.condition.notify()
 
 
 # SplitterWindow
