@@ -200,17 +200,18 @@ class GCReceiver(Thread):
                 t_curr = time.time()
 
             t_last = t_curr
-
-            val = self.gc_cond.wait(1)
-            if val:
-              print("notification received about item production...")
-              self.gc_cond.acquire()
-              self.curr_data_lock.acquire()
-              self.curr_data = np.copy(data_rover_thread.thread_data)
-              self.gc_cond.release()
-              self.curr_data_lock.release()
-            else:
-              print("waiting timeout...")
+            with self.gc_cond:
+                val = self.gc_cond.wait(1)
+                
+                if val:
+                  print("notification received about item production...")
+                  self.gc_cond.acquire()
+                  self.curr_data_lock.acquire()
+                  self.curr_data = np.copy(data_rover_thread.thread_data)
+                  self.gc_cond.release()
+                  self.curr_data_lock.release()
+                else:
+                  print("waiting timeout...")
 
 
 
