@@ -106,8 +106,7 @@ class GCFrame(wx.Frame):
                 while not self.data_rover_thread.is_avail():
                     self.gc_cond.wait()
                 print('\n\nData point available: ')
-                print(self.curr_data)
-                print('\nThat was curr_data\n\n')
+                print(self.data_rover_thread.thread_data)
 
     def on_stop_btn(self):
         self.data_rover_thread.stop()
