@@ -194,6 +194,8 @@ class GCThread(Thread):
                 new = np.array((v,dt,t)).reshape(3,1)
                 self.thread_data = np.append(self.thread_data, new, axis=1)
 
+                print(self.thread_data)
+
                 self.avail = True
                 self.condition.notify()
 
