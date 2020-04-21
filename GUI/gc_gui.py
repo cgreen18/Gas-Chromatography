@@ -242,7 +242,7 @@ class GCThread(Thread):
 
 
             with self.condition:
-
+                self.condition.acquire()
                 v = self.gc.get_voltage()
                 dt = t_curr - t_last
                 t = t_curr
@@ -252,6 +252,7 @@ class GCThread(Thread):
 
                 self.avail = True
                 self.condition.notify()
+                self.condition.release()
 
 
 # SplitterWindow
