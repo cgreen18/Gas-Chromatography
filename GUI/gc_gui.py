@@ -200,7 +200,7 @@ class GCReceiver(Thread):
                 t_curr = time.time()
 
             t_last = t_curr
-            print('-------')
+            print('-----------')
 
             self.gc_cond.wait()
             with self.gc_cond:
@@ -239,6 +239,7 @@ class GCThread(Thread):
         epsilon = self.ep
 
         while not self._stop_event.is_set():
+            print('before wait')
             t_curr= time.time()
             while (t_curr - epsilon -t_last < sampling_period):
                 time.sleep(.01)
