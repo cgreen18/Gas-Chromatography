@@ -152,6 +152,7 @@ class GCThread(Thread):
         print(condition)
         print(args)
         print(kwargs)
+        print("end")
         super(GCThread, self).__init__(*args, **kwargs)
         self.gc = gc
         self._stop_event = threading.Event()
