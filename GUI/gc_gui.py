@@ -199,6 +199,8 @@ class GCReceiver(Thread):
                 time.sleep(.01)
                 t_curr = time.time()
 
+            print('-------')
+
             self.gc_cond.wait()
             with self.gc_cond:
                 print('Receiver has cond')
