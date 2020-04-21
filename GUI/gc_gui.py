@@ -45,7 +45,7 @@ imdir = 'images'
 class GCFrame(wx.Frame):
     def __init__(self, parent, optiondict):
         self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
-        self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':20,
+        self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':5,
                         'epsilon_time':0.001, 'plot_refresh_rate':2, 'single_ended':True}
         self.options.update(self.constants)
 
@@ -202,11 +202,17 @@ class GCReceiver(Thread):
             t_last = t_curr
             print('-----------')
 
-            self.gc_cond.wait()
-            print('Receiver has cond')
-            self.curr_data_lock.acquire()
-            self.curr_data = np.copy(data_rover_thread.thread_data)
-            self.curr_data_lock.release()
+
+            val = self.gc_cond.wait(.001)
+            if val:
+              print("notification received about item production...")
+              self.curr_data_lock.acquire()
+              self.curr_data = np.copy(data_rover_thread.thread_data)
+              self.curr_data_lock.release()
+            else:
+              print("waiting timeout...")
+
+
 
 class GCThread(Thread):
     def __init__(self, gc, condition, *args, **kwargs):
@@ -256,7 +262,7 @@ class GCThread(Thread):
             new = np.array((v,dt,t)).reshape(3,1)
             self.thread_data = np.append(self.thread_data, new, axis=1)
 
-            self.avail = True
+            #self.avail = True
             self.condition.notify_all()
             self.condition.release()
 
