@@ -111,11 +111,13 @@ class GCFrame(wx.Frame):
 
         self.receiver_thread.join()
 
+        print('rec join')
+
         self.data_rover_thread.stop()
 
-
-
         self.data_rover_thread.join()
+
+        print('data join')
 
 
         self.running = False
@@ -264,6 +266,7 @@ class GCThread(Thread):
                 print('new daata')
                 self.condition.notify_all()
 
+        print('done running')
 
 # SplitterWindow
 class GCSplitter(wx.SplitterWindow):
