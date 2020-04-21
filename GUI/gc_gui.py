@@ -153,7 +153,7 @@ class GCThread(Thread):
         print(args)
         print(kwargs['args'])
         print("end")
-        super(GCThread, self).__init__(kwargs['args'])
+        super(GCThread, self).__init__( args= kwargs['args'])
         self.gc = gc
         self._stop_event = threading.Event()
 
