@@ -654,8 +654,7 @@ class DetectorPanel(wx.Panel):
     def update_curr_data(self):
         self.curr_data = self.gcframe.curr_data
         init_time = self.curr_data[2][0]
-        for abs_time_pt in self.curr_data[2]:
-            abs_time_pt = abs_time_pt - init_time
+        self.curr_data[2] = self.curr_data[2] - init_time
 
     def clear_plot_btn_evt(self, event):
         self.axes.cla()
