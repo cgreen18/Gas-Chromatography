@@ -213,8 +213,10 @@ class GCReceiver(Thread):
                   self.frame.curr_data_lock.acquire()
                   print('acquired')
                   self.frame.curr_data = np.copy(self.gc.curr_data)
+                  
                   self.gc_cond.release()
                   self.frame.curr_data_lock.release()
+
                 else:
                   print("waiting timeout...")
 
