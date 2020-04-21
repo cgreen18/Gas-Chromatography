@@ -93,7 +93,7 @@ class GCFrame(wx.Frame):
 
         rsp = self.options['plot_refresh_rate']
 
-        self.receiver_thread = GCReceiver(self, self.gc_cond, args = ( rsp, ep ))
+        self.receiver_thread = GCReceiver(self, self.gc, self.gc_cond, args = ( rsp, ep ))
 
         self.data_rover_thread.start()
         self.receiver_thread.start()
@@ -172,10 +172,11 @@ class GCPlotter(Thread):
 
 class GCReceiver(Thread):
 
-    def __init__(self, frame, condition, *args, **kwargs):
+    def __init__(self, frame, gc, condition, *args, **kwargs):
         super(GCReceiver, self).__init__()
 
         self.frame = frame
+        self.gc = gc
 
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]
