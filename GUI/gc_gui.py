@@ -148,16 +148,8 @@ class GCFrame(wx.Frame):
 class GCThread(Thread):
     def __init__(self, gc, empty_arr, condition, *args, **kwargs):
         print(gc)
-        print(empty_arr)
-        print(condition)
-        print(args)
-        print(kwargs['args'][0])
-        print("end")
 
-
-
-        super(GCThread, self).__init__( self)
-        print(self)
+        super(GCThread, self).__init__()
 
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]
@@ -186,6 +178,7 @@ class GCThread(Thread):
         epsilon = self.ep
 
         while not self._stop_event.is_set():
+            t_curr= time.time()
             while (t_curr - epsilon -t_last > sampling_period) or (t_curr + epsilon - t_last < sampling_period):
                 time.sleep(.001)
                 t_curr = time.time()
