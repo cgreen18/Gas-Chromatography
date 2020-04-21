@@ -209,7 +209,7 @@ class GCReceiver(Thread):
                   print('gc_cond acquired')
                   self.curr_data_lock.acquire()
                   print('acquired')
-                  self.curr_data = np.copy(data_rover_thread.thread_data)
+                  self.curr_data = np.copy(self.data_rover_thread.thread_data)
                   self.gc_cond.release()
                   self.curr_data_lock.release()
                 else:
