@@ -93,7 +93,7 @@ class GCFrame(wx.Frame):
 
         rsp = self.options['plot_refresh_rate']
 
-        self.receiver_thread = GCReceiver(self.gc_cond, self.curr_data, self.curr_data_lock, args = ( rsp, ep ))
+        self.receiver_thread = GCReceiver(self, self.gc_cond, args = ( rsp, ep ))
 
         self.data_rover_thread.start()
         self.receiver_thread.start()
@@ -116,7 +116,7 @@ class GCFrame(wx.Frame):
     def on_stop_btn(self):
         self.data_rover_thread.stop()
 
-        self.curr_data =
+        self.curr_data = self.receiver_thread.curr_data
 
         self.receiver_thread.stop()
 
@@ -172,8 +172,10 @@ class GCPlotter(Thread):
 
 class GCReceiver(Thread):
 
-    def __init__(self, condition, curr_data, lock, *args, **kwargs):
+    def __init__(self, frame, condition, curr_data, lock, *args, **kwargs):
         super(GCReceiver, self).__init__()
+
+        self.frame = frame
 
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]
@@ -181,8 +183,6 @@ class GCReceiver(Thread):
         self._stop_event = threading.Event()
 
         self.gc_cond = condition
-        self.curr_data = curr_data
-        self.curr_data_lock = lock
 
     def stop(self):
         self._stop_event.set()
@@ -209,11 +209,11 @@ class GCReceiver(Thread):
                   print("notification received about item production...")
                   #self.gc_cond.acquire()
                   print('gc_cond acquired')
-                  self.curr_data_lock.acquire()
+                  self.frame.curr_data_lock.acquire()
                   print('acquired')
-                  self.curr_data = np.copy(self.gc.curr_data)
+                  self.frame.curr_data = np.copy(self.gc.curr_data)
                   self.gc_cond.release()
-                  self.curr_data_lock.release()
+                  self.frame.curr_data_lock.release()
                 else:
                   print("waiting timeout...")
 
