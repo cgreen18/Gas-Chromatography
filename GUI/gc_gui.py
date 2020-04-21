@@ -215,8 +215,6 @@ class GCReceiver(Thread):
                       print('acquired')
                       self.frame.curr_data = np.copy(self.gc.curr_data)
 
-
-
                 else:
                   print("waiting timeout...")
 
