@@ -195,7 +195,7 @@ class GCReceiver(Thread):
         t_last = time.time()
         while not self._stop_event.is_set():
             t_curr= time.time()
-            while (t_curr - epsilon -t_last > sampling_period):
+            while (t_curr - epsilon -t_last < sampling_period):
                 time.sleep(.01)
                 t_curr = time.time()
 
@@ -239,7 +239,7 @@ class GCThread(Thread):
 
         while not self._stop_event.is_set():
             t_curr= time.time()
-            while (t_curr - epsilon -t_last > sampling_period):
+            while (t_curr - epsilon -t_last < sampling_period):
                 time.sleep(.01)
                 t_curr = time.time()
 
