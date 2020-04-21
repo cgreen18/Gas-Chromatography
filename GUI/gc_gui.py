@@ -246,21 +246,20 @@ class GCThread(Thread):
                 t_curr = time.time()
 
             print('-')
-            with self.condition:
 
-                self.condition.acquire()
-                print('-----')
-                v = self.gc.get_voltage()
-                dt = t_curr - t_last
-                t = t_curr
-                t_last = t_curr
+            self.condition.acquire()
+            print('-----')
+            v = self.gc.get_voltage()
+            dt = t_curr - t_last
+            t = t_curr
+            t_last = t_curr
 
-                new = np.array((v,dt,t)).reshape(3,1)
-                self.thread_data = np.append(self.thread_data, new, axis=1)
+            new = np.array((v,dt,t)).reshape(3,1)
+            self.thread_data = np.append(self.thread_data, new, axis=1)
 
-                self.avail = True
-                self.condition.notify_all()
-                #self.condition.release()
+            self.avail = True
+            self.condition.notify_all()
+            self.condition.release()
 
 
 # SplitterWindow
