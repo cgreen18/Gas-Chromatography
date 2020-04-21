@@ -161,6 +161,8 @@ class GCThread(Thread):
         self.gc = gc
         self._stop_event = threading.Event()
 
+        print(_stop_event)
+
         #empty_arr = np.zeros((gc.dims, 1))
         self.thread_data = empty_arr
 
