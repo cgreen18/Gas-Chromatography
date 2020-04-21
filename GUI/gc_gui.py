@@ -171,44 +171,39 @@ class GCPlotter(Thread):
 class GCReceiver(Thread):
 
     def __init__(self, condition, curr_data, lock, *args, **kwargs):
-        Thread.__init__(self)
-        print(self.stop)
-
+        super(GCReceiver, self).__init__()
 
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]
 
         self._stop_event = threading.Event()
 
-        def stop(self):
-            print('stop defined')
-            self._stop_event.set()
+    def stop(self):
+        self._stop_event.set()
 
-        def stopped(self):
-            return self._stop_event.is_set()
+    def stopped(self):
+        return self._stop_event.is_set()
 
-        def run(self):
-            sampling_period = self.sp
-            epsilon = self.ep
+    def run(self):
+        sampling_period = self.sp
+        epsilon = self.ep
 
-            t_last = time.time()
-            while not self._stop_event.is_set():
-                t_curr= time.time()
-                while (t_curr - epsilon -t_last > sampling_period):
-                    time.sleep(.01)
-                    t_curr = time.time()
+        t_last = time.time()
+        while not self._stop_event.is_set():
+            t_curr= time.time()
+            while (t_curr - epsilon -t_last > sampling_period):
+                time.sleep(.01)
+                t_curr = time.time()
 
-                self.gc_cond.wait()
-                with self.gc_cond:
-                    self.curr_data_lock.acquire()
-                    self.curr_data = np.copy(data_rover_thread.thread_data)
-                    self.curr_data_lock.release()
+            self.gc_cond.wait()
+            with self.gc_cond:
+                self.curr_data_lock.acquire()
+                self.curr_data = np.copy(data_rover_thread.thread_data)
+                self.curr_data_lock.release()
 
 class GCThread(Thread):
     def __init__(self, gc, condition, *args, **kwargs):
-        #super(GCThread, self).__init__()
-        Thread.__init__(self)
-        print(self.stop)
+        super(GCThread, self).__init__()
 
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]
@@ -221,7 +216,6 @@ class GCThread(Thread):
         self.avail = False
 
     def stop(self):
-        print('stop defined')
         self._stop_event.set()
 
     def stopped(self):
