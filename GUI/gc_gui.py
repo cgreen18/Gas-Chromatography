@@ -3,7 +3,7 @@ Title: gc_gui.py
 Author: Conor Green & Matt McPartlan
 Description: Mid-level abstraction of GUI application to perform data acquisition and display. Defines GUI and threading classes and instantiates GC object.
 Usage: Instantiate GCFrame object from gas_chromatography.py
-Version:
+Version (mainly for final report later):
 1.0 - November 24 2019 - Initial creation. All dependencies left in the script: will later be split into various scripts that are imported.
 1.1 - November 24 2019 - Implements numpy and plotting to window. Uses random numbers
 1.2 - 31 March 2020 - Old gas_chromatography.py -> gc_gui.py. This script defines the frame and panel classes that are put together in gas_chromatography.py. As of currently, it plots an example sin curve in the plotter but interfacing with the ADS1115 will be implemented when this is tested on a Raspberry Pi.
@@ -15,6 +15,8 @@ Version:
                             Basic, minimum GC supporting software.
 2.1 - 22 April 2020 - Serial connection with Arduino through temperature thread, which updates the text feedback.
                         Commands not yet implemented.
+2.2 - 22 April 2020 - Works with updated gc_class and lock.
+2.3 - 22 April 2020 - Added functions on voltage in menu bar.
 """
 
 import numpy as np
@@ -64,44 +66,15 @@ class GCFrame(wx.Frame):
         self.establish_serial_conn_()
         self.ser_lock = threading.Lock()
 
-        # Requires serial connection self.ser_conn
+        # Requires serial cofnnection self.ser_conn
         self.temp_thread_running = False
         self.establish_temperature_thread_()
 
+        # including curr_data_frame and curr_data_frame_lock
         self.establish_GC_()
-
-        # Init variables for formatting
-        self.curr_data = np.zeros((self.gc.dims,0))
-        self.curr_data_lock = threading.Lock()
 
         self.prev_data = []
         self.run_number = 0
-
-    def establish_GC_(self):
-        se = self.options['single_ended']
-        self.gc = GC(se)
-
-    def establish_temperature_(self):
-        sp = 1 / self.options['temp_refresh_rate']
-        ep = self.options['epsilon_time']
-        conn = self.ser_conn
-        lock = self.ser_lock
-
-        self.temperature_thread = GCTemperature( self, conn, lock, args = (sp, ep) )
-        self.temperature_thread.start()
-        self.temp_thread_running = True
-
-    def establish_serial_conn_(self):
-        bd = self.options['baud_rate']
-        to = self.options['time_out']
-
-        port = self.get_arduino_port()
-        try:
-            ser = serial.Serial(port, baudrate = bd, timeout = to)
-        except:
-            print("Error connecting to serial...")
-
-        self.ser_conn = ser
 
     def get_arduino_port(self):
         possible = [x for x in os.listdir('/dev/') if 'ACM' in x]
@@ -119,6 +92,35 @@ class GCFrame(wx.Frame):
         string = '/dev/' + possible[0]
 
         return string
+
+    def establish_serial_conn_(self):
+        bd = self.options['baud_rate']
+        to = self.options['time_out']
+
+        port = self.get_arduino_port()
+        try:
+            ser = serial.Serial(port, baudrate = bd, timeout = to)
+        except:
+            print("Error connecting to serial...")
+
+        self.ser_conn = ser
+
+    def establish_temperature_(self):
+        sp = 1 / self.options['temp_refresh_rate']
+        ep = self.options['epsilon_time']
+        conn = self.ser_conn
+        lock = self.ser_lock
+
+        self.temperature_thread = GCTemperature( self, conn, lock, args = (sp, ep) )
+        self.temperature_thread.start()
+        self.temp_thread_running = True
+
+    def establish_GC_(self):
+        se = self.options['single_ended']
+        self.gc = GC(se)
+        self.curr_data_frame_lock = self.gc.get_lock()
+
+        self.update_curr_data_()
 
     def set_options_(self, uo):
         self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
@@ -139,11 +141,16 @@ class GCFrame(wx.Frame):
         return self.panel_detector.get_figure()
 
     def get_curr_data(self):
-        return self.gc.get_curr_data()
+        self.curr_data_frame_lock.acquire()
+        d = self.gc.get_curr_data()
+        self.curr_data_frame_lock.release()
+        return d
 
     # gc_class methods
-    def update_curr_data(self):
-        pass
+    def update_curr_data_(self):
+        self.curr_data_frame_lock.acquire()
+        self.curr_data_frame = self.gc.get_curr_data()
+        self.curr_data_frame_lock.release()
 
     # Events
     def on_ov_txt_ctrl(self, string):
@@ -162,7 +169,9 @@ class GCFrame(wx.Frame):
         with self.ser_lock:
             self.ser_cmd_set_temp(val, str)
 
-
+'''
+BIG TODO >>>>>
+'''
     def ser_cmd_set_temp(self, temp, which = 'oven'):
         if which == 'oven':
             # do something
@@ -171,7 +180,6 @@ class GCFrame(wx.Frame):
             #
         else:
             print('Err')
-
 
     def on_play_btn(self):
         rr = self.options['data_samp_rate']
@@ -262,6 +270,18 @@ class GCFrame(wx.Frame):
 
     def on_jpg_save(self, err):
         saveas_jpg_window = SaveasJPG(self, self.options)
+
+    def on_data_integrate(self, err):
+        self.curr_data_frame_lock.acquire()
+        self.gc.integrate_volt()
+        self.update_curr_data_()
+        self.curr_data_frame_lock.release()
+
+    def on_data_normalize(self, err):
+        self.curr_data_frame_lock.acquire()
+        self.gc.normalize_volt()
+        self.update_curr_data_()
+        self.curr_data_frame_lock.release()
 
 # Threads
 class GCTemperature(Thread):
@@ -505,7 +525,8 @@ class GCSplitter(wx.SplitterWindow):
         self.options = parent.options
         self.parent = parent
 
-    def create_fonts(self):
+    @staticmethod
+    def create_fonts():
         font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
         font.SetPointSize(self.options['BODY_FONT_SIZE'])
         header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
@@ -764,7 +785,7 @@ class DetectorPanel(wx.Panel):
         self.gcframe = parent.parent
         self.options = self.parent.options
 
-        self.fonts = self.parent.create_fonts()
+        self.fonts = GCSplitter.create_fonts()
 
         self.create_panel()
 
@@ -915,7 +936,7 @@ class ControlPanel( wx.Panel ):
         self.gcframe = parent.parent
         self.options = self.parent.options
 
-        self.fonts = self.parent.create_fonts()
+        self.fonts = GCSplitter.create_fonts()
 
         self.create_panel()
 
@@ -1068,7 +1089,14 @@ class GCMenuBar(wx.MenuBar):
         data_menu = wx.Menu()
 
         data_menu.Append(wx.ID_ANY, '&Previous Set')
-        data_menu.Append(wx.ID_ANY, '&Operations...')
+        data_menu_ops = wx.Menu()
+        integ = data_menu_ops.Append(wx.ID_ANY, '&Integrate')
+        self.parent.Bind(wx.EVT_MENU, self.parent.on_data_integrate, integ )
+
+        norm = data_menu_ops.Append(wx.ID_ANY, '&Normalize')
+        self.parent.Bind(wx.EVT_ANY, self.parent.on_data_normalize, norm)
+
+        data_menu.Append(wx.ID_ANY, '&Operations...', data_menu_ops)
 
         return data_menu
 

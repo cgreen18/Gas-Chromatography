@@ -12,6 +12,8 @@ Version:
 1.3 - 21 February 20 - Debugged and works in preliminary testing!
 2.0 - 21 April 2020 - Final version. Sufficiently supports gc_gui.py in data collection with simple methods. ...
                         Old methods, that can plot, print, etc. are left at the end for future debugging/testing.
+2.1 - 22 April 2020 - Integrate and normalize voltage methods.
+2.2 - 22 April 2020 - Huge security upgrade. Moved lock to here (gc_class) and protected curr_data through getters and setters.
 '''
 
 # GPIO imports
@@ -26,6 +28,8 @@ import time
 # Numpy and Matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
+
+from threading import Lock
 
 '''
 @param: single_ended = True if single ended ADC and vice-versa
@@ -49,10 +53,66 @@ class GC:
             self.chan = AnalogIn(self.ads, self.port0 , self.port1)
 
         #Numpy/data
-        self.dims = 3 #voltage, dt, t
+        self.dims = 4 #voltage, dt, t
+        self.indices = {'v':0,'area':1,'dt':2,'t':3}
         self.curr_data = np.zeros((self.dims, 0))
+        self.curr_data_lock = threading.Lock()
+        self.time_out = 1 #sec
         self.prev_runs = []
         self.run_num = 0
+
+    def integrate_volt(self):
+        to = self.time_out
+        #ignore err for now
+        _e = self.curr_data_lock.acquire(to)
+
+        c_d = self.get_curr_data()
+        if len(c_d) != 0:
+            voltage = self.get_volt()
+            _l = 0
+            _h = -1
+            area = self.integrate(voltage, _l, _h)
+            return area
+        else:
+            print("No data")
+
+    def integrate(self, arr, low, high):
+        if low < len(arr) -1:
+            arr = arr[low]
+            high = high - low
+
+        tot_area = np.cumsum(arr)
+        if high == -1:
+            area = tot_area[-1]
+        elif high < len(arr) -1:
+            area = tot_area[high]
+        else:
+            print("High index in integration out of bounds")
+            area = tot_area[-1]
+
+        return area
+
+    def normalize_volt(self):
+        to = self.time_out
+        #ignore error for now
+        _e = self.curr_data_lock.acquire(to)
+
+        volt = self.get_volt()
+        _e = self.curr_data_lock.release()
+
+        _min = volt.min()
+        volt = volt - _min
+
+        _area = self.integrate_volt()
+        volt = volt / _area
+
+        _e = self.curr_data_lock.acquire(to)
+        self.set_volt(volt)
+        _e = self.curr_data_lock.release()
+
+    def break_into_peaks(self):
+        if self.integrate_volt()
+        pass
 
     # ADS1115 Methods
     def reinit_ADS(self):
@@ -61,19 +121,54 @@ class GC:
 
         self.chan = AnalogIn(ads , self.port0) if self.single_ended else AnalogIn(ads, self.port0 , self.port1)
 
-    def set_gain(self, gain):
-        self.ads.gain = gain
+    def set_gain(self, g):
+        self.ads.gain = g
 
-    def set_mode(self, single_ended):
-        self.single_ended = single_ended
+    def set_mode(self, se):
+        self.single_ended = se
         self.reinit_ADS()
 
-    # Unneccessary
-    def get_curr_data(self):
-        return self.curr_data
+    # Getters and setters for locking
+    def get_lock(self):
+        return self.curr_data_lock
 
-    def set_curr_data(self, data):
-        self.curr_data = data
+    def get_curr_data(self):
+        is_locked = self.curr_data_lock.locked()
+        if is_locked:
+            return self.curr_data
+        else:
+            print('no access')
+
+    def set_curr_data(self, d):
+        is_locked = self.curr_data_lock.locked()
+        if is_locked:
+            self.curr_data = d
+        else:
+            print('no access')
+
+    def get_volt(self):
+        is_locked = self.curr_data_lock.locked()
+        v_index = self.indices['v']
+        if is_locked:
+            return self.curr_data[v_index]
+        else:
+            print('no access')
+
+    def set_volt(self, d):
+        is_locked = self.curr_data_lock.locked()
+        v_index = self.indices['v']
+        if is_locked:
+            self.curr_data[v_index] = d
+        else:
+            print('no access')
+
+    def get_time(self):
+        is_locked = self.curr_data_lock.locked()
+        t_index = self.indices['t']
+        if is_locked:
+            return self.curr_data[t_index]
+        else:
+            print('no access')
 
     def print_voltage(self):
         print(self.chan.voltage)
@@ -90,23 +185,35 @@ class GC:
     # Temporary/old graphing methods
     def graph_curr_data_on_popup(self):
         plt.figure()
-        plt.scatter(self.curr_data[1][:], self.curr_data[0][:])
+        to = self.time_out
+        _e = self.curr_data_lock.acquire(to)
+        t = self.get_time()
+        v = self.get_volt()
+        _e = self.curr_data_lock.release(to)
+        plt.scatter( t, v )
         plt.show()
 
     # Numpy/data methods
     def coll_volt_const_pts(self , num_pts):
-        v_dt_t =  np.zeros((self.dims , num_pts ) )
+        v_i = self.indices['v']
+        a_i = self.indices['area']
+        dt_i = self.indices['dt']
+        t_i = self.indices['i']
+
+        temp_data_arr =  np.zeros((self.dims , num_pts ) )
 
         t_start = time.time()
         for i in range(0,num_pts):
             time.sleep(.01)
-            v_dt_t[0][i] = self.get_voltage()
+            temp_data_arr[v_i][i] = self.get_voltage()
+            temp_data_arr[a_i] = None
             t_curr = time.time()
-            v_dt_t[1][i] = t_curr - t_start
-            v_dt_t[2][i] = t_curr
+            temp_data_arr[dt_i][i] = t_curr - t_start
+            temp_data_arr[t_i][i] = t_curr
 
         return voltage_and_time
 
+    # old, dont trust
     def coll_volt_const_pts_self(self, num_pts):
         self.run_num += 1
         self.prev_runs.append(self.curr_data)
