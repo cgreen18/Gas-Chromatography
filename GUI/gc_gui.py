@@ -248,10 +248,10 @@ class GCTemperature(Thread):
         self.ser_lock = serial_lock
 
         self.oven_temp = None
-        self.oven_txt_ctrl = self.frame.panel_config.str_ov_fdbk_val
+        self.oven_stc_txt = self.frame.panel_config.str_ov_fdbk_val
 
         self.det_temp = None
-        self.det_txt_ctrl = self.frame.panel_config.str_det_fdbk_val
+        self.det_stc_txt = self.frame.panel_config.str_det_fdbk_val
 
         self.last_update_time_raw = None
 
@@ -330,8 +330,8 @@ class GCTemperature(Thread):
     def set_both_txt_ctrls(self, temps):
         ov_str = temps[0]
         det_str = temps[1]
-        self.oven_txt_ctrl.SetLabel(ov_str)
-        self.det_txt_ctrl.SetLabel(det_str)
+        self.oven_stc_txt.SetLabel(ov_str)
+        self.det_stc_txt.SetLabel(det_str)
 
 class GCPlotter(Thread):
     def __init__(self, frame, curr_data_lock, *args, **kwargs):
