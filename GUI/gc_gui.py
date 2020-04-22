@@ -230,7 +230,6 @@ class GCFrame(wx.Frame):
         saveas_jpg_window = SaveasJPG(self, self.options)
 
 
-# Not yet created
 class GCTemperature(Thread):
     def __init__(self, frame, serial_connection, serial_lock, *args, **kwargs):
         super(GCTemperature, self).__init__()
