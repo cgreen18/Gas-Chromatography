@@ -13,10 +13,11 @@ Version:
 2.0 - 21 April 2020 - Version 2.0 successfully graphs live data with play button, ...
                             graphs it live, saves images and .gc files, and clears.
                             Basic, minimum GC supporting software.
+2.1 - 22 April 2020 - Serial connection with Arduino through temperature thread, which updates the text feedback.
+                        Commands not yet implemented.
 """
 
 import numpy as np
-from numpy import arange, sin, pi
 
 import matplotlib
 matplotlib.use('WXAgg')
@@ -30,51 +31,97 @@ import wx.lib.plot as plot
 
 import os
 import codecs, json
-from time import localtime, strftime
 import time
 
 from gc_class import GC
 
 import threading
 from threading import Thread
-import multiprocessing as mp
 
-from ctypes import Structure, c_float
+import serial
 
 imdir = 'images'
+
+# c serial cmd definition
+READ_TMP_CMD_STR = '000 000 000 000'
 
 ## TODO: Prompt keyobard when typing in temperature
 
 # Frames
 class GCFrame(wx.Frame):
-    def __init__(self, parent, optiondict):
-        self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
-        self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':5.0,
-                        'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0, 'single_ended':True}
-        self.options.update(self.constants)
-
-        self.options.update(optiondict)
+    def __init__(self, parent, user_options):
+        self.set_options_(user_options)
+        self.parent = parent
 
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = self.options['DEFAULT_FRAME_SIZE'], style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
         self.build_figure_()
 
-        sp = 1 / self.options['temp_refresh_rate']
-        ep = self.options['epsilon_time']
+        self.establish_serial_conn_()
+        self.ser_lock = threading.Lock()
 
-        # TODO: Temperature thread
-        #self.temperature_thread = GCTemperature( self, SERIAL_CONN, type = provider, args = (sp, ep))
+        # Requires serial connection self.ser_conn
+        self.establish_temperature_thread_()
 
-        se = self.options['single_ended']
-        self.gc = GC(se)
-        self.parent = parent
+        self.establish_GC_()
 
+        # Init variables for formatting
         self.curr_data = np.zeros((self.gc.dims,0))
         self.curr_data_lock = threading.Lock()
 
         self.prev_data = []
         self.run_number = 0
+
+    def establish_GC_(self):
+        se = self.options['single_ended']
+        self.gc = GC(se)
+
+    def establish_temperature_(self):
+        sp = 1 / self.options['temp_refresh_rate']
+        ep = self.options['epsilon_time']
+        conn = self.ser_conn
+        lock = self.ser_lock
+
+        self.temperature_thread = GCTemperature( self, conn, lock, args = (sp, ep) )
+
+    def establish_serial_conn_(self):
+        bd = self.options['baud_rate']
+        to = self.options['time_out']
+
+        port = self.get_arduino_port()
+        try:
+            ser = serial.Serial(port, baudrate = bd, timeout = to)
+        except:
+            print("Error connecting to serial...")
+
+        self.ser_conn = ser
+
+    def get_arduino_port(self):
+        possible = [x for x in os.listdir('/dev/') if 'ACM' in x]
+
+        if len(possible) == 0:
+            print("Error: No ACM ports found to connect to Arduino.")
+            print("Continuing for now.")
+            possible[0] = 'ACM0'
+        elif len(possible) != 1:
+            print("Error: Multiple possible ACM ports to connect Arduino")
+            print("Defaulting to '/dev/ACM0'")
+            possible[0] = 'ACM0'
+
+        local = possible[0]
+        string = '/dev/' + possible[0]
+
+        return string
+
+    def set_options_(self, uo):
+        self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
+        self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':5.0, 'baud_rate':115200,
+                        'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
+                        'single_ended':True}
+        self.options.update(self.constants)
+
+        self.options.update(uo)
 
     def __del__(self):
         pass
@@ -109,12 +156,11 @@ class GCFrame(wx.Frame):
         self.data_rover_thread.start()
         self.receiver_thread.start()
 
-        self.plotter_thread = GCPlotter(self, args=(rsp,ep))
+        self.plotter_thread = GCPlotter(self, self.curr_data_lock, args=(rsp,ep))
 
         self.plotter_thread.start()
 
         self.running= True
-
 
     def on_stop_btn(self):
         self.stop_data_coll()
@@ -146,7 +192,6 @@ class GCFrame(wx.Frame):
             self.prev_data.append(self.curr_data)
 
         self.curr_data = np.zeros((self.gc.dims,0))
-
 
     # Formatting
     def build_figure_(self):
@@ -184,17 +229,29 @@ class GCFrame(wx.Frame):
     def on_jpg_save(self, err):
         saveas_jpg_window = SaveasJPG(self, self.options)
 
+
 # Not yet created
 class GCTemperature(Thread):
-    def __init__(self, frame, *args, **kwargs):
+    def __init__(self, frame, serial_connection, serial_lock, *args, **kwargs):
         super(GCTemperature, self).__init__()
 
         self.frame = frame
 
-        self.sp = kwargs['args'][0]
-        self.ep = kwargs['args'][1]
+        self.sp = kwargs['args'][0] #sampling_period
+        self.ep = kwargs['args'][1] #epsilon
 
         self._stop_event = threading.Event()
+
+        self.ser_conn = serial_connection
+        self.ser_lock = serial_lock
+
+        self.oven_temp = None
+        self.oven_txt_ctrl = self.frame.panel_config.str_ov_fdbk_val
+        self.oven_t_last = None
+
+        self.det_temp = None
+        self.det_txt_ctrl = self.frame.panel_config.str_det_fdbk_val
+        self.det_t_last = None
 
     def stop(self):
         self._stop_event.set()
@@ -203,16 +260,66 @@ class GCTemperature(Thread):
         return self._stop_event.is_set()
 
     def run(self):
-        pass
+        sampling_period = self.sp
+        epsilon = self.ep
 
+        t_last = time.time()
+        while not self.stopped():
+            t_curr= time.time()
+            while (t_curr - epsilon -t_last < sampling_period):
+                time.sleep(.1)
+                t_curr = time.time()
 
+            t_last = t_curr
+
+            with self.frame.serial_lock:
+                self.query_temp()
+
+    def query_temp(self):
+        # From c library. Defined in c_constants.py
+        #READ_TMP_CMD_STR = '000 000 000 000'
+        b_str = READ_TMP_CMD_STR.encode()
+
+        ser = self.ser
+
+        _ = ser.write(b_str)
+
+        bit_response = []
+        while ser.in_waiting > 0:
+            line = ser.readline()
+            bit_response.append(line)
+
+        temperatures = self.parse_response(bit_response)
+
+        self.set_both_txt_ctrls(temperatures)
+
+    def parse_response(self, resp):
+        ov_location = 1
+        det_location = 3
+
+        str_resp = [item.decode() for item in resp]
+        str_resp = [item.strip('\r\n') for item in str_resp]
+
+        ov_tmp = str_resp[ov_location]
+
+        det_tmp = str_resp[det_location]
+
+        temps = [ov_tmp, det_tmp]
+
+        return temps
+
+    def set_both_txt_ctrls(self, temps):
+        ov_str = temps[0]
+        det_str = temps[1]
+        self.oven_txt_ctrl.SetLabel(ov_str)
+        self.det_txt_ctrl.SetLabel(det_str)
 
 class GCPlotter(Thread):
-
-    def __init__(self, frame, *args, **kwargs):
+    def __init__(self, frame, curr_data_lock, *args, **kwargs):
         super(GCPlotter, self).__init__()
 
         self.frame = frame
+        self.curr_data_lock = curr_data_lock
 
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]
@@ -230,7 +337,7 @@ class GCPlotter(Thread):
         epsilon = self.ep
 
         t_last = time.time()
-        while not self._stop_event.is_set():
+        while not self.stopped():
             t_curr= time.time()
             while (t_curr - epsilon -t_last < sampling_period):
                 time.sleep(.1)
@@ -238,7 +345,7 @@ class GCPlotter(Thread):
 
             t_last = t_curr
 
-            with self.frame.curr_data_lock:
+            with self.curr_data_lock:
                 print('acquired_plot')
                 self.frame.panel_detector.update_curr_data()
                 self.frame.panel_detector.draw()
@@ -269,7 +376,7 @@ class GCReceiver(Thread):
         epsilon = self.ep
 
         t_last = time.time()
-        while not self._stop_event.is_set():
+        while not self.stopped():
             t_curr= time.time()
             while (t_curr - epsilon -t_last < sampling_period):
                 time.sleep(.01)
@@ -319,7 +426,7 @@ class GCData(Thread):
         sampling_period = self.sp
         epsilon = self.ep
 
-        while not self._stop_event.is_set():
+        while not self.stopped():
             t_curr= time.time()
             while (t_curr - epsilon -t_last < sampling_period):
                 time.sleep(.01)
@@ -799,7 +906,7 @@ class ControlPanel( wx.Panel ):
         str_ov_fdbk.SetFont(font)
         hbox_ov_fdbk.Add(str_ov_fdbk)
 
-        str_ov_fdbk_val = wx.StaticText(self, label = 'N/A')
+        self.str_ov_fdbk_val = wx.StaticText(self, label = 'N/A')
         str_ov_fdbk_val.SetFont(font)
         hbox_ov_fdbk.Add(str_ov_fdbk_val)
 
