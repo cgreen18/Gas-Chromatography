@@ -62,6 +62,7 @@ class GCFrame(wx.Frame):
         self.ser_lock = threading.Lock()
 
         # Requires serial connection self.ser_conn
+        self.temp_thread_running = False
         self.establish_temperature_thread_()
 
         self.establish_GC_()
@@ -84,6 +85,8 @@ class GCFrame(wx.Frame):
         lock = self.ser_lock
 
         self.temperature_thread = GCTemperature( self, conn, lock, args = (sp, ep) )
+        self.temperature_thread.start()
+        self.temp_thread_running = True
 
     def establish_serial_conn_(self):
         bd = self.options['baud_rate']
@@ -229,7 +232,7 @@ class GCFrame(wx.Frame):
     def on_jpg_save(self, err):
         saveas_jpg_window = SaveasJPG(self, self.options)
 
-
+# Threads
 class GCTemperature(Thread):
     def __init__(self, frame, serial_connection, serial_lock, *args, **kwargs):
         super(GCTemperature, self).__init__()
@@ -246,11 +249,14 @@ class GCTemperature(Thread):
 
         self.oven_temp = None
         self.oven_txt_ctrl = self.frame.panel_config.str_ov_fdbk_val
-        self.oven_t_last = None
 
         self.det_temp = None
         self.det_txt_ctrl = self.frame.panel_config.str_det_fdbk_val
-        self.det_t_last = None
+
+        self.last_update_time_raw = None
+
+        self.ov_location = 1
+        self.det_location = 3
 
     def stop(self):
         self._stop_event.set()
@@ -261,6 +267,9 @@ class GCTemperature(Thread):
     def run(self):
         sampling_period = self.sp
         epsilon = self.ep
+
+        o_l = self.ov_location
+        d_l = self.det_location
 
         t_last = time.time()
         while not self.stopped():
@@ -276,6 +285,11 @@ class GCTemperature(Thread):
 
             temperatures = self.parse_response(bit_response)
 
+            self.oven_temp = float(temperatures[o_l])
+            self.det_tmp = float(temperatures[d_l])
+
+            self.last_update_time_raw = time.time()
+
             self.set_both_txt_ctrls(temperatures)
 
     def query_temp(self):
@@ -286,6 +300,7 @@ class GCTemperature(Thread):
         ser = self.ser
 
         ser.flushInput()
+        ser.flushOutput()
 
         _ = ser.write(b_str)
 
@@ -298,15 +313,15 @@ class GCTemperature(Thread):
 
 
     def parse_response(self, resp):
-        ov_location = 1
-        det_location = 3
+        o_l = self.ov_location
+        d_l = self.det_location
 
         str_resp = [item.decode() for item in resp]
         str_resp = [item.strip('\r\n') for item in str_resp]
 
-        ov_tmp = str_resp[ov_location]
+        ov_tmp = str_resp[o_l]
 
-        det_tmp = str_resp[det_location]
+        det_tmp = str_resp[d_l]
 
         temps = [ov_tmp, det_tmp]
 
