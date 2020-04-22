@@ -273,7 +273,11 @@ class GCTemperature(Thread):
             t_last = t_curr
 
             with self.frame.serial_lock:
-                self.query_temp()
+                bit_response = self.query_temp()
+
+            temperatures = self.parse_response(bit_response)
+
+            self.set_both_txt_ctrls(temperatures)
 
     def query_temp(self):
         # From c library. Defined in c_constants.py
@@ -289,9 +293,8 @@ class GCTemperature(Thread):
             line = ser.readline()
             bit_response.append(line)
 
-        temperatures = self.parse_response(bit_response)
+        return bit_response
 
-        self.set_both_txt_ctrls(temperatures)
 
     def parse_response(self, resp):
         ov_location = 1
