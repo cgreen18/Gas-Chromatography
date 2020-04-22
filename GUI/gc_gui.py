@@ -10,6 +10,9 @@ Version:
 1.3 - 31 March 2020 - Added images to buttons. Added more menu options.
 1.4 - 31 March 2020 - Save current figure as .png or .jpg
 1.5 - 21 April 2020 - FINALLY got threading working.
+2.0 - 21 April 2020 - Version 2.0 successfully graphs live data with play button, ...
+                            graphs it live, saves images and .gc files, and clears.
+                            Basic, minimum GC supporting software.
 """
 
 import numpy as np
@@ -181,9 +184,8 @@ class GCFrame(wx.Frame):
     def on_jpg_save(self, err):
         saveas_jpg_window = SaveasJPG(self, self.options)
 
-
+# Not yet created
 class GCTemperature(Thread):
-
     def __init__(self, frame, *args, **kwargs):
         super(GCTemperature, self).__init__()
 
