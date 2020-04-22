@@ -45,6 +45,9 @@ imdir = 'images'
 # c serial cmd definition
 READ_TMP_CMD_STR = '000 000 000 000'
 
+# __future__!! better set it later
+SET_TMP_CMD_STR = 'XXXXXXXXXX'
+
 ## TODO: Prompt keyobard when typing in temperature
 
 # Frames
@@ -141,6 +144,34 @@ class GCFrame(wx.Frame):
     # gc_class methods
     def update_curr_data(self):
         pass
+
+    # Events
+    def on_ov_txt_ctrl(self, string):
+        print("Text control changed")
+        print(string + " received")
+        val = float(string)
+        str = 'oven'
+
+        with self.ser_lock:
+            self.ser_cmd_set_temp(val, str)
+
+    def on_det_txt_ctrl(self, string):
+        val = float(string)
+        str = 'det'
+
+        with self.ser_lock:
+            self.ser_cmd_set_temp(val, str)
+
+
+    def ser_cmd_set_temp(self, temp, which = 'oven'):
+        if which == 'oven':
+            # do something
+            # SET_TMP_CMD_STR
+        elif which == 'det':
+            #
+        else:
+            print('Err')
+
 
     def on_play_btn(self):
         rr = self.options['data_samp_rate']
@@ -905,6 +936,7 @@ class ControlPanel( wx.Panel ):
 
         self.tc_ov_set = wx.TextCtrl(self)
         hbox_ov_set.Add(self.tc_ov_set, proportion=1)
+        self.Bind(wx.EVT_TEXT_ENTER, self.oven_set , self.tc_ov_set)
 
         self.vbox.Add(hbox_ov_set, flag=wx.LEFT|wx.TOP,border =b)
 
@@ -921,8 +953,9 @@ class ControlPanel( wx.Panel ):
         #Detector temp
         hbox_det_set = self.build_det_static_text_one()
 
-        tc_det_set = wx.TextCtrl(self)
-        hbox_det_set.Add(tc_det_set, proportion = 1)
+        self.tc_det_set = wx.TextCtrl(self)
+        hbox_det_set.Add(self.tc_det_set, proportion = 1)
+        self.Bind(wx.EVT_TEXT_ENTER, self.det_set , self.tc_det_set)
 
         self.vbox.Add(hbox_det_set, flag=wx.LEFT|wx.TOP,border =b)
 
@@ -935,6 +968,15 @@ class ControlPanel( wx.Panel ):
         vbox.Add(hbox_det_fdbk, flag=wx.LEFT|wx.TOP,border =b)
 
         self.SetSizer(self.vbox)
+
+
+    def oven_set(self, event):
+        str = self.tc_ov_set.GetLineText()
+        self.gcframe.on_ov_txt_ctrl(str)
+
+    def det_set(self, event):
+        str = self.tc_det_set.GetLineText()
+        self.gcframe.on_det_txt_ctrl(str)
 
     def build_det_static_text_two(self):
         hbox_det_fdbk = wx.BoxSizer(wx.HORIZONTAL)
