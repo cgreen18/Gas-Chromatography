@@ -285,6 +285,8 @@ class GCTemperature(Thread):
 
         ser = self.ser
 
+        ser.flushInput()
+
         _ = ser.write(b_str)
 
         bit_response = []
