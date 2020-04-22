@@ -470,9 +470,17 @@ class GCSplitter(wx.SplitterWindow):
     parent is GCFrame
     '''
     def __init__(self, parent):
+        wx.SplitterWindow.__init__(self, parent, id=wx.ID_ANY,pos=wx.DefaultPosition , size=self.options['frame_size'], style = wx.SP_BORDER, name='Diode Based Gas Chromatography' )
         self.options = parent.options
         self.parent = parent
-        wx.SplitterWindow.__init__(self, parent, id=wx.ID_ANY,pos=wx.DefaultPosition , size=self.options['frame_size'], style = wx.SP_BORDER, name='Diode Based Gas Chromatography' )
+
+    def create_fonts(self):
+        font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
+        font.SetPointSize(self.options['BODY_FONT_SIZE'])
+        header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
+        header_font.SetPointSize(self.options['HEADER_FONT_SIZE'])
+
+        return {'font':font,'header_font':header_font}
 
 #DirectoryWindow(s)
 class DirectoryWindow(wx.Frame):
@@ -719,16 +727,15 @@ class OpenWindow(DirectoryWindow):
 #Panels
 class DetectorPanel(wx.Panel):
     def __init__(self, parent):
-        self.parent = parent
-        self.gcframe = parent.parent
-
-        self.options = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
-        self.fonts = self.create_fonts()
-
         wx.Panel.__init__(self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, style = wx.TAB_TRAVERSAL)
 
-        self.create_panel()
+        self.parent = parent
+        self.gcframe = parent.parent
+        self.options = self.parent.options
 
+        self.fonts = self.parent.create_fonts()
+
+        self.create_panel()
 
     def create_panel(self):
         f = self.fonts['font']
@@ -803,14 +810,6 @@ class DetectorPanel(wx.Panel):
         self.vbox2.Add(self.btn_clr, border= b)
         self.vbox2.Add((-1,es))
 
-    def create_fonts(self):
-        font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
-        font.SetPointSize(self.options['BODY_FONT_SIZE'])
-        header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
-        header_font.SetPointSize(self.options['HEADER_FONT_SIZE'])
-
-        return {'font':font,'header_font':header_font}
-
     def create_figure_(self):
         self.figure = Figure()
         self.axes = self.figure.add_subplot(111)
@@ -879,86 +878,103 @@ class DetectorPanel(wx.Panel):
 
 class ControlPanel( wx.Panel ):
     def __init__( self, parent ):
-        self.parent = parent
-
-        BODY_FONT_SIZE = self.parent.options['BODY_FONT_SIZE']
-        HEADER_FONT_SIZE = self.parent.options['HEADER_FONT_SIZE']
-        EXTRA_SPACE = self.parent.options['EXTRA_SPACE']
-        BORDER = self.parent.options['BORDER']
-
-
         wx.Panel.__init__ (self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, style = wx.TAB_TRAVERSAL )
 
-        font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
-        font.SetPointSize(BODY_FONT_SIZE)
-        header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
-        header_font.SetPointSize(HEADER_FONT_SIZE)
+        self.parent = parent
+        self.gcframe = parent.parent
+        self.options = self.parent.options
 
-        vbox = wx.BoxSizer(wx.VERTICAL)
+        self.fonts = self.parent.create_fonts()
 
-        #Temperature
-        str_temp = wx.StaticText(self, label = 'Temperature')
-        str_temp.SetFont(header_font)
+        self.create_panel()
 
+    def create_panel(self):
+        f = self.fonts['font']
+        hf = self.fonts['header_font']
+        b = self.options['BORDER']
+        es = self.options['EXTRA_SPACE']
+        bfs = self.options['BODY_FONT_SIZE']
 
-        vbox.Add(str_temp, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP,border =BORDER)
+        self.vbox = wx.BoxSizer(wx.VERTICAL)
 
-
-        vbox.Add((-1,EXTRA_SPACE))
+        # Temperature header
+        self.build_static_header_()
 
         #Oven temp
-        hbox_ov_set = wx.BoxSizer(wx.HORIZONTAL)
-        str_ov_set = wx.StaticText(self,label='Set Oven Temp.: ')
-        str_ov_set.SetFont(font)
-        hbox_ov_set.Add(str_ov_set)
+        hbox_ov_set = self.build_oven_static_text_one()
 
-        tc_ov_set = wx.TextCtrl(self)
-        hbox_ov_set.Add(tc_ov_set, proportion=1)
+        self.tc_ov_set = wx.TextCtrl(self)
+        hbox_ov_set.Add(self.tc_ov_set, proportion=1)
 
+        self.vbox.Add(hbox_ov_set, flag=wx.LEFT|wx.TOP,border =b)
 
-        vbox.Add(hbox_ov_set, flag=wx.LEFT|wx.TOP,border =BORDER)
-
-
-
-        hbox_ov_fdbk = wx.BoxSizer(wx.HORIZONTAL)
-        str_ov_fdbk = wx.StaticText(self, label = 'Oven Temp. Reading: ')
-        str_ov_fdbk.SetFont(font)
-        hbox_ov_fdbk.Add(str_ov_fdbk)
+        hbox_ov_fdbk = self.build_oven_static_text_two()
 
         self.str_ov_fdbk_val = wx.StaticText(self, label = 'N/A')
-        str_ov_fdbk_val.SetFont(font)
+        str_ov_fdbk_val.SetFont(f)
         hbox_ov_fdbk.Add(str_ov_fdbk_val)
 
+        self.vbox.Add(hbox_ov_fdbk, flag=wx.LEFT|wx.TOP,border =b)
 
-        vbox.Add(hbox_ov_fdbk, flag=wx.LEFT|wx.TOP,border =BORDER)
-
-
-        vbox.Add((-1,EXTRA_SPACE))
+        self.vbox.Add((-1,es))
 
         #Detector temp
-        hbox_det_set = wx.BoxSizer(wx.HORIZONTAL)
-        str_det_set = wx.StaticText(self, label = 'Set Detector Temp.: ')
-        str_det_set.SetFont(font)
-        hbox_det_set.Add(str_det_set)
+        hbox_det_set = self.build_det_static_text_one()
 
         tc_det_set = wx.TextCtrl(self)
         hbox_det_set.Add(tc_det_set, proportion = 1)
 
-        vbox.Add(hbox_det_set, flag=wx.LEFT|wx.TOP,border =BORDER)
+        self.vbox.Add(hbox_det_set, flag=wx.LEFT|wx.TOP,border =b)
 
-        hbox_det_fdbk = wx.BoxSizer(wx.HORIZONTAL)
-        str_det_fdbk = wx.StaticText(self, label = 'Detector Temp. Reading: ')
-        str_det_fdbk.SetFont(font)
-        hbox_det_fdbk.Add(str_det_fdbk)
+        hbox_det_fdbk = self.build_det_static_text_two()
 
         str_det_fdbk_val = wx.StaticText(self, label = 'N/A')
-        str_det_fdbk_val.SetFont(font)
+        str_det_fdbk_val.SetFont(f)
         hbox_det_fdbk.Add(str_det_fdbk_val)
 
-        vbox.Add(hbox_det_fdbk, flag=wx.LEFT|wx.TOP,border =BORDER)
+        vbox.Add(hbox_det_fdbk, flag=wx.LEFT|wx.TOP,border =b)
 
+        self.SetSizer(self.vbox)
 
-        self.SetSizer(vbox)
+    def build_det_static_text_two(self):
+        hbox_det_fdbk = wx.BoxSizer(wx.HORIZONTAL)
+        str_det_fdbk = wx.StaticText(self, label = 'Detector Temp. Reading: ')
+        str_det_fdbk.SetFont(f)
+        hbox_det_fdbk.Add(str_det_fdbk)
+
+        return hbox_det_fdbk
+
+    def build_det_static_text_one(self):
+        hbox_det_set = wx.BoxSizer(wx.HORIZONTAL)
+        str_det_set = wx.StaticText(self, label = 'Set Detector Temp.: ')
+        str_det_set.SetFont(f)
+        hbox_det_set.Add(str_det_set)
+
+        return hbox_det_set
+
+    def build_oven_static_text_one(self):
+        hbox_ov_set = wx.BoxSizer(wx.HORIZONTAL)
+        str_ov_set = wx.StaticText(self,label='Set Oven Temp.: ')
+        str_ov_set.SetFont(f)
+        hbox_ov_set.Add(str_ov_set)
+
+        return hbox
+
+    def build_oven_static_text_two(self):
+        hbox_ov_fdbk = wx.BoxSizer(wx.HORIZONTAL)
+        str_ov_fdbk = wx.StaticText(self, label = 'Oven Temp. Reading: ')
+        str_ov_fdbk.SetFont(f)
+        hbox_ov_fdbk.Add(str_ov_fdbk)
+
+        return hbox_ov_fdbk
+
+    def build_static_header_(self):
+        #Temperature
+        str_temp = wx.StaticText(self, label = 'Temperature')
+        str_temp.SetFont(hf)
+        self.vbox.Add(str_temp, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP,border =b)
+
+        self.vbox.Add((-1,es))
 
     def __del__( self ):
         pass
