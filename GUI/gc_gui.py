@@ -189,7 +189,7 @@ class GCFrame(wx.Frame):
         sp = 1 / rr
         ep = self.options['epsilon_time']
 
-        self.gc_lock = threading.Lock()
+        self.gc_lock = self.curr_data_frame_lock
         self.gc_cond = threading.Condition(self.gc_lock)
 
         gc = self.gc
