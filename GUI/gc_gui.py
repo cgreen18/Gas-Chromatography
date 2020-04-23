@@ -358,11 +358,8 @@ class GCTemperature(Thread):
 
             temperatures = self.parse_response(bit_response)
 
-            print(temperatures)
-            print(temperatures)
-
-            self.oven_temp = float(temperatures[o_l])
-            self.det_tmp = float(temperatures[d_l])
+            self.oven_temp = float(temperatures[0])
+            self.det_tmp = float(temperatures[1])
 
             self.last_update_time_raw = time.time()
 
@@ -380,9 +377,6 @@ class GCTemperature(Thread):
         ser.flushOutput()
 
         _ = ser.write(b_str)
-        print(_)
-        print("bits written")
-
         time.sleep(SER_DELAY)
 
         bit_response = []
