@@ -64,6 +64,9 @@ class GCFrame(wx.Frame):
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = self.options['DEFAULT_FRAME_SIZE'], style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
+        print("frame self:")
+        print(self)
+
         self.build_figure_()
 
         self.establish_serial_conn_()
