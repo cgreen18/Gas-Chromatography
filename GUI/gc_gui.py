@@ -492,7 +492,10 @@ class GCPlotter(Thread):
 
             t_last = t_curr
 
+            print('drawing')
+            print(self.frame.curr_data_frame_lock.locked())
             self.frame.panel_detector.update_curr_data_()
+            print(self.frame.curr_data_frame_lock.locked())
             self.frame.panel_detector.draw()
 
             print('drew')
