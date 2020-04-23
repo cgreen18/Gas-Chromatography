@@ -326,7 +326,7 @@ class GCFrame(wx.Frame):
             self.panel_detector.update_curr_data_()
             self.panel_detector.draw()
 
-    def on_clean_time(self):
+    def on_clean_time(self, err):
         if not self.running:
             self.gc.clean_time_()
             self.update_curr_data_()
