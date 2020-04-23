@@ -482,10 +482,15 @@ class GCPlotter(Thread):
 
             t_last = t_curr
 
-            with self.curr_data_lock:
-                print('acquired_plot')
-                self.frame.panel_detector.update_curr_data_already_locked()
-                self.frame.panel_detector.draw()
+            self.frame.panel_detector.update_curr_data_()
+            self.frame.panel_detector.draw()
+
+            #
+            # self.frame.update_curr_data_()
+            # with self.curr_data_lock:
+            #     print('acquired_plot')
+
+
 
 class GCReceiver(Thread):
     def __init__(self, frame, lock, gc, condition, *args, **kwargs):
@@ -1002,7 +1007,7 @@ class DetectorPanel(wx.Panel):
     def update_curr_data(self):
         with self.gcframe.curr_data_frame_lock:
 
-            self.curr_data = self.gcframe.curr_data
+            self.curr_data = self.gcframe.get_curr_data()
 
         if self.curr_data.size != 0:
             init_time = self.curr_data[2][0]
@@ -1013,7 +1018,7 @@ class DetectorPanel(wx.Panel):
         print(self.parent)
         print(self.gcframe.get_curr_data)
         print(self.parent.parent)
-        self.gcframe.update_curr_data()
+        self.gcframe.update_curr_data_()
         self.curr_data = self.gcframe.get_curr_data()
 
         if self.curr_data.size != 0:
