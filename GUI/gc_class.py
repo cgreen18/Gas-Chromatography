@@ -63,6 +63,25 @@ class GC:
         self.prev_runs = []
         self.run_num = 0
 
+    def clean_time_(self):
+        if self.run_num > 0:
+            to = self.time_out
+            _e = self.curr_data_lock.acquire(to)
+            t = self.get_time()
+            _e = self.curr_data_lock.release()
+
+            # Hokey -fix
+            leading_zero = False
+            if t[0] == 0:
+                t[0] = t[1]-.01
+                t = t - t[0]
+            else:
+                t = t - t[0]
+
+            _e = self.curr_data_lock.acquire(to)
+            self.set_time(t)
+            _e = self.curr_data_lock.release()
+
     def integrate_volt(self):
         to = self.time_out
         #ignore err for now
@@ -215,6 +234,15 @@ class GC:
         if is_locked:
             _t = self.curr_data[t_index]
             return _t
+        else:
+            print('no access')
+
+    def set_time(self, d):
+        is_locked = self.is_locked()
+        t_index = self.indices['t']
+        if is_locked:
+            d = np.copy(d)
+            self.curr_data[t_index] = d
         else:
             print('no access')
 

@@ -323,6 +323,17 @@ class GCFrame(wx.Frame):
             self.gc.normalize_volt_()
             self.update_curr_data_()
 
+            self.panel_detector.update_curr_data_()
+            self.panel_detector.draw()
+
+    def on_clean_time(self):
+        if not self.running:
+            self.gc.clean_time_()
+            self.update_curr_data_()
+
+            self.panel_detector.update_curr_data_()
+            self.panel_detector.draw()
+
     def on_fill(self, err):
         self.panel_detector.fill_under()
 
@@ -1021,8 +1032,8 @@ class DetectorPanel(wx.Panel):
         cd = self.get_curr_data()
         v_i = self.indices['v']
         t_i = self.indices['t']
-        v = c[v_i]
-        t = c[t_i]
+        v = cd[v_i]
+        t = cd[t_i]
         self.axes.fill_between(t,v)
 
     def draw(self):
@@ -1240,6 +1251,9 @@ class GCMenuBar(wx.MenuBar):
 
         norm = data_menu_ops.Append(wx.ID_ANY, '&Normalize')
         self.parent.Bind(wx.EVT_MENU, self.parent.on_data_normalize, norm)
+
+        clean_time = data_menu_ops.Append(wx.ID_ANY, '&Clean Time Axis')
+        self.parent.Bind(wx.EVT_MENU, self.parent.on_clean_time, clean_time)
 
         data_menu.Append(wx.ID_ANY, '&Operations...', data_menu_ops)
 
