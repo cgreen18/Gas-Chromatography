@@ -105,7 +105,7 @@ class GCFrame(wx.Frame):
 
         self.ser_conn = ser
 
-    def establish_temperature_(self):
+    def establish_temperature_thread(self):
         sp = 1 / self.options['temp_refresh_rate']
         ep = self.options['epsilon_time']
         conn = self.ser_conn
