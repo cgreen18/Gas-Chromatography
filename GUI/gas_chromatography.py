@@ -33,6 +33,9 @@ class MainApp(gc_gui.GCFrame):
             options = yaml.load(f, Loader=yaml.FullLoader)
             self.options = options
 
+        print(self)
+        print(parent)
+
         gc_gui.GCFrame.__init__(self, parent, self.options)
 
 def main():
