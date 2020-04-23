@@ -370,10 +370,13 @@ class GCTemperature(Thread):
         ser.flushOutput()
 
         _ = ser.write(b_str)
+        print(_)
+        print("bits written")
 
         bit_response = []
         while ser.in_waiting > 0:
             line = ser.readline()
+            print(line)
             bit_response.append(line)
 
         return bit_response
