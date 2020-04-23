@@ -380,6 +380,8 @@ class GCTemperature(Thread):
         print("resptest")
         print(resptest)
 
+        print(ser.in_waiting)
+
         bit_response = []
         while ser.in_waiting > 0:
             line = ser.readline()
