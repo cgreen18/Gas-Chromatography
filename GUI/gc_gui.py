@@ -482,7 +482,7 @@ class GCPlotter(Thread):
 
             with self.curr_data_lock:
                 print('acquired_plot')
-                self.frame.panel_detector.update_curr_data()
+                self.frame.panel_detector.update_curr_data_already_locked()
                 self.frame.panel_detector.draw()
 
 class GCReceiver(Thread):
