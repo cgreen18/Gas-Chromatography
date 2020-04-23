@@ -538,6 +538,10 @@ class GCReceiver(Thread):
         sampling_period = self.sp
         epsilon = self.ep
 
+        print('in run')
+        print(self.curr_data_lock)
+        print(self.curr_data_lock.locked())
+
         t_last = time.time()
         while not self.stopped():
             t_curr= time.time()
