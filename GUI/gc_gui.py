@@ -1030,6 +1030,7 @@ class ControlPanel( wx.Panel ):
     def build_det_static_text_two(self):
         hbox_det_fdbk = wx.BoxSizer(wx.HORIZONTAL)
         str_det_fdbk = wx.StaticText(self, label = 'Detector Temp. Reading: ')
+        f = self.fonts['font']
         str_det_fdbk.SetFont(f)
         hbox_det_fdbk.Add(str_det_fdbk)
 
@@ -1038,6 +1039,7 @@ class ControlPanel( wx.Panel ):
     def build_det_static_text_one(self):
         hbox_det_set = wx.BoxSizer(wx.HORIZONTAL)
         str_det_set = wx.StaticText(self, label = 'Set Detector Temp.: ')
+        f = self.fonts['font']
         str_det_set.SetFont(f)
         hbox_det_set.Add(str_det_set)
 
@@ -1046,6 +1048,7 @@ class ControlPanel( wx.Panel ):
     def build_oven_static_text_one(self):
         hbox_ov_set = wx.BoxSizer(wx.HORIZONTAL)
         str_ov_set = wx.StaticText(self,label='Set Oven Temp.: ')
+        f = self.fonts['font']
         str_ov_set.SetFont(f)
         hbox_ov_set.Add(str_ov_set)
 
@@ -1054,6 +1057,7 @@ class ControlPanel( wx.Panel ):
     def build_oven_static_text_two(self):
         hbox_ov_fdbk = wx.BoxSizer(wx.HORIZONTAL)
         str_ov_fdbk = wx.StaticText(self, label = 'Oven Temp. Reading: ')
+        f = self.fonts['font']
         str_ov_fdbk.SetFont(f)
         hbox_ov_fdbk.Add(str_ov_fdbk)
 
@@ -1062,6 +1066,7 @@ class ControlPanel( wx.Panel ):
     def build_static_header_(self):
         #Temperature
         str_temp = wx.StaticText(self, label = 'Temperature')
+        hf = self.fonts['header_font']
         str_temp.SetFont(hf)
         self.vbox.Add(str_temp, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP,border =b)
 
