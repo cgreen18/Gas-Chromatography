@@ -247,6 +247,9 @@ class GCFrame(wx.Frame):
 
         self.running = False
 
+        if self.curr_data_frame_lock.locked():
+            self.curr_data_frame_lock.release()
+
     def on_plot_btn(self):
         if self.running:
             self.stop_data_coll()
@@ -304,16 +307,20 @@ class GCFrame(wx.Frame):
         saveas_jpg_window = SaveasJPG(self, self.options)
 
     def on_data_integrate(self, err):
-        _l = self.curr_data_frame_lock
-        with _l:
-            self.gc.integrate_volt()
-            self.update_curr_data_()
+        print("on integrate")
+        if not self.running:
+            _l = self.curr_data_frame_lock
+            with _l:
+                self.gc.integrate_volt()
+                self.update_curr_data_()
 
     def on_data_normalize(self, err):
-        _l = self.curr_data_frame_lock
-        with _l:
-            self.gc.normalize_volt()
-            self.update_curr_data_()
+        print("on normalize")
+        if not self.running:
+            _l = self.curr_data_frame_lock
+            with _l:
+                self.gc.normalize_volt()
+                self.update_curr_data_()
 
     def on_fill(self, err):
         self.panel_detector.fill_under()
