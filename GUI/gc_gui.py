@@ -1,4 +1,4 @@
-"""
+_l = self.curr_data_frame_lock"""
 Title: gc_gui.py
 Author: Conor Green & Matt McPartlan
 Description: Mid-level abstraction of GUI application to perform data acquisition and display. Defines GUI and threading classes and instantiates GC object.
@@ -126,7 +126,7 @@ class GCFrame(wx.Frame):
         self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
         self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':5.0, 'baud_rate':115200,
                         'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
-                        'single_ended':True}
+                        'single_ended':True, 'indices':{'v':0,'area':1,'dt':2,'t':3}}
         self.options.update(self.constants)
 
         self.options.update(uo)
@@ -141,16 +141,17 @@ class GCFrame(wx.Frame):
         return self.panel_detector.get_figure()
 
     def get_curr_data(self):
-        self.curr_data_frame_lock.acquire()
-        d = self.gc.get_curr_data()
-        self.curr_data_frame_lock.release()
-        return d
+        _l = self.curr_data_frame_lock
+        with _l:
+            _d = self.gc.get_curr_data()
+
+        return _d
 
     # gc_class methods
     def update_curr_data_(self):
-        self.curr_data_frame_lock.acquire()
-        self.curr_data_frame = self.gc.get_curr_data()
-        self.curr_data_frame_lock.release()
+        _l = self.curr_data_frame_lock
+        with _l:
+            self.curr_data_frame = self.gc.get_curr_data()
 
     # Events
     def on_ov_txt_ctrl(self, string):
@@ -189,16 +190,21 @@ BIG TODO >>>>>
         self.gc_lock = threading.Lock()
         self.gc_cond = threading.Condition(self.gc_lock)
 
-        self.data_rover_thread = GCData(self.gc, self.gc_cond, args = ( sp, ep ) )
+        gc = self.gc
+        condition = self.gc_cond
+
+        self.data_rover_thread = GCData(gc, condition, args = ( sp, ep ) )
 
         rsp = self.options['plot_refresh_rate']
 
-        self.receiver_thread = GCReceiver(self, self.gc, self.gc_cond, args = ( rsp, ep ))
+        lock = self.curr_data_frame_lock
+
+        self.receiver_thread = GCReceiver(self, lock, gc, condition, args = ( rsp, ep ))
 
         self.data_rover_thread.start()
         self.receiver_thread.start()
 
-        self.plotter_thread = GCPlotter(self, self.curr_data_lock, args=(rsp,ep))
+        self.plotter_thread = GCPlotter(self, lock , args=(rsp,ep))
 
         self.plotter_thread.start()
 
@@ -217,8 +223,6 @@ BIG TODO >>>>>
         self.data_rover_thread.stop()
         self.data_rover_thread.join()
 
-
-
         self.running = False
 
     def on_plot_btn(self):
@@ -230,10 +234,16 @@ BIG TODO >>>>>
         self.panel_detector.draw()
 
     def on_clr_btn(self):
-        if self.run_number > 0:
-            self.prev_data.append(self.curr_data)
+        if self.running:
+            self.stop_data_coll()
 
-        self.curr_data = np.zeros((self.gc.dims,0))
+        if self.run_number > 0:
+            with self.curr_data_frame_lock:
+                self.update_curr_data_()
+                self.prev_data.append(self.curr_data)
+
+        with self.curr_data_frame_lock:
+            self.curr_data = np.zeros((self.gc.dims,0))
 
     # Formatting
     def build_figure_(self):
@@ -272,16 +282,19 @@ BIG TODO >>>>>
         saveas_jpg_window = SaveasJPG(self, self.options)
 
     def on_data_integrate(self, err):
-        self.curr_data_frame_lock.acquire()
-        self.gc.integrate_volt()
-        self.update_curr_data_()
-        self.curr_data_frame_lock.release()
+        _l = self.curr_data_frame_lock
+        with _l:
+            self.gc.integrate_volt()
+            self.update_curr_data_()
 
     def on_data_normalize(self, err):
-        self.curr_data_frame_lock.acquire()
-        self.gc.normalize_volt()
-        self.update_curr_data_()
-        self.curr_data_frame_lock.release()
+        _l = self.curr_data_frame_lock
+        with _l:
+            self.gc.normalize_volt()
+            self.update_curr_data_()
+            
+    def on_fill(self, err):
+        self.panel_detector.fill_under()
 
 # Threads
 class GCTemperature(Thread):
@@ -385,11 +398,11 @@ class GCTemperature(Thread):
         self.det_stc_txt.SetLabel(det_str)
 
 class GCPlotter(Thread):
-    def __init__(self, frame, curr_data_lock, *args, **kwargs):
+    def __init__(self, frame, lock, *args, **kwargs):
         super(GCPlotter, self).__init__()
 
         self.frame = frame
-        self.curr_data_lock = curr_data_lock
+        self.curr_data_lock = lock
 
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]
@@ -421,12 +434,12 @@ class GCPlotter(Thread):
                 self.frame.panel_detector.draw()
 
 class GCReceiver(Thread):
-
-    def __init__(self, frame, gc, condition, *args, **kwargs):
+    def __init__(self, frame, lock, gc, condition, *args, **kwargs):
         super(GCReceiver, self).__init__()
 
         self.frame = frame
         self.gc = gc
+        self.curr_data_lock = lock
 
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]
@@ -462,7 +475,7 @@ class GCReceiver(Thread):
                   #self.gc_cond.acquire()
                   print('gc_cond acquired')
 
-                  with self.frame.curr_data_lock:
+                  with self.curr_data_lock:
                       print('acquired')
                       self.frame.curr_data = np.copy(self.gc.curr_data)
 
@@ -784,6 +797,7 @@ class DetectorPanel(wx.Panel):
         self.parent = parent
         self.gcframe = parent.parent
         self.options = self.parent.options
+        self.indices = self.options['indices']
 
         self.fonts = GCSplitter.create_fonts()
 
@@ -894,6 +908,14 @@ class DetectorPanel(wx.Panel):
 
         return hbox
 
+    def fill_under(self):
+        cd = self.get_curr_data()
+        v_i = self.indices['v']
+        t_i = self.indices['t']
+        v = c[v_i]
+        t = c[t_i]
+        self.axes.fill_between(t,v)
+
     def draw(self):
         if self.curr_data.size != 0:
             self.axes.plot(self.curr_data[2], self.curr_data[0])
@@ -909,7 +931,10 @@ class DetectorPanel(wx.Panel):
         self.gcframe.on_plot_btn()
 
     def update_curr_data(self):
-        self.curr_data = self.gcframe.curr_data
+        with self.gcframe.curr_data_frame_lock:
+
+            self.curr_data = self.gcframe.curr_data
+
         if self.curr_data.size != 0:
             init_time = self.curr_data[2][0]
             self.curr_data[2] = self.curr_data[2] - init_time
@@ -1075,13 +1100,16 @@ class GCMenuBar(wx.MenuBar):
         grapher_menu.Append(wx.ID_ANY, '&Save Image')
 
         graph_menu_saveim = wx.Menu()
-        png_save = graph_menu_saveim.Append(wx.ID_ANY, '&.png')
-        self.parent.Bind(wx.EVT_MENU, self.parent.on_png_save, png_save)
+        _png_save = graph_menu_saveim.Append(wx.ID_ANY, '&.png')
+        self.parent.Bind(wx.EVT_MENU, self.parent.on_png_save, _png_save)
 
-        jpg_save = graph_menu_saveim.Append(wx.ID_ANY,'&.jpg')
-        self.parent.Bind(wx.EVT_MENU, self.parent.on_jpg_save, jpg_save)
+        _jpg_save = graph_menu_saveim.Append(wx.ID_ANY,'&.jpg')
+        self.parent.Bind(wx.EVT_MENU, self.parent.on_jpg_save, _jpg_save)
 
         grapher_menu.Append(wx.ID_ANY, '&Save Image As...', graph_menu_saveim)
+
+        _fill = grapher_menu.Append(wx.ID_ANY, '&Fill')
+        self.parent.Bind(wx.EVT_MENU, self.parent.on_fill, _fill)
 
         return grapher_menu
 

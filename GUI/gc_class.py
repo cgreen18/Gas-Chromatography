@@ -58,6 +58,8 @@ class GC:
         self.curr_data = np.zeros((self.dims, 0))
         self.curr_data_lock = threading.Lock()
         self.time_out = 1 #sec
+        self.epsilon = 0.01
+        self.min_noise_after_norm = 0.2
         self.prev_runs = []
         self.run_num = 0
 
@@ -92,11 +94,10 @@ class GC:
 
         return area
 
-    def normalize_volt(self):
+    def normalize_volt_(self):
         to = self.time_out
         #ignore error for now
         _e = self.curr_data_lock.acquire(to)
-
         volt = self.get_volt()
         _e = self.curr_data_lock.release()
 
@@ -110,9 +111,35 @@ class GC:
         self.set_volt(volt)
         _e = self.curr_data_lock.release()
 
+    def mov_mean_(self, window):
+        _e = self.curr_data_lock.acquire(to)
+        volt = self.get_volt()
+        _e = self.curr_data_lock.release()
+
+        np.convolve(vec, np.ones((window,))/window, mode='valid')
+
     def break_into_peaks(self):
-        if self.integrate_volt()
-        pass
+        ep = self.epsilon
+        if abs(self.integrate_volt() -1.0 ) > ep:
+            self.normalize_volt_()
+
+    def define_peaks(self):
+        _e = self.curr_data_lock.acquire(to)
+        volt = self.get_volt()
+        _e = self.curr_data_lock.release()
+
+        thresh = self.min_noise_after_norm
+        large = False
+        uphill = False
+
+        window = 100
+
+        deriv = np.diff(volt, order)
+
+        for pt in volt:
+            if large
+            if pt > thresh:
+                if
 
     # ADS1115 Methods
     def reinit_ADS(self):
@@ -135,13 +162,15 @@ class GC:
     def get_curr_data(self):
         is_locked = self.curr_data_lock.locked()
         if is_locked:
-            return self.curr_data
+            _d = np.copy(self.curr_data)
+            return _d
         else:
             print('no access')
 
     def set_curr_data(self, d):
         is_locked = self.curr_data_lock.locked()
         if is_locked:
+            d = np.copy(d)
             self.curr_data = d
         else:
             print('no access')
@@ -150,7 +179,8 @@ class GC:
         is_locked = self.curr_data_lock.locked()
         v_index = self.indices['v']
         if is_locked:
-            return self.curr_data[v_index]
+            _v = np.copy(self.curr_data[v_index])
+            return _v
         else:
             print('no access')
 
@@ -158,6 +188,7 @@ class GC:
         is_locked = self.curr_data_lock.locked()
         v_index = self.indices['v']
         if is_locked:
+            d = np.copy(d)
             self.curr_data[v_index] = d
         else:
             print('no access')
@@ -166,7 +197,8 @@ class GC:
         is_locked = self.curr_data_lock.locked()
         t_index = self.indices['t']
         if is_locked:
-            return self.curr_data[t_index]
+            _t = self.curr_data[t_index]
+            return _t
         else:
             print('no access')
 
