@@ -363,7 +363,7 @@ class GCTemperature(Thread):
         #READ_TMP_CMD_STR = '000 000 000 000'
         b_str = READ_TMP_CMD_STR.encode()
 
-        ser = self.ser
+        ser = self.ser_conn
 
         ser.flushInput()
         ser.flushOutput()
@@ -510,6 +510,7 @@ class GCData(Thread):
 
         sampling_period = self.sp
         epsilon = self.ep
+        dims = self.gc.dims
 
         while not self.stopped():
             t_curr= time.time()
@@ -523,7 +524,17 @@ class GCData(Thread):
                 t = t_curr
                 t_last = t_curr
 
-                new = np.array((v,dt,t)).reshape(3,1)
+                new = np.zeros((dims, 1))
+
+                indices = self.gc.indices
+                v_i = indices['v']
+                dt_i = indices['dt']
+                t_i = indices['t']
+
+                new[v_i] = v
+                new[dt_i] = dt
+                new[t_i] = t
+
                 self.gc.curr_data = np.append(self.gc.curr_data, new, axis=1)
                 print('new daata')
                 self.condition.notify_all()
