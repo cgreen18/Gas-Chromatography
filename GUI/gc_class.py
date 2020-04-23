@@ -56,7 +56,7 @@ class GC:
         self.dims = 4 #voltage, dt, t
         self.indices = {'v':0,'area':1,'dt':2,'t':3}
         self.curr_data = np.zeros((self.dims, 0))
-        self.curr_data_lock = threading.Lock()
+        self.curr_data_lock = Lock()
         self.time_out = 1 #sec
         self.epsilon = 0.01
         self.min_noise_after_norm = 0.2

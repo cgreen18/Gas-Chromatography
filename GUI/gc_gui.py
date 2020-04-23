@@ -346,7 +346,7 @@ class GCTemperature(Thread):
 
             t_last = t_curr
 
-            with self.frame.serial_lock:
+            with self.frame.ser_lock:
                 bit_response = self.query_temp()
 
             temperatures = self.parse_response(bit_response)
