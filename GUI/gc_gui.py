@@ -1132,7 +1132,7 @@ class GCMenuBar(wx.MenuBar):
         self.parent.Bind(wx.EVT_MENU, self.parent.on_data_integrate, integ )
 
         norm = data_menu_ops.Append(wx.ID_ANY, '&Normalize')
-        self.parent.Bind(wx.EVT_ANY, self.parent.on_data_normalize, norm)
+        self.parent.Bind(wx.EVT_MENU, self.parent.on_data_normalize, norm)
 
         data_menu.Append(wx.ID_ANY, '&Operations...', data_menu_ops)
 
