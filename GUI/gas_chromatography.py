@@ -33,11 +33,11 @@ class MainApp(gc_gui.GCFrame):
             options = yaml.load(f, Loader=yaml.FullLoader)
             self.options = options
 
-        gc_gui.GCFrame(self, self.options)
+        gc_gui.GCFrame.__init__(self, parent, self.options)
 
 def main():
     app = wx.App()
-    window = MainApp(None)
+    window = MainApp(None) #GCFrame
     window.Show(True)
     app.MainLoop()
 

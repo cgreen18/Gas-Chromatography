@@ -57,18 +57,14 @@ SER_DELAY = .01 #sec
 
 # Frames
 class GCFrame(wx.Frame):
+    # self is MainApp(GCFrame)
+    # parent is None
     def __init__(self, parent, user_options):
         self.set_options_(user_options)
         self.parent = parent
 
-        print(self)
-        print(parent)
-
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = self.options['DEFAULT_FRAME_SIZE'], style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
-
-        print("frame self:")
-        print(self)
 
         self.build_figure_()
 
@@ -1015,7 +1011,7 @@ class DetectorPanel(wx.Panel):
     def update_curr_data_already_locked(self):
         print(self)
         print(self.parent)
-        print(self.gcframe)
+        print(self.gcframe.get_curr_data)
         print(self.parent.parent)
         self.gcframe.update_curr_data()
         self.curr_data = self.gcframe.get_curr_data()
