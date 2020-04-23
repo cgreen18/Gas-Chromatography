@@ -1008,7 +1008,8 @@ class DetectorPanel(wx.Panel):
         print(self.parent)
         print(self.gcframe)
         print(self.parent.parent)
-        self.curr_data = self.gcframe.curr_data
+        self.gcframe.update_curr_data()
+        self.curr_data = self.gcframe.get_curr_data()
 
         if self.curr_data.size != 0:
             init_time = self.curr_data[2][0]
