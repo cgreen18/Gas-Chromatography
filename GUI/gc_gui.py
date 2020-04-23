@@ -251,7 +251,7 @@ class GCFrame(wx.Frame):
             self.curr_data_frame_lock.release()
 
         print(self.curr_data_frame_lock.locked())
-        print(self.gc.)
+        print(self.gc.is_locked())
 
     def on_plot_btn(self):
         if self.running:
