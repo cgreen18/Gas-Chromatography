@@ -1004,6 +1004,9 @@ class DetectorPanel(wx.Panel):
             self.curr_data[2] = self.curr_data[2] - init_time
 
     def update_curr_data_already_locked(self):
+        print(self)
+        print(self.parent)
+        print(self.gcframe)
         self.curr_data = self.gcframe.curr_data
 
         if self.curr_data.size != 0:
