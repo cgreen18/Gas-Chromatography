@@ -220,6 +220,8 @@ class GCFrame(wx.Frame):
         rsp = self.options['plot_refresh_rate']
 
         lock = self.curr_data_frame_lock
+        print('locked when first passed?')
+        print(lock.locked())
 
         self.receiver_thread = GCReceiver(self, lock, gc, condition, args = ( rsp, ep ))
 
@@ -493,6 +495,8 @@ class GCPlotter(Thread):
             self.frame.panel_detector.update_curr_data_()
             self.frame.panel_detector.draw()
 
+            print('drew')
+            print(self.frame.curr_data_frame_lock.locked())
             #
             # self.frame.update_curr_data_()
             # with self.curr_data_lock:
@@ -547,7 +551,8 @@ class GCReceiver(Thread):
 
                   with self.curr_data_lock:
                       print('acquired')
-                      self.frame.curr_data = np.copy(self.gc.curr_data)
+
+                      self.frame.curr_data = self.gc.get_curr_data()
 
                 else:
                   print("waiting timeout...")
