@@ -517,6 +517,9 @@ class GCReceiver(Thread):
         self.frame = frame
         self.gc = gc
         self.curr_data_lock = lock
+        print('initial')
+        print(self.curr_data_lock)
+        print(self.curr_data_lock.locked())
 
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]
