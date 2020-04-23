@@ -95,6 +95,8 @@ class GC:
         return area
 
     def normalize_volt_(self):
+        print("nomrlai")
+        print(self.is_locked())
         to = self.time_out
         #ignore error for now
         _e = self.curr_data_lock.acquire(to)
@@ -163,7 +165,7 @@ class GC:
         return _il
 
     def get_curr_data(self):
-        is_locked = self.curr_data_lock.locked()
+        is_locked = self.is_locked()
         if is_locked:
             _d = np.copy(self.curr_data)
             return _d
@@ -171,7 +173,7 @@ class GC:
             print('no access')
 
     def set_curr_data(self, d):
-        is_locked = self.curr_data_lock.locked()
+        is_locked = self.is_locked()
         if is_locked:
             d = np.copy(d)
             self.curr_data = d
@@ -179,7 +181,7 @@ class GC:
             print('no access')
 
     def get_volt(self):
-        is_locked = self.curr_data_lock.locked()
+        is_locked = self.is_locked()
         v_index = self.indices['v']
         if is_locked:
             _v = np.copy(self.curr_data[v_index])
@@ -188,7 +190,7 @@ class GC:
             print('no access')
 
     def set_volt(self, d):
-        is_locked = self.curr_data_lock.locked()
+        is_locked = self.is_locked()
         v_index = self.indices['v']
         if is_locked:
             d = np.copy(d)
@@ -197,7 +199,7 @@ class GC:
             print('no access')
 
     def get_time(self):
-        is_locked = self.curr_data_lock.locked()
+        is_locked = self.is_locked()
         t_index = self.indices['t']
         if is_locked:
             _t = self.curr_data[t_index]
