@@ -70,6 +70,7 @@ class GCFrame(wx.Frame):
         # Requires serial cofnnection self.ser_conn
         self.temp_thread_running = False
         self.establish_temperature_thread_()
+        print(self.ser_conn)
 
         # including curr_data_frame and curr_data_frame_lock
         self.establish_GC_()
@@ -83,11 +84,11 @@ class GCFrame(wx.Frame):
         if len(possible) == 0:
             print("Error: No ACM ports found to connect to Arduino.")
             print("Continuing for now.")
-            possible[0] = 'ACM0'
+            possible[0] = 'ttyACM0'
         elif len(possible) != 1:
             print("Error: Multiple possible ACM ports to connect Arduino")
-            print("Defaulting to '/dev/ACM0'")
-            possible[0] = 'ACM0'
+            print("Defaulting to '/dev/ttyACM0'")
+            possible[0] = 'ttyACM0'
 
         local = possible[0]
         string = '/dev/' + possible[0]
@@ -110,6 +111,7 @@ class GCFrame(wx.Frame):
         sp = 1 / self.options['temp_refresh_rate']
         ep = self.options['epsilon_time']
         conn = self.ser_conn
+        print(conn)
         lock = self.ser_lock
 
         self.temperature_thread = GCTemperature( self, conn, lock, args = (sp, ep) )
@@ -312,6 +314,7 @@ class GCTemperature(Thread):
         self._stop_event = threading.Event()
 
         self.ser_conn = serial_connection
+        print(self.ser_conn)
         self.ser_lock = serial_lock
 
         self.oven_temp = None
@@ -372,6 +375,10 @@ class GCTemperature(Thread):
         _ = ser.write(b_str)
         print(_)
         print("bits written")
+
+        resptest = ser.readlline()
+        print("resptest")
+        print(resptest)
 
         bit_response = []
         while ser.in_waiting > 0:
