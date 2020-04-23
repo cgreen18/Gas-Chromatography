@@ -364,6 +364,8 @@ class GCTemperature(Thread):
 
             temperatures = self.parse_response(bit_response)
 
+            print(temperatures)
+
             self.last_oven_temp = self.oven_temp
             self.last_det_temp = self.det_temp
 
@@ -422,11 +424,7 @@ class GCTemperature(Thread):
         bit_response = []
         while ser.in_waiting > 0:
             line = ser.readline()
-            print(line)
             bit_response.append(line)
-
-        print(bit_response)
-
         return bit_response
 
 
@@ -436,9 +434,6 @@ class GCTemperature(Thread):
 
         str_resp = [item.decode() for item in resp]
         str_resp = [item.strip('\r\n') for item in str_resp]
-
-        print("str_resp is: ")
-        print(str_resp)
 
         ov_tmp = str_resp[o_l]
 
