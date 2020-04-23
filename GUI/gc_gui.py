@@ -1071,6 +1071,7 @@ class ControlPanel( wx.Panel ):
         b = self.options['BORDER']
         self.vbox.Add(str_temp, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP,border =b)
 
+        es = self.options['EXTRA_SPACE']
         self.vbox.Add((-1,es))
 
     def __del__( self ):
