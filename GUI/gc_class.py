@@ -70,6 +70,10 @@ class GC:
             t = self.get_time()
             _e = self.curr_data_lock.release()
 
+            print(t[0])
+            print(t[0:5])
+            
+
             # Hokey -fix
             leading_zero = False
             if t[0] == 0:
