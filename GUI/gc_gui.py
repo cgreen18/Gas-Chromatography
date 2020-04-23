@@ -48,7 +48,7 @@ imdir = 'images'
 READ_TMP_CMD_STR = '000 000 000 000'
 
 # __future__!! better set it later
-SET_TMP_CMD_STR = 'XXXXXXXXXX'
+SET_TMP_CMD_STR = '000 000 000 000'
 
 ## TODO: Prompt keyobard when typing in temperature
 
