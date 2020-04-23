@@ -364,13 +364,11 @@ class GCTemperature(Thread):
 
             temperatures = self.parse_response(bit_response)
 
-            print(temperatures)
-
             self.last_oven_temp = self.oven_temp
             self.last_det_temp = self.det_temp
 
             self.oven_temp = float(temperatures[0])
-            self.det_tmp = float(temperatures[1])
+            self.det_temp = float(temperatures[1])
 
             if self.last_oven_temp == self.oven_temp:
                 self.oven_val_change = False
@@ -383,8 +381,6 @@ class GCTemperature(Thread):
                 self.det_val_change = True
 
             self.last_update_time_raw = time.time()
-
-            print(self.det_val_change)
 
             if self.det_val_change and self.oven_val_change:
                 func = self.set_both_txt_ctrls
