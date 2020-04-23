@@ -64,6 +64,7 @@ class GCFrame(wx.Frame):
         self.build_figure_()
 
         self.establish_serial_conn_()
+        print(self.ser_conn)
         self.ser_lock = threading.Lock()
 
         # Requires serial cofnnection self.ser_conn
