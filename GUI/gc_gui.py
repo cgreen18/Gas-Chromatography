@@ -61,6 +61,9 @@ class GCFrame(wx.Frame):
         self.set_options_(user_options)
         self.parent = parent
 
+        print(self)
+        print(parent)
+
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = self.options['DEFAULT_FRAME_SIZE'], style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
