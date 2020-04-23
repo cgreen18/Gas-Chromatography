@@ -81,6 +81,8 @@ class GCFrame(wx.Frame):
         self.prev_data = []
         self.run_number = 0
 
+        self.running = False
+
     def get_arduino_port(self):
         possible = [x for x in os.listdir('/dev/') if 'ACM' in x]
 
@@ -996,6 +998,13 @@ class DetectorPanel(wx.Panel):
         with self.gcframe.curr_data_frame_lock:
 
             self.curr_data = self.gcframe.curr_data
+
+        if self.curr_data.size != 0:
+            init_time = self.curr_data[2][0]
+            self.curr_data[2] = self.curr_data[2] - init_time
+
+    def update_curr_data_already_locked(self):
+        self.curr_data = self.gcframe.curr_data
 
         if self.curr_data.size != 0:
             init_time = self.curr_data[2][0]
