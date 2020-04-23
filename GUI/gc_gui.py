@@ -1,4 +1,4 @@
-_l = self.curr_data_frame_lock"""
+'''
 Title: gc_gui.py
 Author: Conor Green & Matt McPartlan
 Description: Mid-level abstraction of GUI application to perform data acquisition and display. Defines GUI and threading classes and instantiates GC object.
@@ -17,7 +17,7 @@ Version (mainly for final report later):
                         Commands not yet implemented.
 2.2 - 22 April 2020 - Works with updated gc_class and lock.
 2.3 - 22 April 2020 - Added functions on voltage in menu bar.
-"""
+'''
 
 import numpy as np
 
@@ -292,7 +292,7 @@ BIG TODO >>>>>
         with _l:
             self.gc.normalize_volt()
             self.update_curr_data_()
-            
+
     def on_fill(self, err):
         self.panel_detector.fill_under()
 
