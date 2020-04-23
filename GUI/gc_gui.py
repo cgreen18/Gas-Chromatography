@@ -50,6 +50,9 @@ READ_TMP_CMD_STR = '000 000 000 000'
 # __future__!! better set it later
 SET_TMP_CMD_STR = '000 000 000 000'
 
+SER_DELAY = 1 #sec
+
+
 ## TODO: Prompt keyobard when typing in temperature
 
 # Frames
@@ -355,6 +358,9 @@ class GCTemperature(Thread):
 
             temperatures = self.parse_response(bit_response)
 
+            print(temperatures)
+            print(temperatures)
+
             self.oven_temp = float(temperatures[o_l])
             self.det_tmp = float(temperatures[d_l])
 
@@ -367,6 +373,7 @@ class GCTemperature(Thread):
         #READ_TMP_CMD_STR = '000 000 000 000'
         b_str = READ_TMP_CMD_STR.encode()
 
+
         ser = self.ser_conn
 
         ser.flushInput()
@@ -376,17 +383,15 @@ class GCTemperature(Thread):
         print(_)
         print("bits written")
 
-        resptest = ser.readline()
-        print("resptest")
-        print(resptest)
-
-        print(ser.in_waiting)
+        time.sleep(SER_DELAY)
 
         bit_response = []
         while ser.in_waiting > 0:
             line = ser.readline()
             print(line)
             bit_response.append(line)
+
+        print(bit_response)
 
         return bit_response
 
