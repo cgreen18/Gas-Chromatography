@@ -67,11 +67,10 @@ class GC:
         to = self.time_out
         #ignore err for now
         _e = self.curr_data_lock.acquire(to)
-
-        c_d = self.get_curr_data()
+        voltage = self.get_volt()
         _e = self.curr_data_lock.release()
-        if len(c_d) != 0:
-            voltage = self.get_volt()
+
+        if len(voltage) != 0:
             _l = 0
             _h = -1
             area = self.integrate(voltage, _l, _h)
