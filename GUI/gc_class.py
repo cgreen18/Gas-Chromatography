@@ -158,6 +158,10 @@ class GC:
     def get_lock(self):
         return self.curr_data_lock
 
+    def is_locked(self):
+        _il = self.curr_data_lock.locked()
+        return _il
+
     def get_curr_data(self):
         is_locked = self.curr_data_lock.locked()
         if is_locked:
