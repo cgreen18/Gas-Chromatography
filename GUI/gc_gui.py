@@ -1052,7 +1052,7 @@ class ControlPanel( wx.Panel ):
         str_ov_set.SetFont(f)
         hbox_ov_set.Add(str_ov_set)
 
-        return hbox
+        return hbox_ov_set
 
     def build_oven_static_text_two(self):
         hbox_ov_fdbk = wx.BoxSizer(wx.HORIZONTAL)
