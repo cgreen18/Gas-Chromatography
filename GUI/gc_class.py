@@ -78,6 +78,15 @@ class GC:
         else:
             print("No data")
 
+    def integrate_volt_2(self, voltage):
+        if len(voltage) != 0:
+            _l = 0
+            _h = -1
+            area = self.integrate(voltage, _l, _h)
+            return area
+        else:
+            print("No data")
+
     def integrate(self, arr, low, high):
         if low < len(arr) -1:
             arr = arr[low]
@@ -100,14 +109,16 @@ class GC:
         to = self.time_out
         #ignore error for now
         _e = self.curr_data_lock.acquire(to)
-        print('acquired volt')
+
         volt = self.get_volt()
         _e = self.curr_data_lock.release()
+
+        print('acquired volt')
 
         _min = volt.min()
         volt = volt - _min
 
-        _area = self.integrate_volt()
+        _area = self.integrate_volt_2(volt)
         volt = volt / _area
 
         _e = self.curr_data_lock.acquire(to)
