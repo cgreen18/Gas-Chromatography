@@ -33,10 +33,7 @@ class MainApp(gc_gui.GCFrame):
             options = yaml.load(f, Loader=yaml.FullLoader)
             self.options = options
 
-        print(self)
-        print(parent)
-
-        gc_gui.GCFrame.__init__(self, parent, self.options)
+        gc_gui.GCFrame(self, self.options)
 
 def main():
     app = wx.App()
