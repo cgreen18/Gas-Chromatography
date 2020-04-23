@@ -50,7 +50,7 @@ READ_TMP_CMD_STR = '000 000 000 000'
 # __future__!! better set it later
 SET_TMP_CMD_STR = '000 000 000 000'
 
-SER_DELAY = 1 #sec
+SER_DELAY = .01 #sec
 
 
 ## TODO: Prompt keyobard when typing in temperature
@@ -321,15 +321,20 @@ class GCTemperature(Thread):
         self.ser_lock = serial_lock
 
         self.oven_temp = None
+        self.last_oven_temp = None
+        self.oven_val_change = False
         self.oven_stc_txt = self.frame.panel_config.str_ov_fdbk_val
 
         self.det_temp = None
+        self.last_det_temp = None
+        self.oven_val_change = False
         self.det_stc_txt = self.frame.panel_config.str_det_fdbk_val
 
         self.last_update_time_raw = None
 
         self.ov_location = 1
         self.det_location = 3
+
 
     def stop(self):
         self._stop_event.set()
@@ -345,6 +350,7 @@ class GCTemperature(Thread):
         d_l = self.det_location
 
         t_last = time.time()
+        
         while not self.stopped():
             t_curr= time.time()
             while (t_curr - epsilon -t_last < sampling_period):
@@ -358,12 +364,45 @@ class GCTemperature(Thread):
 
             temperatures = self.parse_response(bit_response)
 
+            self.last_oven_temp = self.oven_temp
+            self.last_det_temp = self.det_temp
+
             self.oven_temp = float(temperatures[0])
             self.det_tmp = float(temperatures[1])
 
+            if self.last_oven_temp == self.oven_temp:
+                self.oven_val_change = False
+            else:
+                self.oven_val_change = True
+
+            if self.last_det_temp == self.det_temp:
+                self.det_val_change = False
+            else:
+                self.det_val_change = True
+
             self.last_update_time_raw = time.time()
 
-            self.set_both_txt_ctrls(temperatures)
+            if self.det_val_change && self.oven_val_change:
+                func = self.set_both_txt_ctrls
+                args = temperatures
+                wx.CallAfter(func, args)
+
+            elif self.oven_val_change:
+                ov_str = temperatures[0]
+
+                func = self.oven_stc_txt.SetLabel
+                args = ov_str
+
+                wx.CallAfter(func, args)
+
+            elif self.det_val_change:
+                det_str = temperatures[1]
+
+                func = self.det_stc_txt.SetLabel
+                args = det_str
+                wx.CallAfter(func, args)
+
+
 
     def query_temp(self):
         # From c library. Defined in c_constants.py
@@ -377,7 +416,8 @@ class GCTemperature(Thread):
         ser.flushOutput()
 
         _ = ser.write(b_str)
-        time.sleep(SER_DELAY)
+        while ser.in_waiting == 0:
+            time.sleep(SER_DELAY)
 
         bit_response = []
         while ser.in_waiting > 0:
