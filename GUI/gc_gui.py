@@ -350,7 +350,7 @@ class GCTemperature(Thread):
         d_l = self.det_location
 
         t_last = time.time()
-        
+
         while not self.stopped():
             t_curr= time.time()
             while (t_curr - epsilon -t_last < sampling_period):
@@ -382,7 +382,7 @@ class GCTemperature(Thread):
 
             self.last_update_time_raw = time.time()
 
-            if self.det_val_change && self.oven_val_change:
+            if self.det_val_change and self.oven_val_change:
                 func = self.set_both_txt_ctrls
                 args = temperatures
                 wx.CallAfter(func, args)
