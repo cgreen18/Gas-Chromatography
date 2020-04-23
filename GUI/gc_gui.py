@@ -1007,6 +1007,7 @@ class DetectorPanel(wx.Panel):
         print(self)
         print(self.parent)
         print(self.gcframe)
+        print(self.parent.parent)
         self.curr_data = self.gcframe.curr_data
 
         if self.curr_data.size != 0:
