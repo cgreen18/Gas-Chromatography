@@ -992,8 +992,8 @@ class ControlPanel( wx.Panel ):
         hbox_ov_fdbk = self.build_oven_static_text_two()
 
         self.str_ov_fdbk_val = wx.StaticText(self, label = 'N/A')
-        str_ov_fdbk_val.SetFont(f)
-        hbox_ov_fdbk.Add(str_ov_fdbk_val)
+        self.str_ov_fdbk_val.SetFont(f)
+        hbox_ov_fdbk.Add(self.str_ov_fdbk_val)
 
         self.vbox.Add(hbox_ov_fdbk, flag=wx.LEFT|wx.TOP,border =b)
 
@@ -1010,9 +1010,9 @@ class ControlPanel( wx.Panel ):
 
         hbox_det_fdbk = self.build_det_static_text_two()
 
-        str_det_fdbk_val = wx.StaticText(self, label = 'N/A')
-        str_det_fdbk_val.SetFont(f)
-        hbox_det_fdbk.Add(str_det_fdbk_val)
+        self.str_det_fdbk_val = wx.StaticText(self, label = 'N/A')
+        self.str_det_fdbk_val.SetFont(f)
+        hbox_det_fdbk.Add(self.str_det_fdbk_val)
 
         vbox.Add(hbox_det_fdbk, flag=wx.LEFT|wx.TOP,border =b)
 
