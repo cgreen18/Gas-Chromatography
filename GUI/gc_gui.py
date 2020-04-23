@@ -312,18 +312,16 @@ class GCFrame(wx.Frame):
     def on_data_integrate(self, err):
         print("on integrate")
         if not self.running:
-            _l = self.curr_data_frame_lock
-            with _l:
-                self.gc.integrate_volt()
-                self.update_curr_data_()
+            ans = self.gc.integrate_volt()
+            print("The integral is: ")
+            print(ans)
+            self.update_curr_data_()
 
     def on_data_normalize(self, err):
         print("on normalize")
         if not self.running:
-            _l = self.curr_data_frame_lock
-            with _l:
-                self.gc.normalize_volt_()
-                self.update_curr_data_()
+            self.gc.normalize_volt_()
+            self.update_curr_data_()
 
     def on_fill(self, err):
         self.panel_detector.fill_under()
