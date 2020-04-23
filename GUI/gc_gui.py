@@ -536,8 +536,10 @@ class GCSplitter(wx.SplitterWindow):
     parent is GCFrame
     '''
     def __init__(self, parent):
-        wx.SplitterWindow.__init__(self, parent, id=wx.ID_ANY,pos=wx.DefaultPosition , size=self.options['frame_size'], style = wx.SP_BORDER, name='Diode Based Gas Chromatography' )
-        self.options = parent.options
+        ops = parent.options
+        fs = ops['frame_size']
+        wx.SplitterWindow.__init__(self, parent, id=wx.ID_ANY,pos=wx.DefaultPosition , size=fs, style = wx.SP_BORDER, name='Diode Based Gas Chromatography' )
+        self.options = ops
         self.parent = parent
 
     @staticmethod
