@@ -170,14 +170,16 @@ class GCFrame(wx.Frame):
         with self.ser_lock:
             self.ser_cmd_set_temp(val, str)
 
-'''
-BIG TODO >>>>>
-'''
+
+#BIG TODO >>>>>
+
     def ser_cmd_set_temp(self, temp, which = 'oven'):
         if which == 'oven':
+            pass
             # do something
             # SET_TMP_CMD_STR
         elif which == 'det':
+            pass
             #
         else:
             print('Err')
