@@ -534,6 +534,9 @@ class GCReceiver(Thread):
                   #self.gc_cond.acquire()
                   print('gc_cond acquired')
 
+                  print(self.curr_data_lock)
+                  print(self.curr_data_lock.locked())
+
                   with self.curr_data_lock:
                       print('acquired')
                       self.frame.curr_data = np.copy(self.gc.curr_data)
