@@ -322,12 +322,12 @@ class GCTemperature(Thread):
 
         self.oven_temp = None
         self.last_oven_temp = None
-        self.oven_val_change = False
+        self.oven_val_change = True
         self.oven_stc_txt = self.frame.panel_config.str_ov_fdbk_val
 
         self.det_temp = None
         self.last_det_temp = None
-        self.oven_val_change = False
+        self.oven_val_change = True
         self.det_stc_txt = self.frame.panel_config.str_det_fdbk_val
 
         self.last_update_time_raw = None
@@ -383,6 +383,8 @@ class GCTemperature(Thread):
                 self.det_val_change = True
 
             self.last_update_time_raw = time.time()
+
+            print(self.det_val_change)
 
             if self.det_val_change and self.oven_val_change:
                 func = self.set_both_txt_ctrls
