@@ -1041,6 +1041,7 @@ class DetectorPanel(wx.Panel):
         t_i = self.indices['t']
 
         if self.curr_data.size != 0:
+            self.axes.cla()
             self.axes.plot(self.curr_data[t_i], self.curr_data[v_i])
             self.canvas.draw()
 
