@@ -137,9 +137,7 @@ class GC:
         deriv = np.diff(volt, order)
 
         for pt in volt:
-            if large
-            if pt > thresh:
-                if
+            print(pt)
 
     # ADS1115 Methods
     def reinit_ADS(self):
