@@ -496,7 +496,8 @@ class GCPlotter(Thread):
             print(self.frame.curr_data_frame_lock.locked())
             self.frame.panel_detector.update_curr_data_()
             print(self.frame.curr_data_frame_lock.locked())
-            self.frame.panel_detector.draw()
+            func = self.frame.panel_detector.draw
+            wx.CallAfter(func)
             print(self.frame.curr_data_frame_lock.locked())
 
 
