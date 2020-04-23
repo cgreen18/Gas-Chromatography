@@ -98,6 +98,7 @@ class GC:
         to = self.time_out
         #ignore error for now
         _e = self.curr_data_lock.acquire(to)
+        print('acquired volt')
         volt = self.get_volt()
         _e = self.curr_data_lock.release()
 
