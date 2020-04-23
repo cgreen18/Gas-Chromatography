@@ -601,6 +601,9 @@ class GCSplitter(wx.SplitterWindow):
         fs = ops['frame_size']
         wx.SplitterWindow.__init__(self, parent, id=wx.ID_ANY,pos=wx.DefaultPosition , size=fs, style = wx.SP_BORDER, name='Diode Based Gas Chromatography' )
         self.options = ops
+
+        print("splitter inherits parent: ")
+        print(parent)
         self.parent = parent
 
     def create_fonts(self):
