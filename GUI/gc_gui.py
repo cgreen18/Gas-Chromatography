@@ -157,6 +157,14 @@ class GCFrame(wx.Frame):
 
         return _d
 
+    def get_curr_data_copy(self):
+        _l = self.curr_data_frame_lock
+        with _l:
+            _d = self.gc.get_curr_data()
+            _copy = np.copy(_d)
+
+        return _copy
+
     # gc_class methods
     def update_curr_data_(self):
         _l = self.curr_data_frame_lock
@@ -205,6 +213,8 @@ class GCFrame(wx.Frame):
         gc = self.gc
         condition = self.gc_cond
 
+        self.running= True
+
         self.data_rover_thread = GCData(gc, condition, args = ( sp, ep ) )
 
         rsp = self.options['plot_refresh_rate']
@@ -216,11 +226,9 @@ class GCFrame(wx.Frame):
         self.data_rover_thread.start()
         self.receiver_thread.start()
 
-        self.plotter_thread = GCPlotter(self, lock , args=(rsp,ep))
+        self.plotter_thread = GCPlotter(self, args=(rsp,ep))
 
         self.plotter_thread.start()
-
-        self.running= True
 
     def on_stop_btn(self):
         self.stop_data_coll()
@@ -242,7 +250,7 @@ class GCFrame(wx.Frame):
             self.stop_data_coll()
 
         print('plot')
-        self.panel_detector.update_curr_data()
+        self.panel_detector.update_curr_data_()
         self.panel_detector.draw()
 
     def on_clr_btn(self):
@@ -452,11 +460,11 @@ class GCTemperature(Thread):
         self.det_stc_txt.SetLabel(det_str)
 
 class GCPlotter(Thread):
-    def __init__(self, frame, lock, *args, **kwargs):
+    def __init__(self, frame, *args, **kwargs):
         super(GCPlotter, self).__init__()
 
         self.frame = frame
-        self.curr_data_lock = lock
+        #self.curr_data_lock = lock
 
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]
@@ -612,8 +620,6 @@ class GCSplitter(wx.SplitterWindow):
         wx.SplitterWindow.__init__(self, parent, id=wx.ID_ANY,pos=wx.DefaultPosition , size=fs, style = wx.SP_BORDER, name='Diode Based Gas Chromatography' )
         self.options = ops
 
-        print("splitter inherits parent: ")
-        print(parent)
         self.parent = parent
 
     def create_fonts(self):
@@ -994,8 +1000,11 @@ class DetectorPanel(wx.Panel):
         self.axes.fill_between(t,v)
 
     def draw(self):
+        v_i = self.indices['v']
+        t_i = self.indices['t']
+
         if self.curr_data.size != 0:
-            self.axes.plot(self.curr_data[2], self.curr_data[0])
+            self.axes.plot(self.curr_data[t_i], self.curr_data[v_i])
             self.canvas.draw()
 
     def ply_btn_evt(self, event):
@@ -1008,19 +1017,7 @@ class DetectorPanel(wx.Panel):
         self.gcframe.on_plot_btn()
 
     def update_curr_data_(self):
-        self.curr_data = self.gcframe.get_curr_data()
-
-        if self.curr_data.size != 0:
-            init_time = self.curr_data[2][0]
-            self.curr_data[2] = self.curr_data[2] - init_time
-
-    def update_curr_data_already_locked(self):
-        print(self)
-        print(self.parent)
-        print(self.gcframe.get_curr_data)
-        print(self.parent.parent)
-        self.gcframe.update_curr_data_()
-        self.curr_data = self.gcframe.get_curr_data()
+        self.curr_data = self.gcframe.get_curr_data_copy()
 
         if self.curr_data.size != 0:
             init_time = self.curr_data[2][0]
