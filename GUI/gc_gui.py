@@ -1014,7 +1014,7 @@ class ControlPanel( wx.Panel ):
         self.str_det_fdbk_val.SetFont(f)
         hbox_det_fdbk.Add(self.str_det_fdbk_val)
 
-        vbox.Add(hbox_det_fdbk, flag=wx.LEFT|wx.TOP,border =b)
+        self.vbox.Add(hbox_det_fdbk, flag=wx.LEFT|wx.TOP,border =b)
 
         self.SetSizer(self.vbox)
 
