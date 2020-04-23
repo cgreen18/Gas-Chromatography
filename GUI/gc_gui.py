@@ -376,7 +376,7 @@ class GCTemperature(Thread):
         print(_)
         print("bits written")
 
-        resptest = ser.readlline()
+        resptest = ser.readline()
         print("resptest")
         print(resptest)
 
