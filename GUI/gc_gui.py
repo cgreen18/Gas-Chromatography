@@ -1068,6 +1068,7 @@ class ControlPanel( wx.Panel ):
         str_temp = wx.StaticText(self, label = 'Temperature')
         hf = self.fonts['header_font']
         str_temp.SetFont(hf)
+        b = self.options['BORDER']
         self.vbox.Add(str_temp, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP,border =b)
 
         self.vbox.Add((-1,es))
