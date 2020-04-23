@@ -542,8 +542,7 @@ class GCSplitter(wx.SplitterWindow):
         self.options = ops
         self.parent = parent
 
-    @staticmethod
-    def create_fonts():
+    def create_fonts(self):
         font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
         font.SetPointSize(self.options['BODY_FONT_SIZE'])
         header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
@@ -803,7 +802,7 @@ class DetectorPanel(wx.Panel):
         self.options = self.parent.options
         self.indices = self.options['indices']
 
-        self.fonts = GCSplitter.create_fonts()
+        self.fonts = parent.create_fonts()
 
         self.create_panel()
 
@@ -965,7 +964,7 @@ class ControlPanel( wx.Panel ):
         self.gcframe = parent.parent
         self.options = self.parent.options
 
-        self.fonts = GCSplitter.create_fonts()
+        self.fonts = parent.create_fonts()
 
         self.create_panel()
 
