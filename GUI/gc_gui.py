@@ -385,6 +385,9 @@ class GCTemperature(Thread):
         str_resp = [item.decode() for item in resp]
         str_resp = [item.strip('\r\n') for item in str_resp]
 
+        print("str_resp is: ")
+        print(str_resp)
+
         ov_tmp = str_resp[o_l]
 
         det_tmp = str_resp[d_l]
