@@ -69,6 +69,7 @@ class GC:
         _e = self.curr_data_lock.acquire(to)
 
         c_d = self.get_curr_data()
+        _e = self.curr_data_lock.release()
         if len(c_d) != 0:
             voltage = self.get_volt()
             _l = 0
