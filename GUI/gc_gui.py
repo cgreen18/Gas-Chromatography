@@ -319,7 +319,7 @@ class GCFrame(wx.Frame):
         if not self.running:
             _l = self.curr_data_frame_lock
             with _l:
-                self.gc.normalize_volt()
+                self.gc.normalize_volt_()
                 self.update_curr_data_()
 
     def on_fill(self, err):
