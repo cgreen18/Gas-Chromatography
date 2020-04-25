@@ -536,7 +536,7 @@ class GCConfigPopup(wx.Frame):
         txt_prompt = wx.StaticText(self, label = _t, size= _s)
 
         txt_prompt.SetFont(hf)
-        hbox.Add(txt_prompt, , proportion=1)
+        hbox.Add(txt_prompt, proportion=1)
 
         _dv = self.default
         _p = wx.DefaultPosition
