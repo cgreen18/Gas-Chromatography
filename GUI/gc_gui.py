@@ -17,6 +17,9 @@ Version (mainly for final report later):
                         Commands not yet implemented.
 2.2 - 22 April 2020 - Works with updated gc_class and lock.
 2.3 - 22 April 2020 - Added functions on voltage in menu bar.
+2.4 - 24 April 2020 - Stable. Correctly increments run_number and stores data in prev_data.
+                        Menu data functions: normalize, integrate, and clean time all work as intended.
+                        Menu grapher function: fill almost works
 '''
 
 import numpy as np

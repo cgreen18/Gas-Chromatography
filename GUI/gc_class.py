@@ -14,6 +14,7 @@ Version:
                         Old methods, that can plot, print, etc. are left at the end for future debugging/testing.
 2.1 - 22 April 2020 - Integrate and normalize voltage methods.
 2.2 - 22 April 2020 - Huge security upgrade. Moved lock to here (gc_class) and protected curr_data through getters and setters.
+2.3 - 24 April 2020 - Modified lock structure. Added re_init_data and curr_to_prev to move current data to prev_data list.
 '''
 
 # GPIO imports
