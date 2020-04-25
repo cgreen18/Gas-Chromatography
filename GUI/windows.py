@@ -212,16 +212,14 @@ class SaveasGC(SaveasWindow):
         self.save_gc(name)
 
     def save_gc(self, name):
-        _date = strftime('%d %m %Y', localtime())
-        date_str = 'Current date: ' + _date
-        _time = strftime('%H:%M:%S',localtime())
+        _date = time.strftime('%d %m %Y (MM/DD/YYYY)', time.localtime())
+        date_str = 'Current date: ' + _date + ' '
+        _time = time.strftime('%H:%M:%S',time.localtime())
         time_str = 'Time at save: ' + _time
 
         _l = self.parent.curr_data_frame_lock
         with _l:
             _d = self.parent.get_curr_data_copy()
-
-        _d
 
         curr_data = self.jsonify_data(_d)
         prev_data = self.parent.get_prev_data_copy()
