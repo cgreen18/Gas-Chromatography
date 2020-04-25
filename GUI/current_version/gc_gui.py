@@ -1348,10 +1348,6 @@ class DetectorPanel(wx.Panel):
         with self.gcframe.curr_data_frame_lock:
             self.curr_data = self.gcframe.get_curr_data_copy()
 
-        if self.curr_data.size != 0:
-            init_time = self.curr_data[2][0]
-            self.curr_data[2] = self.curr_data[2] - init_time
-
     def clear_plot_btn_evt(self, event):
         self.gcframe.on_clr_btn()
         self.axes.cla()
