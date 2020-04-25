@@ -833,8 +833,8 @@ class OpenWindow(DirectoryWindow):
     def __init__(self, parent, ops):
         str = 'Open GC File'
         super().__init__( parent, ops)
-        self.SetTitle(Open)
-        self.btn_entr.SetLabel(str)
+        self.SetTitle(str)
+        self.btn_entr.SetLabel('Open as .gc')
 
     def spec_cwdlist_dclick_evt(self,  choice, filename, extension):
         name = self.tc_name.GetValue()
