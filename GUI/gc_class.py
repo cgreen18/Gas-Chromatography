@@ -1,4 +1,4 @@
-['a']indices['a']'''
+'''
 Name: gc_class.py
 Authors: Conor Green and Matt McPartlan
 Description: Mid-level abstraction that will do most of the work. User interaction as well as data processing.
