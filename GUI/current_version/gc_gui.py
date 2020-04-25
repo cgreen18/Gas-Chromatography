@@ -1121,6 +1121,8 @@ class GCData(Thread):
         while not self.stopped():
             while self.paused():
                 time.sleep(.001)
+                if self.stopped():
+                    return
 
             t_curr= time.time()
             while (t_curr - epsilon -t_last < sampling_period):
