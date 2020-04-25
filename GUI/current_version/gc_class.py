@@ -245,7 +245,7 @@ class GC:
         return [peaks , volt ]
 
     def integrate_peaks(self):
-        [ peaks , volt] = self.break_into_peaks_ret_volt_copy()
+        [peaks , volt] = self.break_into_peaks_ret_volt_copy()
 
         areas = []
 
@@ -261,8 +261,10 @@ class GC:
         maximas = []
 
         for low, high in peaks:
-            _m = np.max(volt[low:high])
-            maximas.append(_m)
+            arr = volt[low:high]
+            _m = np.max(arr)
+            _mi = arr.argmax()
+            maximas.append((_m, _mi))
 
         return maximas
 

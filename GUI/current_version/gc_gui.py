@@ -440,6 +440,17 @@ class GCFrame(wx.Frame):
         self.panel_detector.fill_under_()
         print('out fill')
 
+    def on_label_peaks(self, err):
+        print('on label peaks')
+
+        #labels = [ {'text':area_0, 'co-ord':(x_0,y_0))} , {'text':area_1,'co-ord':(x_1,y_1)}, ...  ]
+        labels = []
+        areas = self.gc.integrate_peaks()
+        maximas = self.gc.get_peak_local_maximas()
+
+        self.panel_detector.label_peaks_(labels)
+        print('out label peaks')
+
     '''
     Defaults overridden
     '''
@@ -1236,6 +1247,9 @@ class DetectorPanel(wx.Panel):
 
         return hbox
 
+    def label_peaks_(self):
+        pass
+
     def fill_under_(self):
         cd = self.get_curr_data()
         _vi = self.indices['v']
@@ -1449,6 +1463,9 @@ class GCMenuBar(wx.MenuBar):
 
         _fill = grapher_menu.Append(wx.ID_ANY, '&Fill')
         self.parent.Bind(wx.EVT_MENU, self.parent.on_fill, _fill)
+
+        _label_peaks = grapher_menu.Append(wx.ID_ANY, '&Label Peaks')
+        self.parent.Bind(wx.EVT_MENU, self.parent.on_label_peaks, _label_peaks)
 
         return grapher_menu
 
