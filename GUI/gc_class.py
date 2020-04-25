@@ -38,7 +38,7 @@ from threading import Lock
 class GC:
     '''
     Modification functions: clean_time_, calc_cumsum_into_area_, normalize_volt_, mov_mean_, curr_to_prev_
-    Math functions: integrate_volt, break_into_peaks
+    Math functions: integrate_volt, integrate_volt_direct, break_into_peaks
     helper functions: define_peaks, reint_curr_data, inc_run_num_, integrate
     ADS configuration functions: reint_ADS, set_gain, set_mode
     Lock functions: get_lock, is_locked
@@ -123,7 +123,7 @@ class GC:
         _min = volt.min()
         volt = volt - _min
 
-        _area = self.integrate_volt(volt)
+        _area = self.integrate_volt_direct(volt)
         volt = volt / _area
 
         _e = self.curr_data_lock.acquire(to)
@@ -167,7 +167,7 @@ class GC:
 
     #@param: directly given voltage vector
     #@returns: int or float that is the area of voltage, including negatives
-    def integrate_volt(self, voltage):
+    def integrate_volt_direct(self, voltage):
         print('direct called')
         if len(voltage) != 0:
             _l = 0
