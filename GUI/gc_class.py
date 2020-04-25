@@ -123,7 +123,7 @@ class GC:
         _min = volt.min()
         volt = volt - _min
 
-        _area = self.integrate_volt_2(volt)
+        _area = self.integrate_volt(volt)
         volt = volt / _area
 
         _e = self.curr_data_lock.acquire(to)
