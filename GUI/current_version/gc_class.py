@@ -74,7 +74,9 @@ class GC:
         self.curr_data_lock = Lock()
         self.time_out = 1 #sec
         self.epsilon = 0.01
-        self.min_noise_after_norm = 0.2
+        self.pk_volt_min_after_norm = 0.2
+        self.pk_time_min = 10
+        self.peaks = []
         self.prev_data = []
         self.run_num = 0
 
@@ -181,33 +183,92 @@ class GC:
 
     #@state: UNFINISHED
     #@description: Breaks the voltage vector into potential peaks. Simple and untested algorithm.
-    #@returns: Indices of centers of peaks
+    #@returns: List of tuples of start and end index (both inclusive) of peaks
     def break_into_peaks(self):
-        pass
         ep = self.epsilon
-        if abs(self.integrate_volt() -1.0 ) > ep:
+        if abs(self.integrate_volt() - 1.0 ) > ep:
             self.normalize_volt_()
-
-    '''
-    helper functions: define_peaks, reint_curr_data, inc_run_num_, integrate
-    '''
-    def define_peaks(self):
         to = self.time_out
+        #ignore err for now
         _e = self.curr_data_lock.acquire(to)
         volt = self.get_volt()
         _e = self.curr_data_lock.release()
 
-        thresh = self.min_noise_after_norm
-        large = False
-        uphill = False
+        volt_thresh = self.pk_volt_min_after_norm
+        time_thresh = self.pk_time_min
 
-        window = 100
+        peaks = []
 
-        deriv = np.diff(volt, order)
+        num_pts = len(volt)
+        on_peak = False
+        low = 0
+        for i in range(0, num_pts):
+            if not on_peak:
+                if volt[i] >= volt_thresh:
+                    on_peak = True
+                    low = i
+            else:
+                if volt[i] <= volt_thresh:
+                    on_peak = False
+                    if i - low >= time_thresh:
+                        peaks.append((low, i))
+        return peaks
 
-        for pt in volt:
-            print(pt)
+    def break_into_peaks_ret_volt_copy(self):
+        ep = self.epsilon
+        if abs(self.integrate_volt() - 1.0 ) > ep:
+            self.normalize_volt_()
+        to = self.time_out
+        #ignore err for now
+        _e = self.curr_data_lock.acquire(to)
+        volt = self.get_volt()
+        _e = self.curr_data_lock.release()
 
+        volt_thresh = self.pk_volt_min_after_norm
+        time_thresh = self.pk_time_min
+
+        peaks = []
+
+        num_pts = len(volt)
+        on_peak = False
+        low = 0
+        for i in range(0, num_pts):
+            if not on_peak:
+                if volt[i] >= volt_thresh:
+                    on_peak = True
+                    low = i
+            else:
+                if volt[i] <= volt_thresh:
+                    on_peak = False
+                    if i - low >= time_thresh:
+                        peaks.append((low, i))
+        return [peaks , volt ]
+
+    def integrate_peaks(self):
+        [ peaks , volt] = self.break_into_peaks_ret_volt_copy()
+
+        areas = []
+
+        for low, high in peaks:
+            _a = self.integrate(volt, low, high)
+            areas.append(_a)
+
+        return areas
+
+    def get_peak_local_maximas(self):
+        [peaks,volt] = self.break_into_peaks_ret_volt_copy()
+
+        maximas = []
+
+        for low, high in peaks:
+            _m = np.max(volt[low:high])
+            maximas.append(_m)
+
+        return maximas
+
+    '''
+    helper functions: reint_curr_data, inc_run_num_, integrate
+    '''
     def integrate(self, arr, low, high):
         if low < len(arr) -1:
             arr = arr[low]

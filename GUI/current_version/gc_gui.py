@@ -66,7 +66,7 @@ class GCFrame(wx.Frame):
         self.__version__ = '3.0+'
         self.__authors__ = 'Conor Green and Matt McPartlan'
 
-        self.set_options_(user_options)
+        self.establish_options_(user_options)
         self.parent = parent
 
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = self.options['DEFAULT_FRAME_SIZE'], style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
@@ -102,7 +102,7 @@ class GCFrame(wx.Frame):
         if len(possible) == 0:
             print("Error: No ACM ports found to connect to Arduino.")
             print("Continuing for now.")
-            possible[0] = 'ttyACM0'
+            possible.append('ttyACM0')
         elif len(possible) != 1:
             print("Error: Multiple possible ACM ports to connect Arduino")
             print("Defaulting to '/dev/ttyACM0'")
@@ -139,6 +139,28 @@ class GCFrame(wx.Frame):
         se = self.options['single_ended']
         self.gc = GC(se)
         self.gc_lock = self.gc.curr_data_lock
+
+    def establish_options_(self, uo):
+        self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
+        self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':5.0, 'baud_rate':115200,
+                        'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
+                        'single_ended':True, 'indices':{'v':0,'a':1,'dt':2,'t':3},
+                        'units_str':{'x-axis':'Time [seconds]' , 'y-axis':'Detector Response [volts]'}}
+        self.options.update(self.constants)
+
+        self.options.update(uo)
+
+#BIG TODO
+    def set_temp_ser_cmd(self, temp, which = 'oven'):
+        if which == 'oven':
+            pass
+            # do something
+            # SET_TMP_CMD_STR
+        elif which == 'det':
+            pass
+            #
+        else:
+            print('Err')
 
     '''
     Lock function
@@ -217,31 +239,6 @@ class GCFrame(wx.Frame):
         _il = self.is_frame_data_locked()
         if _il:
             self.curr_data_frame = d
-
-        '''
-        Getters
-        '''
-
-    def set_options_(self, uo):
-        self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
-        self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':5.0, 'baud_rate':115200,
-                        'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
-                        'single_ended':True, 'indices':{'v':0,'a':1,'dt':2,'t':3}}
-        self.options.update(self.constants)
-
-        self.options.update(uo)
-
-#BIG TODO
-    def set_temp_ser_cmd(self, temp, which = 'oven'):
-        if which == 'oven':
-            pass
-            # do something
-            # SET_TMP_CMD_STR
-        elif which == 'det':
-            pass
-            #
-        else:
-            print('Err')
 
     '''
         Getters
@@ -473,6 +470,72 @@ class GCSplitter(wx.SplitterWindow):
 
         return {'font':font,'header_font':header_font}
 
+# Popup Configuration Window
+class PopupWindow(wx.Frame):
+    def __init__(self, parent, text, type, variable_in_focus):
+        self.parent = parent
+        self.options = self.parent.options
+
+        self.prompt = text
+
+        self.default = variable_in_focus
+        self.type = type
+
+        self.fonts = self.create_fonts()
+
+        _p = parent
+        _id = wx.ID_ANY
+        _t = 'Configuration Popup Window'
+        _pos = wx.DefaultPosition
+        _s = (250, 100)
+        _sty = wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL
+        wx.Frame.__init__(self, _p, _id, _t, _pos, _s, _sty)
+
+    def create_fonts(self):
+        font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
+        font.SetPointSize(self.options['BODY_FONT_SIZE'])
+        header_font = wx.SystemSettings.GetFont(wx.SYS_SYSTEM_FONT)
+        header_font.SetPointSize(self.options['HEADER_FONT_SIZE'])
+
+        return {'font':font,'header_font':header_font}
+
+    def create_frame_(self):
+        hf = self.fonts['header_font']
+        f = self.fonts['font']
+        b = self.options['BORDER']
+
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
+
+        _t = self.prompt
+        _s = (100,50)
+        txt_prompt = wx.StaticText(self, label = _t, size= _s)
+
+        txt_prompt.SetFont(hf)
+        hbox.Add(txt_prompt, , proportion=1)
+
+        _dv = self.default
+        _p = wx.DefaultPosition
+        _s = (50,50)
+        self.tc_val = wx.TextCtrl(self, value = _dv, pos = _p, size = _s)
+        self.tc_val.SetFont(hf)
+
+        hbox.Add(self.tc_val, proportion=1, border= b)
+
+        _id = wx.ID_ANY
+        _t = 'Enter'
+        _s = (50, 50)
+        self.btn_entr = wx.Button(self, id=_id, label=_t, size = _s)
+        self.Bind(wx.EVT_BUTTON, self.entrbtn_click_evt, self.btn_entr)
+
+        hbox.Add(self.btn_entr, proportion=1)
+
+        self.SetSizer(hbox)
+        self.Centre()
+        self.Show()
+
+    def entrbtn_click_evt(self, event):
+        pass
+
 #DirectoryWindow(s)
 class DirectoryWindow(wx.Frame):
     def __init__(self, parent, ops):
@@ -482,7 +545,15 @@ class DirectoryWindow(wx.Frame):
         self.options = ops
         self.fonts = self.create_fonts()
 
-        self.create_frame()
+        _p = parent
+        _id = wx.ID_ANY
+        _t = wx.EmptyString
+        _pos = wx.DefaultPosition
+        _s = (600, 600)
+        _sty = wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL
+        wx.Frame.__init__(self, _p, _id, _t, _pos, _s, _sty)
+
+        self.create_frame_()
         self.update_cwd()
 
     def create_fonts(self):
@@ -493,9 +564,7 @@ class DirectoryWindow(wx.Frame):
 
         return {'font':font,'header_font':header_font}
 
-    def create_frame(self):
-        wx.Frame.__init__ ( self, self.parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = (600,600), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
-
+    def create_frame_(self):
         vbox = wx.BoxSizer(wx.VERTICAL)
         vbox.Add((-1,self.options['EXTRA_SPACE']))
 
@@ -1059,6 +1128,7 @@ class DetectorPanel(wx.Panel):
         self.gcframe = parent.parent
         self.options = self.parent.options
         self.indices = self.options['indices']
+        self.units_str = self.options['units_str']
 
         self.fonts = parent.create_fonts()
 
@@ -1133,6 +1203,11 @@ class DetectorPanel(wx.Panel):
     def create_figure_(self):
         self.figure = Figure()
         self.axes = self.figure.add_subplot(111)
+        _xstr = self.units_str['x-axis']
+        _ystr = self.units_str['y-axis']
+        self.axes.set_xlabel(_xstr)
+        self.axes.set_ylabel(_ystr)
+
         self.canvas = FigureCanvas(self, -1, self.figure)
 
     def create_control_box(self):
