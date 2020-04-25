@@ -441,8 +441,6 @@ class GCSplitter(wx.SplitterWindow):
 
         return {'font':font,'header_font':header_font}
 
-
-
 #DirectoryWindow(s)
 class DirectoryWindow(wx.Frame):
     def __init__(self, parent, ops):
