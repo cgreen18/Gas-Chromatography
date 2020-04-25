@@ -61,6 +61,9 @@ class GCFrame(wx.Frame):
     # self is MainApp(GCFrame)
     # parent is None
     def __init__(self, parent, user_options):
+        self.__version__ = '3.0+'
+        self.__authors__ = 'Conor Green and Matt McPartlan'
+
         self.set_options_(user_options)
         self.parent = parent
 

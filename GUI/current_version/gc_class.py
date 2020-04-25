@@ -50,7 +50,7 @@ class GC:
 
     #@param: single_ended = True if single ended ADC and vice-versa
     def __init__(self, single_ended):
-        self.__version__ = '3.0'
+        self.__version__ = '3.0+'
         self.__authors__ = 'Conor Green and Matt McPartlan'
 
         #ADS1115
