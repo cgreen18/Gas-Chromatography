@@ -140,7 +140,7 @@ class GCFrame(wx.Frame):
     def update_curr_data_(self):
         _gcl = self.gc.curr_data_lock
         with _gcl:
-            d = self.gc.get_curr_data()
+            _d = self.gc.get_curr_data()
 
         _l = self.curr_data_frame_lock
         with _l:
