@@ -204,10 +204,10 @@ class GCFrame(wx.Frame):
         data_dict_numpy = self.reverse_jsonify(_djson)
 
         _cdstr = 'Current Data'
-        cd = session[_cdstr]
+        cd = data_dict_numpy[_cdstr]
 
         _pdstr = ' Previous Data'
-        pd = session[_pdstr]
+        pd = data_dict_numpy[_pdstr]
 
         return [cd , pd]
 
