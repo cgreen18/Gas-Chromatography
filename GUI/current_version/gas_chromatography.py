@@ -11,6 +11,7 @@ Version:
 1.4 - 31 March 2020 - Added Open window, similar to Save As. Both inherit new window class.
 2.0 - 21 April 2020 - Final version. Moved all code to gc_gui.py...
                         and made this a simple App running script.
+3.0 - 24 April 2020 - Same as 2.0. Updated with gc_class and gc_gui
 '''
 
 import wx
