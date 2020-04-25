@@ -11,6 +11,7 @@ Version:
 1.4 - 31 March 2020 - Added Open window, similar to Save As. Both inherit new window class.
 2.0 - 21 April 2020 - Final version. Moved all code to gc_gui.py...
                         and made this a simple App running script.
+3.0 - 24 April 2020 - Same as 2.0. Updated version to match gc_class and gc_gui
 '''
 
 import wx
@@ -26,7 +27,7 @@ attribute: self.options - the UI defeaults and current settings loaded from YAML
 '''
 class MainApp(gc_gui.GCFrame):
     def __init__(self, parent):
-        self.__version__ = '2.0'
+        self.__version__ = '3.0'
         self.__authors__ = 'Conor Green and Matt McPartlan'
 
         with open('config.yaml') as f:
