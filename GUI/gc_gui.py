@@ -669,7 +669,7 @@ class GCData(Thread):
             new = np.append(old, new, axis=1)
 
             with self.condition:
-                self.gc.set_curr_data(new)
+                self.gc.set_curr_data_(new)
                 self.condition.notify_all()
             print('new daata')
 
