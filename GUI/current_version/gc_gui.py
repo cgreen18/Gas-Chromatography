@@ -20,7 +20,8 @@ Version (mainly for final report later):
 2.4 - 24 April 2020 - Stable. Correctly increments run_number and stores data in prev_data.
                         Menu data functions: normalize, integrate, and clean time all work as intended.
                         Menu grapher function: fill almost works
-3.0 -24 April 2020 - Arduino serial interface. Temperature control and feedback thread. Normalize, integrate, and clean time menu functions.
+3.0 - 24 April 2020 - Arduino serial interface. Temperature control and feedback thread. Normalize, integrate, and clean time menu functions.
+3.1 - 25 April 2020 - Open .gc file will set current and previous data to the loaded file.
 '''
 
 import numpy as np
@@ -152,6 +153,35 @@ class GCFrame(wx.Frame):
     '''
         Setters
     '''
+    def set_frame_from_session_(self, session):
+        [curr , prev] = self.parse_session(session)
+
+        _l = self.curr_data_frame_lock
+        with _l:
+            self.set_curr_data_w_ref_(curr)
+
+        _gcl = self.gc_lock
+        with _gcl:
+            self.gc.set_curr_data_w_ref_(curr)
+
+        self.prev_data = prev
+
+    def parse_session(self, session):
+        # # Format of JSON .gc filetype
+        # curr_session = {
+        # 'Date' : date_str ,
+        # 'Time' : time_str ,
+        # 'Current Data' : curr_data ,
+        #  'Previous Data': prev_data
+        # }
+        _cdstr = 'Current Data'
+        cd = session[_cdstr]
+
+        _pdstr = ' Previous Data'
+        pd = session[_pdstr]
+
+        return [cd , pd]
+
     def update_curr_data_(self):
         _gcl = self.gc.curr_data_lock
         with _gcl:
@@ -695,10 +725,15 @@ class SaveasJPG(SaveasWindow):
         self.Close()
 
     def save_jpg(self, name):
-        if name[-4:] == '.jpg':
+        if self.is_jpg(name):
             self.figure.savefig(name)
         else:
             self.figure.savefig(name + '.jpg')
+
+    def is_jpg(self, n):
+        if n[-4:] == '.jpg':
+            return True
+        return False
 
 class OpenWindow(DirectoryWindow):
     def __init__(self, parent, ops):
@@ -708,7 +743,18 @@ class OpenWindow(DirectoryWindow):
         self.btn_entr.SetLabel(str)
 
     def spec_cwdlist_dclick_evt(self,  choice, filename, extension):
-        pass
+        name = self.tc_name.GetValue()
+        if self.is_gc(name):
+            self.open_gc(name)
+            self.Close()
+
+    def open_gc(self, name):
+        self.parent.set_frame_from_file(name)
+
+    def is_gc(self, name):
+        if name[-3:] == '.gc':
+            return True
+        return False
 
 # Threads
 class GCTemperature(Thread):
