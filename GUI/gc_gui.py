@@ -349,6 +349,9 @@ class GCFrame(wx.Frame):
     Menu events
     '''
     def on_quit(self , err):
+        if self.data_running:
+            self.stop_data_coll_()
+            
         self.Close()
 
     def on_saveas(self, err):
