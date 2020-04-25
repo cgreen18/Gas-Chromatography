@@ -177,6 +177,11 @@ class GCFrame(wx.Frame):
 
         return _c
 
+    def get_prev_data_copy(self):
+        _pd = self.prev_data
+        _pdc = np.copy(_pd)
+        return _pdc
+
     def curr_to_prev_(self):
         _l = self.curr_data_frame_lock
         with _l:
@@ -332,16 +337,20 @@ class GCFrame(wx.Frame):
         self.Close()
 
     def on_saveas(self, err):
-        saveas_gc_window = SaveasGC( self, self.options)
+        _l = self.curr_data_frame_lock
+        with _l:
+            _d = self.get_curr_data_copy()
+
+        _saveas_gc_window = SaveasGC( self, _d)
 
     def on_open(self, err):
-        open_window = OpenWindow(self, self.options)
+        _open_window = OpenWindow(self, self.options)
 
     def on_png_save(self, err):
-        saveas_png_window = SaveasPNG(self, self.options)
+        _saveas_png_window = SaveasPNG(self, self.options)
 
     def on_jpg_save(self, err):
-        saveas_jpg_window = SaveasJPG(self, self.options)
+        _saveas_jpg_window = SaveasJPG(self, self.options)
 
     def on_data_integrate(self, err):
         print("on integrate")

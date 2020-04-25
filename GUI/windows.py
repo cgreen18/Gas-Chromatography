@@ -205,19 +205,22 @@ class SaveasGC(SaveasWindow):
         self.SetTitle('Save Session As GC')
         self.btn_entr.SetLabel('Save as .gc')
         #Get important parameters
-        self.curr_data = self.parent.get_curr_data()
+        self.curr_data = data
+        self.parent = parent
 
     def entrbtn_click_evt(self, event):
         name = self.tc_name.GetValue()
         self.save_gc(name)
 
     def save_gc(self, name):
-        date = strftime('%d %m %Y', localtime())
-        time = strftime('%H:%M:%S',localtime())
+        _date = strftime('%d %m %Y', localtime())
+        date_str = 'Current date: ' + _date
+        _time = strftime('%H:%M:%S',localtime())
+        time_str = 'Time at save: ' + _time
 
         curr_data = self.jsonify_data(self.curr_data)
+        prev_data = self.parent.get_prev_data_copy()
 
-        print(curr_data)
 
         if name[-3:] != '.gc':
             name = name + '.gc'
@@ -227,7 +230,7 @@ class SaveasGC(SaveasWindow):
         'Date' : date ,
         'Time' : time ,
         'Current Data' : curr_data ,
-         'Previous Data': None
+         'Previous Data': prev_data
         }
 
         with codecs.open(name , 'w', encoding='utf-8') as json_file:
@@ -282,7 +285,7 @@ class SaveasJPG(SaveasWindow):
         name = self.tc_name.GetValue()
         self.save_jpg(name)
         self.Close()
-        
+
     def save_jpg(self, name):
         if name[-4:] == '.jpg':
             self.figure.savefig(name)
