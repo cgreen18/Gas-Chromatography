@@ -245,8 +245,8 @@ class SaveasGC(SaveasWindow):
 
         # Format of JSON .gc filetype
         curr_session = {
-        'Date' : date ,
-        'Time' : time ,
+        'Date' : date_str ,
+        'Time' : time_str ,
         'Current Data' : curr_data ,
          'Previous Data': prev_data
         }
