@@ -273,7 +273,7 @@ class GC:
     '''
     def integrate(self, arr, low, high):
         if low < len(arr) -1:
-            arr = arr[low]
+            arr = arr[low:-1]
             high = high - low
 
         tot_area = np.cumsum(arr)
