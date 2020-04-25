@@ -7,14 +7,14 @@
 #no pyc
 *.pyc
 
-#ignore ignoring the html for now
+#ignore the html for now
 
-# *.html
+ *.html
 
 #ignore all test .png and .jpg files
 
-#*.jpg
-#*.png
+*.jpg
+*.png
 
 #ignore GC file types
 

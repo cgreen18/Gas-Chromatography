@@ -45,7 +45,7 @@ from threading import Thread
 
 import serial
 
-imdir = 'images'
+imdir = '.images'
 
 # c serial cmd definition
 READ_TMP_CMD_STR = '000 000 000 000'
