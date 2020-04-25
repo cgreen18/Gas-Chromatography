@@ -574,7 +574,7 @@ class GCReceiver(Thread):
                 with self.gc_cond:
                     gc_d = self.gc.get_curr_data()
                 with self.data_lock:
-                    self.frame.set_curr_data(gc_d)
+                    self.frame.set_curr_data_(gc_d)
 
             else:
               print("waiting timeout...")
