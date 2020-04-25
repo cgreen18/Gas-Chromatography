@@ -74,7 +74,7 @@ class GC:
         self.curr_data_lock = Lock()
         self.time_out = 1 #sec
         self.epsilon = 0.01
-        self.pk_volt_min_after_norm = 0.2
+        self.pk_volt_min_after_norm = 0.002
         self.pk_time_min = 10
         self.peaks = []
         self.prev_data = []
