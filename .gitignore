@@ -13,8 +13,8 @@
 
 #ignore all test .png and .jpg files
 
-*.jpg
-*.png
+#*.jpg
+#*.png
 
 #ignore GC file types
 
