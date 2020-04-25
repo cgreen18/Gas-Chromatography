@@ -1271,7 +1271,7 @@ class DetectorPanel(wx.Panel):
 
         hbox.Add(self.btn_ply, border = b)
         hbox.Add((es,-1))
-        hbox.Add(btn_paus, border =b)
+        hbox.Add(self.btn_paus, border =b)
         hbox.Add((es,-1))
         hbox.Add(self.btn_stp, border =b)
         hbox.Add((es,-1))
