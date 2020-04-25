@@ -206,6 +206,7 @@ class SaveasGC(SaveasWindow):
         self.btn_entr.SetLabel('Save as .gc')
         #Get important parameters
         self.parent = parent
+        self.options = ops
 
     def entrbtn_click_evt(self, event):
         name = self.tc_name.GetValue()
@@ -219,7 +220,15 @@ class SaveasGC(SaveasWindow):
 
         _l = self.parent.curr_data_frame_lock
         with _l:
-            _d = self.parent.get_curr_data_copy()
+            data = self.parent.get_curr_data_copy()
+
+        _ind = self.options['indices']
+        _vi = _ind['v']
+        _ai = _ind['a']
+        _ti = _ind['t']
+        _dti = _ind['dt']
+
+        data_dict = {'v':data[_vi],'a':data[_ai],'t':data[_ti],'dt':data[_dti]}
 
         curr_data = self.jsonify_data(_d)
         prev_data = self.parent.get_prev_data_copy()

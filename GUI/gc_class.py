@@ -64,6 +64,9 @@ class GC:
         self.prev_data = []
         self.run_num = 0
 
+    '''
+    @description: Subtracts initial time from all time points => t[0] = 0
+    '''
     def clean_time_(self):
         if self.run_num > 0:
             to = self.time_out
@@ -71,12 +74,7 @@ class GC:
             t = self.get_time()
             _e = self.curr_data_lock.release()
 
-            print(t[0])
-            print(t[0:5])
-
-
-            # Hokey -fix
-            leading_zero = False
+            # Hokey fix in case
             if t[0] == 0:
                 t[0] = t[1]-.01
                 t = t - t[0]
@@ -87,6 +85,9 @@ class GC:
             self.set_time_(t)
             _e = self.curr_data_lock.release()
 
+    '''
+    @returns: int or float that is the area of voltage, including negatives
+    '''
     def integrate_volt(self):
         to = self.time_out
         #ignore err for now
@@ -97,12 +98,16 @@ class GC:
         if len(voltage) != 0:
             _l = 0
             _h = -1
-            area = self.integrate(voltage, _l, _h)
-            return area
+            _a = self.integrate(voltage, _l, _h)
+            return _a
         else:
             print("No data")
 
-    def integrate_volt_2(self, voltage):
+    '''
+    @param: directly given voltage vector
+    @returns: int or float that is the area of voltage, including negatives
+    '''
+    def integrate_volt(self, voltage):
         if len(voltage) != 0:
             _l = 0
             _h = -1
@@ -111,22 +116,26 @@ class GC:
         else:
             print("No data")
 
-    def integrate(self, arr, low, high):
-        if low < len(arr) -1:
-            arr = arr[low]
-            high = high - low
+    '''
+    @description: Calculates the cumulative sum of the voltage at each point and stores the result in area.
+    '''
+    def calc_cumsum_into_area_(self):
+        to = self.time_out
+        #ignore err for now
+        _e = self.curr_data_lock.acquire(to)
+        voltage = self.get_volt()
+        _e = self.curr_data_lock.release()
 
-        tot_area = np.cumsum(arr)
-        if high == -1:
-            area = tot_area[-1]
-        elif high < len(arr) -1:
-            area = tot_area[high]
-        else:
-            print("High index in integration out of bounds")
-            area = tot_area[-1]
+        cs = np.cumsum(voltage)
 
-        return area
+        _e = self.curr_data_lock.acquire(to)
+        self.set_area_(cs)
+        _e = self.curr_data_lock.release()
 
+    '''
+    @description: Normalizes (integral[voltage] = 1 & min[voltage] = 0) the voltage in place
+                    ( v - min[v] ) / |v| => v
+    '''
     def normalize_volt_(self):
         to = self.time_out
         #ignore error for now
@@ -146,6 +155,10 @@ class GC:
         self.set_volt_(volt)
         _e = self.curr_data_lock.release()
 
+    '''
+    @description: Applies moving mean of window size given to voltage via convolution
+    @param: window size
+    '''
     def mov_mean_(self, window):
         to = self.time_out
         _e = self.curr_data_lock.acquire(to)
@@ -154,11 +167,30 @@ class GC:
 
         np.convolve(vec, np.ones((window,))/window, mode='valid')
 
+    '''
+    UNFINISHED
+    @description: Breaks the voltage vector into potential peaks. Simple and untested algorithm.
+    @returns: Indices of centers of peaks
+    '''
     def break_into_peaks(self):
         ep = self.epsilon
         if abs(self.integrate_volt() -1.0 ) > ep:
             self.normalize_volt_()
 
+    '''
+    @description: Appends current data copy to previoius data list and sets current data back to zero vector.
+    '''
+    def curr_to_prev_(self):
+        _l = self.curr_data_lock
+        with _l:
+            _d = self.get_curr_data_copy()
+
+        self.prev_data.append(_d)
+        self.reint_curr_data()
+
+    '''
+    helper functions: define_peaks, reint_curr_data, inc_run_num_, integrate
+    '''
     def define_peaks(self):
         to = self.time_out
         _e = self.curr_data_lock.acquire(to)
@@ -176,15 +208,23 @@ class GC:
         for pt in volt:
             print(pt)
 
-    def curr_to_prev_(self):
-        _l = self.curr_data_lock
-        with _l:
-            _d = self.get_curr_data_copy()
+    def integrate(self, arr, low, high):
+        if low < len(arr) -1:
+            arr = arr[low]
+            high = high - low
 
-        self.prev_data.append(_d)
-        self.re_int_curr_data()
+        tot_area = np.cumsum(arr)
+        if high == -1:
+            area = tot_area[-1]
+        elif high < len(arr) -1:
+            area = tot_area[high]
+        else:
+            print("High index in integration out of bounds")
+            area = tot_area[-1]
 
-    def re_int_curr_data(self):
+        return area
+
+    def reint_curr_data(self):
         _dims = self.dims
 
         _l = self.curr_data_lock
@@ -195,7 +235,9 @@ class GC:
     def inc_run_num_(self):
         self.run_num += 1
 
-    # ADS1115 Methods
+    '''
+    ADS configuration functions: reint_ADS, set_gain, set_mode
+    '''
     def reinit_ADS(self):
         self.i2c = busio.I2C(board.SCL , board.SDA)
         self.ads = ADS.ADS1115(self.i2c)
@@ -209,7 +251,9 @@ class GC:
         self.single_ended = se
         self.reinit_ADS()
 
-    # Getters and setters for locking
+    '''
+    Lock functions: get_lock, is_locked
+    '''
     def get_lock(self):
         return self.curr_data_lock
 
@@ -217,6 +261,9 @@ class GC:
         _il = self.curr_data_lock.locked()
         return _il
 
+    '''
+    Getters: get_curr_data, get_volt, get_time
+    '''
     def get_curr_data(self):
         _il = self.is_locked()
         if _il:
@@ -225,6 +272,27 @@ class GC:
         else:
             print('get_curr_data: no access')
 
+    def get_volt(self):
+        is_locked = self.is_locked()
+        _vi = self.indices['v']
+        if is_locked:
+            _v = np.copy(self.curr_data[_vi])
+            return _v
+        else:
+            print('get_volt: no access')
+
+    def get_time(self):
+        _il = self.is_locked()
+        _ti = self.indices['t']
+        if _il:
+            _t = self.curr_data[_ti]
+            return _t
+        else:
+            print('get_time: no access')
+
+    '''
+    Setters: set_curr_data_, set_time_w_ref_, set_volt_, set_time_, set_time_w_ref_, set_area_
+    '''
     def set_curr_data_(self, d):
         _il = self.is_locked()
         if _il:
@@ -240,15 +308,6 @@ class GC:
         else:
             print('set_curr_data_w_ref: no access')
 
-    def get_volt(self):
-        is_locked = self.is_locked()
-        _vi = self.indices['v']
-        if is_locked:
-            _v = np.copy(self.curr_data[_vi])
-            return _v
-        else:
-            print('get_volt: no access')
-
     def set_volt_(self, d):
         is_locked = self.is_locked()
         _vi= self.indices['v']
@@ -257,15 +316,6 @@ class GC:
             self.curr_data[_vi] = d
         else:
             print('set_volt: no access')
-
-    def get_time(self):
-        _il = self.is_locked()
-        _ti = self.indices['t']
-        if _il:
-            _t = self.curr_data[_ti]
-            return _t
-        else:
-            print('get_time: no access')
 
     def set_time_(self, d):
         _il = self.is_locked()
@@ -284,19 +334,36 @@ class GC:
         else:
             print('set_time_w_ref: no access')
 
+    def set_area_(self, d):
+        _il = self.is_locked()
+        _ai = self.indices['a']
+        if _il:
+            d = np.copy(d)
+            self.curr_data[_ai] = d
+        else:
+            print('set_area_w_ref: no access')
+
+    '''
+    Printer functions: print_voltage, print_value
+    '''
     def print_voltage(self):
         print(self.chan.voltage)
 
     def print_value(self):
         print(self.chan.value)
 
+    '''
+    Measurement functions: measure_voltage, measure_value
+    '''
     def measure_voltage(self):
         return self.chan.voltage
 
     def measure_value(self):
         return self.chan.value
 
-    # Temporary/old graphing methods
+    '''
+    Temporary/old methods
+    '''
     def graph_curr_data_on_popup(self):
         plt.figure()
         to = self.time_out
@@ -308,6 +375,7 @@ class GC:
         plt.show()
 
     # Numpy/data methods
+    # old, dont trust
     def coll_volt_const_pts(self , num_pts):
         _vi = self.indices['v']
         _ai = self.indices['area']

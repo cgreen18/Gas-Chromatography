@@ -256,6 +256,7 @@ class GCFrame(wx.Frame):
         self.gc.inc_run_num_()
 
         self.curr_to_prev_()
+        self.gc.curr_to_prev_()
 
         gcl = self.gc_lock
         self.gc_cond = threading.Condition(gcl)
@@ -275,6 +276,9 @@ class GCFrame(wx.Frame):
         self.plotter_thread.start()
 
     def on_stop_btn(self):
+        self.stop_data_coll_(self)
+
+    def stop_data_coll_(self):
         self.plotter_thread.stop()
         self.plotter_thread.join()
 
@@ -294,7 +298,7 @@ class GCFrame(wx.Frame):
 
     def on_plot_btn(self):
         if self.data_running:
-            self.stop_data_coll()
+            self.stop_data_coll_()
 
         print('plot')
         self.panel_detector.update_curr_data_()
@@ -355,6 +359,7 @@ class GCFrame(wx.Frame):
             ans = self.gc.integrate_volt()
             print("The integral is: ")
             print(ans)
+            self.gc.calc_cumsum_into_area_()
             self.update_curr_data_()
         print('out integrate')
 
