@@ -81,6 +81,9 @@ class GCFrame(wx.Frame):
         self.curr_data_frame_lock = threading.Lock()
         self.establish_GC_()
 
+        self.curr_data_frame = np.zeros((self.gc.dims, 0))
+        self.update_curr_data_()
+
         self.prev_data = []
         self.run_number = 0
 
@@ -129,7 +132,6 @@ class GCFrame(wx.Frame):
         se = self.options['single_ended']
         self.gc = GC(se)
         self.gc_lock = self.gc.curr_data_lock
-        self.update_curr_data_()
 
     # data Methods
     def is_frame_data_locked(self):
@@ -160,14 +162,14 @@ class GCFrame(wx.Frame):
     def get_curr_data(self):
         _il = self.is_frame_data_locked()
         if _il:
-            _d = self.curr_data
+            _d = self.curr_data_frame
 
         return _d
 
     def get_curr_data_copy(self):
         _il = self.is_frame_data_locked()
         if _il:
-            _d = self.curr_data
+            _d = self.curr_data_frame
             _c = np.copy(_d)
 
         return _c
