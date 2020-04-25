@@ -337,7 +337,7 @@ class GCFrame(wx.Frame):
         self.Close()
 
     def on_saveas(self, err):
-        _saveas_gc_window = SaveasGC( self, _d)
+        _saveas_gc_window = SaveasGC( self, self.options)
 
     def on_open(self, err):
         _open_window = OpenWindow(self, self.options)
