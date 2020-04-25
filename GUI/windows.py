@@ -233,6 +233,7 @@ class SaveasGC(SaveasWindow):
         with codecs.open(name , 'w', encoding='utf-8') as json_file:
             json.dump(curr_session, json_file, separators =(',',':'),indent=4)
 
+        self.Close()
     '''
     dict(numpys)->dict(lists)
     '''
@@ -261,6 +262,7 @@ class SaveasPNG(SaveasWindow):
     def entrbtn_click_evt(self, event):
         name = self.tc_name.GetValue()
         self.save_png(name)
+        self.Close()
 
     def save_png(self, name):
         if name[-4:] == '.png':
@@ -279,7 +281,8 @@ class SaveasJPG(SaveasWindow):
     def entrbtn_click_evt(self, event):
         name = self.tc_name.GetValue()
         self.save_jpg(name)
-
+        self.Close()
+        
     def save_jpg(self, name):
         if name[-4:] == '.jpg':
             self.figure.savefig(name)
