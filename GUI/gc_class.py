@@ -1,4 +1,4 @@
-'''
+
 Name: gc_class.py
 Authors: Conor Green and Matt McPartlan
 Description: Mid-level abstraction that will do most of the work. User interaction as well as data processing.
@@ -15,7 +15,7 @@ Version:
 2.1 - 22 April 2020 - Integrate and normalize voltage methods.
 2.2 - 22 April 2020 - Huge security upgrade. Moved lock to here (gc_class) and protected curr_data through getters and setters.
 2.3 - 24 April 2020 - Modified lock structure. Added re_init_data and curr_to_prev to move current data to prev_data list.
-'''
+
 
 # GPIO imports
 import board
@@ -34,8 +34,18 @@ from threading import Lock
 
 class GC:
     '''
-    @param: single_ended = True if single ended ADC and vice-versa
+    Modification functions: clean_time_, calc_cumsum_into_area_, normalize_volt_, mov_mean_, curr_to_prev_
+    Math functions: integrate_volt, break_into_peaks
+    helper functions: define_peaks, reint_curr_data, inc_run_num_, integrate
+    ADS configuration functions: reint_ADS, set_gain, set_mode
+    Lock functions: get_lock, is_locked
+    Getters: get_curr_data, get_volt, get_time
+    Setters: set_curr_data_, set_time_w_ref_, set_volt_, set_time_, set_time_w_ref_, set_area_
+    Printer functions: print_voltage, print_value
+    Measurement functions: measure_voltage, measure_value
     '''
+
+    #@param: single_ended = True if single ended ADC and vice-versa
     def __init__(self, single_ended):
         self.__version__ = '2.0'
         self.__authors__ = 'Conor Green and Matt McPartlan'
@@ -64,9 +74,9 @@ class GC:
         self.prev_data = []
         self.run_num = 0
 
-    '''
-    @description: Subtracts initial time from all time points => t[0] = 0
-    '''
+        self.__dict__ = {'i2c connection':self.i2c, 'ads connection':self.ads, 'if single ended':self.single_ended}
+
+    #@description: Subtracts initial time from all time points => t[0] = 0
     def clean_time_(self):
         if self.run_num > 0:
             to = self.time_out
@@ -85,40 +95,7 @@ class GC:
             self.set_time_(t)
             _e = self.curr_data_lock.release()
 
-    '''
-    @returns: int or float that is the area of voltage, including negatives
-    '''
-    def integrate_volt(self):
-        to = self.time_out
-        #ignore err for now
-        _e = self.curr_data_lock.acquire(to)
-        voltage = self.get_volt()
-        _e = self.curr_data_lock.release()
-
-        if len(voltage) != 0:
-            _l = 0
-            _h = -1
-            _a = self.integrate(voltage, _l, _h)
-            return _a
-        else:
-            print("No data")
-
-    '''
-    @param: directly given voltage vector
-    @returns: int or float that is the area of voltage, including negatives
-    '''
-    def integrate_volt(self, voltage):
-        if len(voltage) != 0:
-            _l = 0
-            _h = -1
-            _a = self.integrate(voltage, _l, _h)
-            return _a
-        else:
-            print("No data")
-
-    '''
-    @description: Calculates the cumulative sum of the voltage at each point and stores the result in area.
-    '''
+    #@description: Calculates the cumulative sum of the voltage at each point and stores the result in area.
     def calc_cumsum_into_area_(self):
         to = self.time_out
         #ignore err for now
@@ -132,10 +109,8 @@ class GC:
         self.set_area_(cs)
         _e = self.curr_data_lock.release()
 
-    '''
-    @description: Normalizes (integral[voltage] = 1 & min[voltage] = 0) the voltage in place
-                    ( v - min[v] ) / |v| => v
-    '''
+    #@description: Normalizes (integral[voltage] = 1 & min[voltage] = 0) the voltage in place
+    #                ( v - min[v] ) / |v| => v
     def normalize_volt_(self):
         to = self.time_out
         #ignore error for now
@@ -155,10 +130,8 @@ class GC:
         self.set_volt_(volt)
         _e = self.curr_data_lock.release()
 
-    '''
-    @description: Applies moving mean of window size given to voltage via convolution
-    @param: window size
-    '''
+    #@description: Applies moving mean of window size given to voltage via convolution
+    #@param: window size
     def mov_mean_(self, window):
         to = self.time_out
         _e = self.curr_data_lock.acquire(to)
@@ -167,19 +140,7 @@ class GC:
 
         np.convolve(vec, np.ones((window,))/window, mode='valid')
 
-    '''
-    UNFINISHED
-    @description: Breaks the voltage vector into potential peaks. Simple and untested algorithm.
-    @returns: Indices of centers of peaks
-    '''
-    def break_into_peaks(self):
-        ep = self.epsilon
-        if abs(self.integrate_volt() -1.0 ) > ep:
-            self.normalize_volt_()
-
-    '''
-    @description: Appends current data copy to previoius data list and sets current data back to zero vector.
-    '''
+    #@description: Appends current data copy to previoius data list and sets current data back to zero vector.
     def curr_to_prev_(self):
         _l = self.curr_data_lock
         with _l:
@@ -187,6 +148,42 @@ class GC:
 
         self.prev_data.append(_d)
         self.reint_curr_data()
+
+    #@returns: int or float that is the area of voltage, including negatives
+    def integrate_volt(self):
+        to = self.time_out
+        #ignore err for now
+        _e = self.curr_data_lock.acquire(to)
+        voltage = self.get_volt()
+        _e = self.curr_data_lock.release()
+
+        if len(voltage) != 0:
+            _l = 0
+            _h = -1
+            _a = self.integrate(voltage, _l, _h)
+            return _a
+        else:
+            print("No data")
+
+    #@param: directly given voltage vector
+    #@returns: int or float that is the area of voltage, including negatives
+    def integrate_volt(self, voltage):
+        if len(voltage) != 0:
+            _l = 0
+            _h = -1
+            _a = self.integrate(voltage, _l, _h)
+            return _a
+        else:
+            print("No data")
+
+    #UNFINISHED
+    #@description: Breaks the voltage vector into potential peaks. Simple and untested algorithm.
+    #@returns: Indices of centers of peaks
+    def break_into_peaks(self):
+        pass
+        ep = self.epsilon
+        if abs(self.integrate_volt() -1.0 ) > ep:
+            self.normalize_volt_()
 
     '''
     helper functions: define_peaks, reint_curr_data, inc_run_num_, integrate
