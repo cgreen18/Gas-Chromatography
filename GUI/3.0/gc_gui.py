@@ -20,6 +20,7 @@ Version (mainly for final report later):
 2.4 - 24 April 2020 - Stable. Correctly increments run_number and stores data in prev_data.
                         Menu data functions: normalize, integrate, and clean time all work as intended.
                         Menu grapher function: fill almost works
+Arduino serial interface. Temperature control and feedback thread. Normalize, integrate, and clean time menu functions. 
 '''
 
 import numpy as np
@@ -63,7 +64,7 @@ class GCFrame(wx.Frame):
     def __init__(self, parent, user_options):
         self.__version__ = '3.0'
         self.__authors__ = 'Conor Green and Matt McPartlan'
-        
+
         self.set_options_(user_options)
         self.parent = parent
 
