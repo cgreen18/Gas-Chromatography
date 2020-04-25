@@ -147,9 +147,9 @@ class GCFrame(wx.Frame):
     '''
     Frame data functions
     '''
-        '''
+    '''
         Setters
-        '''
+    '''
     def update_curr_data_(self):
         _gcl = self.gc.curr_data_lock
         with _gcl:
@@ -211,6 +211,9 @@ class GCFrame(wx.Frame):
         else:
             print('Err')
 
+    '''
+        Getters
+    '''
     def get_curr_data(self):
         _il = self.is_frame_data_locked()
         if _il:
@@ -351,7 +354,7 @@ class GCFrame(wx.Frame):
     def on_quit(self , err):
         if self.data_running:
             self.stop_data_coll_()
-            
+
         self.Close()
 
     def on_saveas(self, err):
