@@ -2,9 +2,8 @@
 # start.sh
 
 cd /home/pi
-source "/home/pi/gc/bin/activate"
+source "/home/pi/gtest/bin/activate"
 
 cd Gas-Chromatography/GUI
 
-python gc_gui.py
-
+python3 gas_chromatography.py

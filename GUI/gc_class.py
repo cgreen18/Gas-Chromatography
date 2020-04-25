@@ -10,11 +10,13 @@ Version:
 1.1 - 18 February 20 - Initialized and created some methods for ADS1115 and numpy
 1.2 - 20 February 20 - Added methods for data collection and organizing self variables
 1.3 - 21 February 20 - Debugged and works in preliminary testing!
+
 2.0 - 21 April 2020 - Final version. Sufficiently supports gc_gui.py in data collection with simple methods. ...
                         Old methods, that can plot, print, etc. are left at the end for future debugging/testing.
 2.1 - 22 April 2020 - Integrate and normalize voltage methods.
 2.2 - 22 April 2020 - Huge security upgrade. Moved lock to here (gc_class) and protected curr_data through getters and setters.
 2.3 - 24 April 2020 - Modified lock structure. Added re_init_data and curr_to_prev to move current data to prev_data list.
+
 3.0 - 24 April 2020 - Clean version that works great with gui script. Version 3 is very pydocs friendly and has accompanying html, gc_class.html
 '''
 
