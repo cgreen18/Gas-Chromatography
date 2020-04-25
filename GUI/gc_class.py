@@ -83,7 +83,7 @@ class GC:
                 t = t - t[0]
 
             _e = self.curr_data_lock.acquire(to)
-            self.set_time(t)
+            self.set_time_(t)
             _e = self.curr_data_lock.release()
 
     def integrate_volt(self):
@@ -142,7 +142,7 @@ class GC:
         volt = volt / _area
 
         _e = self.curr_data_lock.acquire(to)
-        self.set_volt(volt)
+        self.set_volt_(volt)
         _e = self.curr_data_lock.release()
 
     def mov_mean_(self, window):
@@ -189,7 +189,7 @@ class GC:
         _l = self.curr_data_lock
         with _l:
             _z = np.zeros((_dims, 0))
-            self.set_curr_data_w_ref(_z)
+            self.set_curr_data_w_ref_(_z)
 
     def inc_run_num_(self):
         self.run_num += 1
@@ -224,7 +224,7 @@ class GC:
         else:
             print('get_curr_data: no access')
 
-    def set_curr_data(self, d):
+    def set_curr_data_(self, d):
         _il = self.is_locked()
         if _il:
             d = np.copy(d)
@@ -232,7 +232,7 @@ class GC:
         else:
             print('set_curr_data: no access')
 
-    def set_curr_data_w_ref(self, d):
+    def set_curr_data_w_ref_(self, d):
         _il = self.is_locked()
         if _il:
             self.curr_data = d
@@ -248,7 +248,7 @@ class GC:
         else:
             print('get_volt: no access')
 
-    def set_volt(self, d):
+    def set_volt_(self, d):
         is_locked = self.is_locked()
         _vi= self.indices['v']
         if is_locked:
@@ -266,7 +266,7 @@ class GC:
         else:
             print('get_time: no access')
 
-    def set_time(self, d):
+    def set_time_(self, d):
         _il = self.is_locked()
         _ti = self.indices['t']
         if _il:
@@ -275,7 +275,7 @@ class GC:
         else:
             print('set_time: no access')
 
-    def set_time_w_ref(self, d):
+    def set_time_w_ref_(self, d):
         _il = self.is_locked()
         _ti = self.indices['t']
         if _il:

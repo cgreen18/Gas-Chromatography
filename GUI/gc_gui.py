@@ -188,7 +188,7 @@ class GCFrame(wx.Frame):
         _l = self.curr_data_frame_lock
         with _l:
             _z = np.zeros((_dims, 0))
-            self.set_curr_data_w_ref(_z)
+            self.set_curr_data_w_ref_(_z)
 
     def set_options_(self, uo):
         self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
