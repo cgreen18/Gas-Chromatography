@@ -231,7 +231,7 @@ class GCFrame(wx.Frame):
 
     def get_prev_data_copy(self):
         _pd = self.prev_data
-        _pdc = np.copy(_pd)
+        _pdc = [ np.copy(_item) for _item in _pd ]
         return _pdc
 
     def get_figure(self):
