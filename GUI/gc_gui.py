@@ -194,7 +194,7 @@ class GCFrame(wx.Frame):
         self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
         self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':5.0, 'baud_rate':115200,
                         'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
-                        'single_ended':True, 'indices':{'v':0,'area':1,'dt':2,'t':3}}
+                        'single_ended':True, 'indices':{'v':0,'a':1,'dt':2,'t':3}}
         self.options.update(self.constants)
 
         self.options.update(uo)
