@@ -206,7 +206,7 @@ class GCFrame(wx.Frame):
         _cdstr = 'Current Data'
         cd = data_dict_numpy[_cdstr]
 
-        _pdstr = ' Previous Data'
+        _pdstr = 'Previous Data'
         pd = data_dict_numpy[_pdstr]
 
         return [cd , pd]
