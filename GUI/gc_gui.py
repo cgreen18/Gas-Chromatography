@@ -174,6 +174,22 @@ class GCFrame(wx.Frame):
 
         return _c
 
+    def curr_to_prev_(self):
+        _l = self.curr_data_frame_lock
+        with _l:
+            _d = self.get_curr_data_copy()
+
+        self.prev_data.append(_d)
+        self.re_int_curr_data()
+
+    def re_int_curr_data(self):
+        _dims = self.gc.dims
+
+        _l = self.curr_data_frame_lock
+        with _l:
+            _z = np.zeros((_dims, 0))
+            self.set_curr_data_w_ref(_z)
+
     def set_options_(self, uo):
         self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
         self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':5.0, 'baud_rate':115200,
@@ -191,7 +207,6 @@ class GCFrame(wx.Frame):
 
     def get_figure(self):
         return self.panel_detector.get_figure()
-
 
     # Events
     def on_ov_txt_ctrl(self, string):
@@ -229,6 +244,10 @@ class GCFrame(wx.Frame):
         ep = self.options['epsilon_time']
 
         self.data_running= True
+        self.run_number += 1
+        self.gc.inc_run_num_()
+
+        self.curr_to_prev_()
 
         gcl = self.gc_lock
         self.gc_cond = threading.Condition(gcl)
@@ -360,6 +379,7 @@ class GCFrame(wx.Frame):
     def on_fill(self, err):
         print("on fill")
         self.panel_detector.fill_under_()
+        print('out fill')
 
 # Threads
 class GCTemperature(Thread):

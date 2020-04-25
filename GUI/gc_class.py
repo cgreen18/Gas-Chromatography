@@ -60,7 +60,7 @@ class GC:
         self.time_out = 1 #sec
         self.epsilon = 0.01
         self.min_noise_after_norm = 0.2
-        self.prev_runs = []
+        self.prev_data = []
         self.run_num = 0
 
     def clean_time_(self):
@@ -174,6 +174,25 @@ class GC:
 
         for pt in volt:
             print(pt)
+
+    def curr_to_prev_(self):
+        _l = self.curr_data_lock
+        with _l:
+            _d = self.get_curr_data_copy()
+
+        self.prev_data.append(_d)
+        self.re_int_curr_data()
+
+    def re_int_curr_data(self):
+        _dims = self.dims
+
+        _l = self.curr_data_lock
+        with _l:
+            _z = np.zeros((_dims, 0))
+            self.set_curr_data_w_ref(_z)
+
+    def inc_run_num_(self):
+        self.run_num += 1
 
     # ADS1115 Methods
     def reinit_ADS(self):
@@ -310,7 +329,7 @@ class GC:
     # old, dont trust
     def coll_volt_const_pts_self(self, num_pts):
         self.run_num += 1
-        self.prev_runs.append(self.curr_data)
+        self.prev_data.append(self.curr_data)
         self.curr_data = self.coll_volt_const_pts(num_pts)
         print(self.curr_data)
 
