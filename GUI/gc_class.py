@@ -168,10 +168,12 @@ class GC:
     #@param: directly given voltage vector
     #@returns: int or float that is the area of voltage, including negatives
     def integrate_volt(self, voltage):
+        print('direct called')
         if len(voltage) != 0:
             _l = 0
             _h = -1
             _a = self.integrate(voltage, _l, _h)
+            print(_a)
             return _a
         else:
             print("No data")
