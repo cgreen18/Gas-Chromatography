@@ -62,23 +62,33 @@ Version:<br>
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt><a href="#GC">GC</a>(single_ended)<br>
 &nbsp;<br>
-@param:&nbsp;single_ended&nbsp;=&nbsp;True&nbsp;if&nbsp;single&nbsp;ended&nbsp;ADC&nbsp;and&nbsp;vice-versa<br>&nbsp;</tt></td></tr>
+Modification&nbsp;functions:&nbsp;clean_time_,&nbsp;calc_cumsum_into_area_,&nbsp;normalize_volt_,&nbsp;mov_mean_,&nbsp;curr_to_prev_<br>
+Math&nbsp;functions:&nbsp;integrate_volt,&nbsp;break_into_peaks<br>
+helper&nbsp;functions:&nbsp;define_peaks,&nbsp;reint_curr_data,&nbsp;inc_run_num_,&nbsp;integrate<br>
+ADS&nbsp;configuration&nbsp;functions:&nbsp;reint_ADS,&nbsp;set_gain,&nbsp;set_mode<br>
+Lock&nbsp;functions:&nbsp;get_lock,&nbsp;is_locked<br>
+Getters:&nbsp;get_curr_data,&nbsp;get_volt,&nbsp;get_time<br>
+Setters:&nbsp;set_curr_data_,&nbsp;set_time_w_ref_,&nbsp;set_volt_,&nbsp;set_time_,&nbsp;set_time_w_ref_,&nbsp;set_area_<br>
+Printer&nbsp;functions:&nbsp;print_voltage,&nbsp;print_value<br>
+Measurement&nbsp;functions:&nbsp;measure_voltage,&nbsp;measure_value<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
 <dl><dt><a name="GC-__init__"><strong>__init__</strong></a>(self, single_ended)</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
 
-<dl><dt><a name="GC-break_into_peaks"><strong>break_into_peaks</strong></a>(self)</dt></dl>
+<dl><dt><a name="GC-break_into_peaks"><strong>break_into_peaks</strong></a>(self)</dt><dd><tt>#UNFINISHED<br>
+#@description:&nbsp;Breaks&nbsp;the&nbsp;voltage&nbsp;vector&nbsp;into&nbsp;potential&nbsp;peaks.&nbsp;Simple&nbsp;and&nbsp;untested&nbsp;algorithm.<br>
+#@returns:&nbsp;Indices&nbsp;of&nbsp;centers&nbsp;of&nbsp;peaks</tt></dd></dl>
 
-<dl><dt><a name="GC-calc_cumsum_into_area_"><strong>calc_cumsum_into_area_</strong></a>(self)</dt></dl>
+<dl><dt><a name="GC-calc_cumsum_into_area_"><strong>calc_cumsum_into_area_</strong></a>(self)</dt><dd><tt>#@description:&nbsp;Calculates&nbsp;the&nbsp;cumulative&nbsp;sum&nbsp;of&nbsp;the&nbsp;voltage&nbsp;at&nbsp;each&nbsp;point&nbsp;and&nbsp;stores&nbsp;the&nbsp;result&nbsp;in&nbsp;area.</tt></dd></dl>
 
-<dl><dt><a name="GC-clean_time_"><strong>clean_time_</strong></a>(self)</dt></dl>
+<dl><dt><a name="GC-clean_time_"><strong>clean_time_</strong></a>(self)</dt><dd><tt>#@description:&nbsp;Subtracts&nbsp;initial&nbsp;time&nbsp;from&nbsp;all&nbsp;time&nbsp;points&nbsp;=&gt;&nbsp;t[0]&nbsp;=&nbsp;0</tt></dd></dl>
 
 <dl><dt><a name="GC-coll_volt_const_pts"><strong>coll_volt_const_pts</strong></a>(self, num_pts)</dt><dd><tt>#&nbsp;Numpy/data&nbsp;methods<br>
 #&nbsp;old,&nbsp;dont&nbsp;trust</tt></dd></dl>
 
 <dl><dt><a name="GC-coll_volt_const_pts_self"><strong>coll_volt_const_pts_self</strong></a>(self, num_pts)</dt><dd><tt>#&nbsp;old,&nbsp;dont&nbsp;trust</tt></dd></dl>
 
-<dl><dt><a name="GC-curr_to_prev_"><strong>curr_to_prev_</strong></a>(self)</dt></dl>
+<dl><dt><a name="GC-curr_to_prev_"><strong>curr_to_prev_</strong></a>(self)</dt><dd><tt>#@description:&nbsp;Appends&nbsp;current&nbsp;data&nbsp;copy&nbsp;to&nbsp;previoius&nbsp;data&nbsp;list&nbsp;and&nbsp;sets&nbsp;current&nbsp;data&nbsp;back&nbsp;to&nbsp;zero&nbsp;vector.</tt></dd></dl>
 
 <dl><dt><a name="GC-define_peaks"><strong>define_peaks</strong></a>(self)</dt></dl>
 
@@ -96,7 +106,8 @@ Version:<br>
 
 <dl><dt><a name="GC-integrate"><strong>integrate</strong></a>(self, arr, low, high)</dt></dl>
 
-<dl><dt><a name="GC-integrate_volt"><strong>integrate_volt</strong></a>(self, voltage)</dt></dl>
+<dl><dt><a name="GC-integrate_volt"><strong>integrate_volt</strong></a>(self, voltage)</dt><dd><tt>#@param:&nbsp;directly&nbsp;given&nbsp;voltage&nbsp;vector<br>
+#@returns:&nbsp;int&nbsp;or&nbsp;float&nbsp;that&nbsp;is&nbsp;the&nbsp;area&nbsp;of&nbsp;voltage,&nbsp;including&nbsp;negatives</tt></dd></dl>
 
 <dl><dt><a name="GC-is_locked"><strong>is_locked</strong></a>(self)</dt></dl>
 
@@ -104,9 +115,11 @@ Version:<br>
 
 <dl><dt><a name="GC-measure_voltage"><strong>measure_voltage</strong></a>(self)</dt></dl>
 
-<dl><dt><a name="GC-mov_mean_"><strong>mov_mean_</strong></a>(self, window)</dt></dl>
+<dl><dt><a name="GC-mov_mean_"><strong>mov_mean_</strong></a>(self, window)</dt><dd><tt>#@description:&nbsp;Applies&nbsp;moving&nbsp;mean&nbsp;of&nbsp;window&nbsp;size&nbsp;given&nbsp;to&nbsp;voltage&nbsp;via&nbsp;convolution<br>
+#@param:&nbsp;window&nbsp;size</tt></dd></dl>
 
-<dl><dt><a name="GC-normalize_volt_"><strong>normalize_volt_</strong></a>(self)</dt></dl>
+<dl><dt><a name="GC-normalize_volt_"><strong>normalize_volt_</strong></a>(self)</dt><dd><tt>#@description:&nbsp;Normalizes&nbsp;(integral[voltage]&nbsp;=&nbsp;1&nbsp;&amp;&nbsp;min[voltage]&nbsp;=&nbsp;0)&nbsp;the&nbsp;voltage&nbsp;in&nbsp;place<br>
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(&nbsp;v&nbsp;-&nbsp;min[v]&nbsp;)&nbsp;/&nbsp;|v|&nbsp;=&gt;&nbsp;v</tt></dd></dl>
 
 <dl><dt><a name="GC-print_value"><strong>print_value</strong></a>(self)</dt></dl>
 
