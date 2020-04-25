@@ -58,8 +58,6 @@ SET_TMP_CMD_STR = '000 000 000 000'
 SER_DELAY = .01 #sec
 
 
-## TODO: Prompt keyobard when typing in temperature
-
 # Frames
 class GCFrame(wx.Frame):
     # self is MainApp(GCFrame)
@@ -92,6 +90,9 @@ class GCFrame(wx.Frame):
 
         self.data_running = False
 
+    '''
+    Building functions
+    '''
     def get_arduino_port(self):
         possible = [x for x in os.listdir('/dev/') if 'ACM' in x]
 
@@ -136,12 +137,19 @@ class GCFrame(wx.Frame):
         self.gc = GC(se)
         self.gc_lock = self.gc.curr_data_lock
 
-    # data Methods
+    '''
+    Lock function
+    '''
     def is_frame_data_locked(self):
         _il = self.curr_data_frame_lock.locked()
         return _il
 
-    # gc_class methods
+    '''
+    Frame data functions
+    '''
+        '''
+        Setters
+        '''
     def update_curr_data_(self):
         _gcl = self.gc.curr_data_lock
         with _gcl:
@@ -150,6 +158,22 @@ class GCFrame(wx.Frame):
         _l = self.curr_data_frame_lock
         with _l:
             self.set_curr_data_(_d)
+
+    def curr_to_prev_(self):
+        _l = self.curr_data_frame_lock
+        with _l:
+            _d = self.get_curr_data_copy()
+
+        self.prev_data.append(_d)
+        self.re_int_curr_data()
+
+    def re_int_curr_data(self):
+        _dims = self.gc.dims
+
+        _l = self.curr_data_frame_lock
+        with _l:
+            _z = np.zeros((_dims, 0))
+            self.set_curr_data_w_ref_(_z)
 
     def set_curr_data_(self, d):
         _il = self.is_frame_data_locked()
@@ -161,6 +185,31 @@ class GCFrame(wx.Frame):
         _il = self.is_frame_data_locked()
         if _il:
             self.curr_data_frame = d
+
+        '''
+        Getters
+        '''
+
+    def set_options_(self, uo):
+        self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
+        self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':5.0, 'baud_rate':115200,
+                        'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
+                        'single_ended':True, 'indices':{'v':0,'area':1,'dt':2,'t':3}}
+        self.options.update(self.constants)
+
+        self.options.update(uo)
+
+#BIG TODO
+    def set_temp_ser_cmd(self, temp, which = 'oven'):
+        if which == 'oven':
+            pass
+            # do something
+            # SET_TMP_CMD_STR
+        elif which == 'det':
+            pass
+            #
+        else:
+            print('Err')
 
     def get_curr_data(self):
         _il = self.is_frame_data_locked()
@@ -182,41 +231,12 @@ class GCFrame(wx.Frame):
         _pdc = np.copy(_pd)
         return _pdc
 
-    def curr_to_prev_(self):
-        _l = self.curr_data_frame_lock
-        with _l:
-            _d = self.get_curr_data_copy()
-
-        self.prev_data.append(_d)
-        self.re_int_curr_data()
-
-    def re_int_curr_data(self):
-        _dims = self.gc.dims
-
-        _l = self.curr_data_frame_lock
-        with _l:
-            _z = np.zeros((_dims, 0))
-            self.set_curr_data_w_ref_(_z)
-
-    def set_options_(self, uo):
-        self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
-        self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':5.0, 'baud_rate':115200,
-                        'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
-                        'single_ended':True, 'indices':{'v':0,'area':1,'dt':2,'t':3}}
-        self.options.update(self.constants)
-
-        self.options.update(uo)
-
-    def __del__(self):
-        pass
-
-    def main(self):
-        pass
-
     def get_figure(self):
         return self.panel_detector.get_figure()
 
-    # Events
+    '''
+    Button Events
+    '''
     def on_ov_txt_ctrl(self, string):
         print("Text control changed")
         print(string + " received")
@@ -232,19 +252,6 @@ class GCFrame(wx.Frame):
 
         with self.ser_lock:
             self.ser_cmd_set_temp(val, str)
-
-
-#BIG TODO
-    def ser_cmd_set_temp(self, temp, which = 'oven'):
-        if which == 'oven':
-            pass
-            # do something
-            # SET_TMP_CMD_STR
-        elif which == 'det':
-            pass
-            #
-        else:
-            print('Err')
 
     def on_play_btn(self):
         rr = self.options['data_samp_rate']
@@ -276,7 +283,7 @@ class GCFrame(wx.Frame):
         self.plotter_thread.start()
 
     def on_stop_btn(self):
-        self.stop_data_coll_(self)
+        self.stop_data_coll_()
 
     def stop_data_coll_(self):
         self.plotter_thread.stop()
@@ -316,7 +323,9 @@ class GCFrame(wx.Frame):
         with self.curr_data_frame_lock:
             self.curr_data = np.zeros((self.gc.dims,0))
 
-    # Formatting
+    '''
+    Formatting/building functions
+    '''
     def build_figure_(self):
         self.split_vert_()
         self.set_up_menu_bar_()
@@ -336,7 +345,9 @@ class GCFrame(wx.Frame):
         menubar = GCMenuBar(self)
         self.SetMenuBar(menubar)
 
-    # Menu events
+    '''
+    Menu events
+    '''
     def on_quit(self , err):
         self.Close()
 
@@ -393,6 +404,15 @@ class GCFrame(wx.Frame):
         print("on fill")
         self.panel_detector.fill_under_()
         print('out fill')
+
+    '''
+    Defaults overridden
+    '''
+    def __del__(self):
+        pass
+
+    def main(self):
+        pass
 
 # Threads
 class GCTemperature(Thread):
