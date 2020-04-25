@@ -1,4 +1,4 @@
-'''
+['a']indices['a']'''
 Name: gc_class.py
 Authors: Conor Green and Matt McPartlan
 Description: Mid-level abstraction that will do most of the work. User interaction as well as data processing.
@@ -15,6 +15,7 @@ Version:
 2.1 - 22 April 2020 - Integrate and normalize voltage methods.
 2.2 - 22 April 2020 - Huge security upgrade. Moved lock to here (gc_class) and protected curr_data through getters and setters.
 2.3 - 24 April 2020 - Modified lock structure. Added re_init_data and curr_to_prev to move current data to prev_data list.
+3.0 - 24 April 2020 - Clean version that works great with gui script. Version 3 is very pydocs friendly and has accompanying html, gc_class.html
 '''
 
 # GPIO imports
@@ -47,7 +48,7 @@ class GC:
 
     #@param: single_ended = True if single ended ADC and vice-versa
     def __init__(self, single_ended):
-        self.__version__ = '2.0'
+        self.__version__ = '3.0'
         self.__authors__ = 'Conor Green and Matt McPartlan'
 
         #ADS1115
@@ -65,7 +66,7 @@ class GC:
 
         #Numpy/data
         self.dims = 4 #voltage, dt, t
-        self.indices = {'v':0,'area':1,'dt':2,'t':3}
+        self.indices = {'v':0,'a':1,'dt':2,'t':3}
         self.curr_data = np.zeros((self.dims, 0))
         self.curr_data_lock = Lock()
         self.time_out = 1 #sec
@@ -73,8 +74,6 @@ class GC:
         self.min_noise_after_norm = 0.2
         self.prev_data = []
         self.run_num = 0
-
-        self.__dict__ = {'i2c connection':self.i2c, 'ads connection':self.ads, 'if single ended':self.single_ended}
 
     #@description: Subtracts initial time from all time points => t[0] = 0
     def clean_time_(self):
@@ -109,8 +108,7 @@ class GC:
         self.set_area_(cs)
         _e = self.curr_data_lock.release()
 
-    #@description: Normalizes (integral[voltage] = 1 & min[voltage] = 0) the voltage in place
-    #                ( v - min[v] ) / |v| => v
+    #@description: Normalizes (integral[voltage] = 1 & min[voltage] = 0) the voltage in place.
     def normalize_volt_(self):
         to = self.time_out
         #ignore error for now
@@ -176,7 +174,7 @@ class GC:
         else:
             print("No data")
 
-    #UNFINISHED
+    #@state: UNFINISHED
     #@description: Breaks the voltage vector into potential peaks. Simple and untested algorithm.
     #@returns: Indices of centers of peaks
     def break_into_peaks(self):
@@ -361,6 +359,7 @@ class GC:
     '''
     Temporary/old methods
     '''
+    # old, dont trust
     def graph_curr_data_on_popup(self):
         plt.figure()
         to = self.time_out
@@ -371,11 +370,10 @@ class GC:
         plt.scatter( t, v )
         plt.show()
 
-    # Numpy/data methods
     # old, dont trust
     def coll_volt_const_pts(self , num_pts):
         _vi = self.indices['v']
-        _ai = self.indices['area']
+        _ai = self.indices['a']
         _dti = self.indices['dt']
         _ti = self.indices['i']
 
