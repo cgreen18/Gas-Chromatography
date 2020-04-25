@@ -1308,8 +1308,8 @@ class DetectorPanel(wx.Panel):
             self.axes.plot(self.curr_data[_ti], self.curr_data[_vi])
             # _x = self.limits['x']
             # self.axes.set_xlim(_x)
-            _y = self.limits['y']
-            self.axes.set_ylim(_y)
+            # _y = self.limits['y']
+            # self.axes.set_ylim(_y)
 
             func = self.canvas.draw
             wx.CallAfter(func)
