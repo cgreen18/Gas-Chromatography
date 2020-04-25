@@ -92,6 +92,8 @@ class GCFrame(wx.Frame):
         self.run_number = 0
 
         self.data_running = False
+        self.data_paused = False
+
 
     '''
     Building functions
@@ -145,7 +147,8 @@ class GCFrame(wx.Frame):
         self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':5.0, 'baud_rate':115200,
                         'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
                         'single_ended':True, 'indices':{'v':0,'a':1,'dt':2,'t':3},
-                        'units_str':{'x-axis':'Time [seconds]' , 'y-axis':'Detector Response [volts]'}}
+                        'units_str':{'x-axis':'Time [seconds]' , 'y-axis':'Detector Response [volts]'},
+                        'limits':{'x':(0,-1),'y':(0,4)}}
         self.options.update(self.constants)
 
         self.options.update(uo)
@@ -313,6 +316,16 @@ class GCFrame(wx.Frame):
 
         self.plotter_thread = GCPlotter(self, args=(rsp,ep))
         self.plotter_thread.start()
+
+    def on_paus_btn(self):
+        gc_thread = self.data_rover_thread
+
+        if not self.is_paused:
+            gc_thread.pause()
+            self.is_paused = True
+        else:
+            gc_thread.un_pause()
+            self.is_paused - False
 
     def on_stop_btn(self):
         self.stop_data_coll_()
@@ -482,7 +495,8 @@ class GCSplitter(wx.SplitterWindow):
         return {'font':font,'header_font':header_font}
 
 # Popup Configuration Window
-class PopupWindow(wx.Frame):
+# Maybe wx.PopupWindow later?
+class GCConfigPopup(wx.Frame):
     def __init__(self, parent, text, type, variable_in_focus):
         self.parent = parent
         self.options = self.parent.options
@@ -1073,6 +1087,7 @@ class GCData(Thread):
         self.ep = kwargs['args'][1]
         self.gc = gc
         self._stop_event = threading.Event()
+        self._pause_event = threading.Event()
 
         self.condition = condition
         #
@@ -1083,6 +1098,15 @@ class GCData(Thread):
 
     def stopped(self):
         return self._stop_event.is_set()
+
+    def pause(self):
+        self._pause_event.set()
+
+    def un_pause(self):
+        self._pause_event.clear()
+
+    def paused(self):
+        return self._pause_event.is_set()
 
     def is_avail(self):
         return self.avail
@@ -1095,6 +1119,9 @@ class GCData(Thread):
         dims = self.gc.dims
 
         while not self.stopped():
+            while self.paused():
+                time.sleep(.001)
+
             t_curr= time.time()
             while (t_curr - epsilon -t_last < sampling_period):
                 time.sleep(.01)
@@ -1140,6 +1167,7 @@ class DetectorPanel(wx.Panel):
         self.options = self.parent.options
         self.indices = self.options['indices']
         self.units_str = self.options['units_str']
+        self.limits = self.options['limits']
 
         self.fonts = parent.create_fonts()
 
@@ -1232,7 +1260,8 @@ class DetectorPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.ply_btn_evt, self.btn_ply)
 
         bmp = wx.Bitmap(imdir + '/paus_btn_20p.png',wx.BITMAP_TYPE_ANY)
-        btn_paus = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
+        self.btn_paus = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
+        self.Bind(wx.EVT_BUTTON, self.paus_btn_evt, self.btn_paus)
 
         bmp = wx.Bitmap(imdir + '/stop_btn_20p.png',wx.BITMAP_TYPE_ANY)
         self.btn_stp = wx.BitmapButton(self, id=wx.ID_ANY, bitmap=bmp, size = (50,50))
@@ -1253,8 +1282,7 @@ class DetectorPanel(wx.Panel):
         for i in range(0,num_pts):
             _t = areas[i]
             (x , y ) = maximas[i]
-            (x , y) = (float(x) , float(y))
-            self.axes.annotate(_t, (x,y))
+            self.axes.annotate(_t, xy= (x,y), xytext=(5,5))
 
         func = self.canvas.draw
         wx.CallAfter(func)
@@ -1276,11 +1304,19 @@ class DetectorPanel(wx.Panel):
         if self.curr_data.size != 0:
             self.axes.cla()
             self.axes.plot(self.curr_data[_ti], self.curr_data[_vi])
+            # _x = self.limits['x']
+            # self.axes.set_xlim(_x)
+            _y = self.limits['y']
+            self.axes.set_ylim(_y)
+
             func = self.canvas.draw
             wx.CallAfter(func)
 
     def ply_btn_evt(self, event):
         self.gcframe.on_play_btn()
+
+    def paus_btn_evt(self, event):
+        self.gcframe.on_paus_btn()
 
     def stp_btn_evt(self, event):
         self.gcframe.on_stop_btn()
