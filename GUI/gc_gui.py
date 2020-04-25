@@ -69,21 +69,20 @@ class GCFrame(wx.Frame):
         self.build_figure_()
 
         self.establish_serial_conn_()
-        print(self.ser_conn)
         self.ser_lock = threading.Lock()
 
         # Requires serial cofnnection self.ser_conn
         self.temp_thread_running = False
         self.establish_temperature_thread_()
-        print(self.ser_conn)
 
         # including curr_data_frame and curr_data_frame_lock
+        self.curr_data_frame_lock = threading.Lock()
         self.establish_GC_()
 
         self.prev_data = []
         self.run_number = 0
 
-        self.running = False
+        self.data_running = False
 
     def get_arduino_port(self):
         possible = [x for x in os.listdir('/dev/') if 'ACM' in x]
@@ -118,7 +117,6 @@ class GCFrame(wx.Frame):
         sp = 1 / self.options['temp_refresh_rate']
         ep = self.options['epsilon_time']
         conn = self.ser_conn
-        print(conn)
         lock = self.ser_lock
 
         self.temperature_thread = GCTemperature( self, conn, lock, args = (sp, ep) )
@@ -128,9 +126,45 @@ class GCFrame(wx.Frame):
     def establish_GC_(self):
         se = self.options['single_ended']
         self.gc = GC(se)
-        self.curr_data_frame_lock = self.gc.get_lock()
-
+        self.gc_lock = self.gc.curr_data_lock
         self.update_curr_data_()
+
+    # data Methods
+    def is_frame_data_locked(self):
+        _il = self.curr_data_frame_lock.locked()
+        return _il
+
+    # gc_class methods
+    def update_curr_data_(self):
+        _l = self.curr_data_frame_lock
+        with _l:
+            self.curr_data_frame = self.gc.get_curr_data()
+
+    def set_curr_data_(self, d):
+        _il = self.is_frame_data_locked()
+        if _il:
+            d = np.copy(d)
+            self.curr_data_frame = d
+
+    def set_curr_data_w_ref(self, d):
+        _il = self.is_frame_data_locked()
+        if _il:
+            self.curr_data_frame = d
+
+    def get_curr_data(self):
+        _il = self.is_frame_data_locked()
+        if _il:
+            _d = self.curr_data
+
+        return _d
+
+    def get_curr_data_copy(self):
+        _il = self.is_frame_data_locked()
+        if _il:
+            _d = self.curr_data
+            _c = np.copy(_d)
+
+        return _c
 
     def set_options_(self, uo):
         self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
@@ -150,26 +184,6 @@ class GCFrame(wx.Frame):
     def get_figure(self):
         return self.panel_detector.get_figure()
 
-    def get_curr_data(self):
-        _l = self.curr_data_frame_lock
-        with _l:
-            _d = self.gc.get_curr_data()
-
-        return _d
-
-    def get_curr_data_copy(self):
-        _l = self.curr_data_frame_lock
-        with _l:
-            _d = self.gc.get_curr_data()
-            _copy = np.copy(_d)
-
-        return _copy
-
-    # gc_class methods
-    def update_curr_data_(self):
-        _l = self.curr_data_frame_lock
-        with _l:
-            self.curr_data_frame = self.gc.get_curr_data()
 
     # Events
     def on_ov_txt_ctrl(self, string):
@@ -189,8 +203,7 @@ class GCFrame(wx.Frame):
             self.ser_cmd_set_temp(val, str)
 
 
-#BIG TODO >>>>>
-
+#BIG TODO
     def ser_cmd_set_temp(self, temp, which = 'oven'):
         if which == 'oven':
             pass
@@ -207,35 +220,26 @@ class GCFrame(wx.Frame):
         sp = 1 / rr
         ep = self.options['epsilon_time']
 
-        self.gc_lock = threading.Lock()
-        self.gc_cond = threading.Condition(self.gc_lock)
+        self.data_running= True
+
+        gcl = self.gc_lock
+        self.gc_cond = threading.Condition(gcl)
 
         gc = self.gc
         condition = self.gc_cond
-
-        self.running= True
-
         self.data_rover_thread = GCData(gc, condition, args = ( sp, ep ) )
 
         rsp = self.options['plot_refresh_rate']
-
         lock = self.curr_data_frame_lock
-        print('locked when first passed?')
-        print(lock.locked())
-
         self.receiver_thread = GCReceiver(self, lock, gc, condition, args = ( rsp, ep ))
 
         self.data_rover_thread.start()
         self.receiver_thread.start()
 
         self.plotter_thread = GCPlotter(self, args=(rsp,ep))
-
         self.plotter_thread.start()
 
     def on_stop_btn(self):
-        self.stop_data_coll()
-
-    def stop_data_coll(self):
         self.plotter_thread.stop()
         self.plotter_thread.join()
 
@@ -245,7 +249,7 @@ class GCFrame(wx.Frame):
         self.data_rover_thread.stop()
         self.data_rover_thread.join()
 
-        self.running = False
+        self.data_running = False
 
         if self.curr_data_frame_lock.locked():
             self.curr_data_frame_lock.release()
@@ -254,7 +258,7 @@ class GCFrame(wx.Frame):
         print(self.gc.is_locked())
 
     def on_plot_btn(self):
-        if self.running:
+        if self.data_running:
             self.stop_data_coll()
 
         print('plot')
@@ -262,7 +266,7 @@ class GCFrame(wx.Frame):
         self.panel_detector.draw()
 
     def on_clr_btn(self):
-        if self.running:
+        if self.data_running:
             self.stop_data_coll()
 
         if self.run_number > 0:
@@ -311,7 +315,7 @@ class GCFrame(wx.Frame):
 
     def on_data_integrate(self, err):
         print("on integrate")
-        if not self.running:
+        if not self.data_running:
             ans = self.gc.integrate_volt()
             print("The integral is: ")
             print(ans)
@@ -319,7 +323,7 @@ class GCFrame(wx.Frame):
 
     def on_data_normalize(self, err):
         print("on normalize")
-        if not self.running:
+        if not self.data_running:
             self.gc.normalize_volt_()
             self.update_curr_data_()
 
@@ -327,7 +331,7 @@ class GCFrame(wx.Frame):
             self.panel_detector.draw()
 
     def on_clean_time(self, err):
-        if not self.running:
+        if not self.data_running:
             self.gc.clean_time_()
             self.update_curr_data_()
 
@@ -335,7 +339,8 @@ class GCFrame(wx.Frame):
             self.panel_detector.draw()
 
     def on_fill(self, err):
-        self.panel_detector.fill_under()
+        print("on fill")
+        self.panel_detector.fill_under_()
 
 # Threads
 class GCTemperature(Thread):
@@ -511,39 +516,24 @@ class GCPlotter(Thread):
 
             t_last = t_curr
 
-            print('drawing')
-            print(self.frame.curr_data_frame_lock.locked())
             self.frame.panel_detector.update_curr_data_()
-            print(self.frame.curr_data_frame_lock.locked())
-            func = self.frame.panel_detector.draw
+            func = self.frame.panel_detector.draw()
             wx.CallAfter(func)
-            print(self.frame.curr_data_frame_lock.locked())
-
-
-            print('drew')
-            print(self.frame.curr_data_frame_lock.locked())
-            #
-            # self.frame.update_curr_data_()
-            # with self.curr_data_lock:
-            #     print('acquired_plot')
-
 
 
 class GCReceiver(Thread):
     def __init__(self, frame, lock, gc, condition, *args, **kwargs):
         super(GCReceiver, self).__init__()
 
-        self.frame = frame
-        self.gc = gc
-        self.curr_data_lock = lock
-        print('initial')
-        print(self.curr_data_lock)
-        print(self.curr_data_lock.locked())
-
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]
+        self.time_out = 1
 
         self._stop_event = threading.Event()
+
+        self.frame = frame
+        self.gc = gc
+        self.data_lock = lock
 
         self.gc_cond = condition
 
@@ -556,10 +546,7 @@ class GCReceiver(Thread):
     def run(self):
         sampling_period = self.sp
         epsilon = self.ep
-
-        print('in run')
-        print(self.curr_data_lock)
-        print(self.curr_data_lock.locked())
+        to = self.time_out
 
         t_last = time.time()
         while not self.stopped():
@@ -570,24 +557,18 @@ class GCReceiver(Thread):
 
             t_last = t_curr
             with self.gc_cond:
-                val = self.gc_cond.wait(1)
+                val = self.gc_cond.wait(to)
 
-                if val:
-                  print("notification received about item production...")
+            if val:
+                print("notification received about item production...")
 
-                  #self.gc_cond.acquire()
-                  print('gc_cond acquired')
+                with self.gc_cond:
+                    gc_d = self.gc.get_curr_data_copy
+                with self.data_lock:
+                    self.frame.set_curr_data(gc_d)
 
-                  print(self.curr_data_lock)
-                  print(self.curr_data_lock.locked())
-
-                  with self.curr_data_lock:
-                      print('acquired')
-
-                      self.frame.curr_data = self.gc.get_curr_data()
-
-                else:
-                  print("waiting timeout...")
+            else:
+              print("waiting timeout...")
 
 class GCData(Thread):
     def __init__(self, gc, condition, *args, **kwargs):
@@ -599,6 +580,7 @@ class GCData(Thread):
         self._stop_event = threading.Event()
 
         self.condition = condition
+        #
         self.avail = False
 
     def stop(self):
@@ -623,26 +605,33 @@ class GCData(Thread):
                 time.sleep(.01)
                 t_curr = time.time()
 
+            v = self.gc.measure_voltage()
+
+            dt = t_curr - t_last
+            t = t_curr
+            t_last = t_curr
+
+            new = np.zeros((dims, 1))
+
+            indices = self.gc.indices
+            _vi = indices['v']
+            _dti = indices['dt']
+            _ti = indices['t']
+
+            new[_vi] = v
+            new[_dti] = dt
+            new[_ti] = t
+            # a default zero
+
             with self.condition:
-                v = self.gc.get_voltage()
-                dt = t_curr - t_last
-                t = t_curr
-                t_last = t_curr
+                old = self.gc.get_curr_data()
 
-                new = np.zeros((dims, 1))
+            np.append(old, new, axis=1)
 
-                indices = self.gc.indices
-                v_i = indices['v']
-                dt_i = indices['dt']
-                t_i = indices['t']
-
-                new[v_i] = v
-                new[dt_i] = dt
-                new[t_i] = t
-
-                self.gc.curr_data = np.append(self.gc.curr_data, new, axis=1)
-                print('new daata')
+            with self.condition:
+                self.gc.set_curr_data()
                 self.condition.notify_all()
+            print('new daata')
 
         print('done running')
 
@@ -1028,22 +1017,23 @@ class DetectorPanel(wx.Panel):
 
         return hbox
 
-    def fill_under(self):
+    def fill_under_(self):
         cd = self.get_curr_data()
-        v_i = self.indices['v']
-        t_i = self.indices['t']
-        v = cd[v_i]
-        t = cd[t_i]
+        _vi = self.indices['v']
+        _ti = self.indices['t']
+        v = cd[_vi]
+        t = cd[_ti]
         self.axes.fill_between(t,v)
 
     def draw(self):
-        v_i = self.indices['v']
-        t_i = self.indices['t']
+        _vi = self.indices['v']
+        _ti = self.indices['t']
 
         if self.curr_data.size != 0:
             self.axes.cla()
-            self.axes.plot(self.curr_data[t_i], self.curr_data[v_i])
-            self.canvas.draw()
+            self.axes.plot(self.curr_data[_ti], self.curr_data[_vi])
+            func = self.canvas.draw
+            wx.CallAfter(func)
 
     def ply_btn_evt(self, event):
         self.gcframe.on_play_btn()
@@ -1055,7 +1045,8 @@ class DetectorPanel(wx.Panel):
         self.gcframe.on_plot_btn()
 
     def update_curr_data_(self):
-        self.curr_data = self.gcframe.get_curr_data_copy()
+        with self.gcframe.curr_data_frame_lock:
+            self.curr_data = self.gcframe.get_curr_data_copy()
 
         if self.curr_data.size != 0:
             init_time = self.curr_data[2][0]

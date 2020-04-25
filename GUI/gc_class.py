@@ -31,10 +31,10 @@ import matplotlib.pyplot as plt
 
 from threading import Lock
 
-'''
-@param: single_ended = True if single ended ADC and vice-versa
-'''
 class GC:
+    '''
+    @param: single_ended = True if single ended ADC and vice-versa
+    '''
     def __init__(self, single_ended):
         self.__version__ = '2.0'
         self.__authors__ = 'Conor Green and Matt McPartlan'
@@ -72,7 +72,7 @@ class GC:
 
             print(t[0])
             print(t[0:5])
-            
+
 
             # Hokey -fix
             leading_zero = False
@@ -105,8 +105,8 @@ class GC:
         if len(voltage) != 0:
             _l = 0
             _h = -1
-            area = self.integrate(voltage, _l, _h)
-            return area
+            _a = self.integrate(voltage, _l, _h)
+            return _a
         else:
             print("No data")
 
@@ -127,12 +127,9 @@ class GC:
         return area
 
     def normalize_volt_(self):
-        print("nomrlai")
-        print(self.is_locked())
         to = self.time_out
         #ignore error for now
         _e = self.curr_data_lock.acquire(to)
-
         volt = self.get_volt()
         _e = self.curr_data_lock.release()
 
@@ -149,6 +146,7 @@ class GC:
         _e = self.curr_data_lock.release()
 
     def mov_mean_(self, window):
+        to = self.time_out
         _e = self.curr_data_lock.acquire(to)
         volt = self.get_volt()
         _e = self.curr_data_lock.release()
@@ -161,6 +159,7 @@ class GC:
             self.normalize_volt_()
 
     def define_peaks(self):
+        to = self.time_out
         _e = self.curr_data_lock.acquire(to)
         volt = self.get_volt()
         _e = self.curr_data_lock.release()
@@ -199,54 +198,69 @@ class GC:
         return _il
 
     def get_curr_data(self):
-        is_locked = self.is_locked()
-        if is_locked:
+        _il = self.is_locked()
+        if _il:
             _d = np.copy(self.curr_data)
             return _d
         else:
             print('no access')
 
     def set_curr_data(self, d):
-        is_locked = self.is_locked()
-        if is_locked:
+        _il = self.is_locked()
+        if _il:
             d = np.copy(d)
+            self.curr_data = d
+        else:
+            print('no access')
+
+    def set_curr_data_w_ref(self, d):
+        _il = self.is_locked()
+        if _il:
             self.curr_data = d
         else:
             print('no access')
 
     def get_volt(self):
         is_locked = self.is_locked()
-        v_index = self.indices['v']
+        _vi = self.indices['v']
         if is_locked:
-            _v = np.copy(self.curr_data[v_index])
+            _v = np.copy(self.curr_data[_vi])
             return _v
         else:
             print('no access')
 
     def set_volt(self, d):
         is_locked = self.is_locked()
-        v_index = self.indices['v']
+        _vi= self.indices['v']
         if is_locked:
             d = np.copy(d)
-            self.curr_data[v_index] = d
+            self.curr_data[_vi] = d
         else:
             print('no access')
 
     def get_time(self):
-        is_locked = self.is_locked()
-        t_index = self.indices['t']
-        if is_locked:
-            _t = self.curr_data[t_index]
+        _il = self.is_locked()
+        _ti = self.indices['t']
+        if _il:
+            _t = self.curr_data[_ti]
             return _t
         else:
             print('no access')
 
     def set_time(self, d):
-        is_locked = self.is_locked()
-        t_index = self.indices['t']
-        if is_locked:
+        _il = self.is_locked()
+        _ti = self.indices['t']
+        if _il:
             d = np.copy(d)
-            self.curr_data[t_index] = d
+            self.curr_data[_ti] = d
+        else:
+            print('no access')
+
+    def set_time_w_ref(self, d):
+        _il = self.is_locked()
+        _ti = self.indices['t']
+        if _il:
+            self.curr_data[_ti] = d
         else:
             print('no access')
 
@@ -256,10 +270,10 @@ class GC:
     def print_value(self):
         print(self.chan.value)
 
-    def get_voltage(self):
+    def measure_voltage(self):
         return self.chan.voltage
 
-    def get_value(self):
+    def measure_value(self):
         return self.chan.value
 
     # Temporary/old graphing methods
@@ -275,23 +289,23 @@ class GC:
 
     # Numpy/data methods
     def coll_volt_const_pts(self , num_pts):
-        v_i = self.indices['v']
-        a_i = self.indices['area']
-        dt_i = self.indices['dt']
-        t_i = self.indices['i']
+        _vi = self.indices['v']
+        _ai = self.indices['area']
+        _dti = self.indices['dt']
+        _ti = self.indices['i']
 
         temp_data_arr =  np.zeros((self.dims , num_pts ) )
 
         t_start = time.time()
         for i in range(0,num_pts):
             time.sleep(.01)
-            temp_data_arr[v_i][i] = self.get_voltage()
-            temp_data_arr[a_i] = None
+            temp_data_arr[_vi][i] = self.measure_voltage()
+            temp_data_arr[_ai] = None
             t_curr = time.time()
-            temp_data_arr[dt_i][i] = t_curr - t_start
-            temp_data_arr[t_i][i] = t_curr
+            temp_data_arr[_dti][i] = t_curr - t_start
+            temp_data_arr[_ti][i] = t_curr
 
-        return voltage_and_time
+        return voltage_an_dtime
 
     # old, dont trust
     def coll_volt_const_pts_self(self, num_pts):
