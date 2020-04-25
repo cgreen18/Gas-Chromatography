@@ -144,7 +144,7 @@ class GC:
     def curr_to_prev_(self):
         _l = self.curr_data_lock
         with _l:
-            _d = self.get_curr_data_copy()
+            _d = self.get_curr_data()
 
         self.prev_data.append(_d)
         self.reint_curr_data()
