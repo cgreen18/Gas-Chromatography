@@ -230,9 +230,14 @@ class SaveasGC(SaveasWindow):
 
         data_dict = {'v':data[_vi],'a':data[_ai],'t':data[_ti],'dt':data[_dti]}
 
-        curr_data = self.jsonify_data(_d)
-        prev_data = self.parent.get_prev_data_copy()
+        curr_data = self.jsonify_data(data_dict)
 
+
+        list_data = self.parent.get_prev_data_copy()
+        for data in list_data:
+            data_dict = {'v':data[_vi],'a':data[_ai],'t':data[_ti],'dt':data[_dti]}
+            _jsond  = self.jsonify_data(data_dict)
+            prev_data.append(_jsond)
 
         if name[-3:] != '.gc':
             name = name + '.gc'
