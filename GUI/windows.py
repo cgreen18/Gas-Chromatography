@@ -26,6 +26,9 @@ from threading import Thread
 
 import serial
 
+# Constants
+global imdir
+imdir = 'images'
 
 # SplitterWindow
 class GCSplitter(wx.SplitterWindow):
@@ -95,6 +98,7 @@ class DirectoryWindow(wx.Frame):
         nav_menu_hbox = wx.BoxSizer(wx.HORIZONTAL)
         nav_menu_hbox.Add((self.options['EXTRA_SPACE'],-1))
 
+        global imdir
         bmp = wx.Bitmap(imdir + '/btn_back_im_20p.png', wx.BITMAP_TYPE_ANY)
 
         self.btn_bck = wx.BitmapButton(self, id=wx.ID_ANY,bitmap=bmp, size = (45,40))
