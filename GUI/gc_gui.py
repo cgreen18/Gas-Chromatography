@@ -334,6 +334,12 @@ class GCFrame(wx.Frame):
     def on_data_normalize(self, err):
         print("on normalize")
         print(self.data_running)
+        _l = self.curr_data_frame_lock
+        with _l:
+            d = self.get_curr_data_copy()
+        _ti = self.indices['t']
+        t_first = d[_ti][0:20]
+        print(t_first)
         if not self.data_running:
             self.gc.normalize_volt_()
             self.update_curr_data_()
