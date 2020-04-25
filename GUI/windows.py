@@ -3,6 +3,29 @@
 
 '''
 
+import numpy as np
+
+import matplotlib
+matplotlib.use('WXAgg')
+from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
+from matplotlib.backends.backend_wx import NavigationToolbar2Wx
+from matplotlib.figure import Figure
+from matplotlib import pyplot as plt
+
+import wx
+import wx.lib.plot as plot
+
+import os
+import codecs, json
+import time
+
+from gc_class import GC
+
+import threading
+from threading import Thread
+
+import serial
+
 
 # SplitterWindow
 class GCSplitter(wx.SplitterWindow):
