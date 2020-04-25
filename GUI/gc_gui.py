@@ -337,10 +337,6 @@ class GCFrame(wx.Frame):
         self.Close()
 
     def on_saveas(self, err):
-        _l = self.curr_data_frame_lock
-        with _l:
-            _d = self.get_curr_data_copy()
-
         _saveas_gc_window = SaveasGC( self, _d)
 
     def on_open(self, err):

@@ -55,11 +55,11 @@ class GCSplitter(wx.SplitterWindow):
 
 #DirectoryWindow(s)
 class DirectoryWindow(wx.Frame):
-    def __init__(self, parent, data):
+    def __init__(self, parent, ops):
         self.parent = parent
         self.cwd = os.getcwd()
 
-        self.options = data
+        self.options = ops
         self.fonts = self.create_fonts()
 
         self.create_frame()
@@ -189,9 +189,9 @@ class DirectoryWindow(wx.Frame):
         self.tc_name.write(choice)
 
 class SaveasWindow(DirectoryWindow):
-    def __init__(self, parent, data):
+    def __init__(self, parent, ops):
         str = 'Save As'
-        DirectoryWindow.__init__(self,parent, data)
+        DirectoryWindow.__init__(self,parent, ops)
         self.SetTitle(str)
         self.btn_entr.SetLabel(str)
 
@@ -199,13 +199,12 @@ class SaveasWindow(DirectoryWindow):
         pass
 
 class SaveasGC(SaveasWindow):
-    def __init__(self, parent, data):
-        SaveasWindow.__init__(self, parent, data)
+    def __init__(self, parent, ops):
+        SaveasWindow.__init__(self, parent, ops)
 
         self.SetTitle('Save Session As GC')
         self.btn_entr.SetLabel('Save as .gc')
         #Get important parameters
-        self.curr_data = data
         self.parent = parent
 
     def entrbtn_click_evt(self, event):
@@ -218,7 +217,13 @@ class SaveasGC(SaveasWindow):
         _time = strftime('%H:%M:%S',localtime())
         time_str = 'Time at save: ' + _time
 
-        curr_data = self.jsonify_data(self.curr_data)
+        _l = self.parent.curr_data_frame_lock
+        with _l:
+            _d = self.parent.get_curr_data_copy()
+
+        _d
+
+        curr_data = self.jsonify_data(_d)
         prev_data = self.parent.get_prev_data_copy()
 
 
@@ -255,8 +260,8 @@ class SaveasGC(SaveasWindow):
         return numpy_dict
 
 class SaveasPNG(SaveasWindow):
-    def __init__(self, parent, data):
-        SaveasWindow.__init__(self, parent, data)
+    def __init__(self, parent, ops):
+        SaveasWindow.__init__(self, parent, ops)
 
         self.SetTitle('Save Current Figure As PNG')
         self.btn_entr.SetLabel('Save as .png')
@@ -274,8 +279,8 @@ class SaveasPNG(SaveasWindow):
             self.figure.savefig(name + '.png')
 
 class SaveasJPG(SaveasWindow):
-    def __init__(self, parent, data):
-        SaveasWindow.__init__(self, parent, data)
+    def __init__(self, parent, ops):
+        SaveasWindow.__init__(self, parent, ops)
 
         self.SetTitle('Save Current Figure As JPEG')
         self.btn_entr.SetLabel('Save as .jpg')
@@ -293,9 +298,9 @@ class SaveasJPG(SaveasWindow):
             self.figure.savefig(name + '.jpg')
 
 class OpenWindow(DirectoryWindow):
-    def __init__(self, parent, data):
+    def __init__(self, parent, ops):
         str = 'Open GC File'
-        super().__init__( parent, data)
+        super().__init__( parent, ops)
         self.SetTitle(Open)
         self.btn_entr.SetLabel(str)
 
