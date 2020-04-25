@@ -323,20 +323,24 @@ class GCFrame(wx.Frame):
 
     def on_data_integrate(self, err):
         print("on integrate")
+        print(self.data_running)
         if not self.data_running:
             ans = self.gc.integrate_volt()
             print("The integral is: ")
             print(ans)
             self.update_curr_data_()
+        print('out integrate')
 
     def on_data_normalize(self, err):
         print("on normalize")
+        print(self.data_running)
         if not self.data_running:
             self.gc.normalize_volt_()
             self.update_curr_data_()
 
             self.panel_detector.update_curr_data_()
             self.panel_detector.draw()
+        print('out normalize')
 
     def on_clean_time(self, err):
         if not self.data_running:
