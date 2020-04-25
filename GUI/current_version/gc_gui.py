@@ -178,8 +178,8 @@ class GCFrame(wx.Frame):
     '''
         Setters
     '''
-    def set_frame_from_session_(self, session):
-        [curr , prev] = self.parse_session(session)
+    def set_frame_from_session_(self, filename):
+        [curr , prev] = self.parse_session(filename)
 
         _l = self.curr_data_frame_lock
         with _l:
@@ -191,7 +191,7 @@ class GCFrame(wx.Frame):
 
         self.prev_data = prev
 
-    def parse_session(self, session):
+    def parse_session(self, name):
         # # Format of JSON .gc filetype
         # curr_session = {
         # 'Date' : date_str ,
@@ -199,6 +199,10 @@ class GCFrame(wx.Frame):
         # 'Current Data' : curr_data ,
         #  'Previous Data': prev_data
         # }
+
+        _djson = self.load_json_file(name)
+        data_dict_numpy = reverse_jsonify(_djson)
+
         _cdstr = 'Current Data'
         cd = session[_cdstr]
 
@@ -206,6 +210,20 @@ class GCFrame(wx.Frame):
         pd = session[_pdstr]
 
         return [cd , pd]
+
+    def load_json_file(self, n):
+        with open(n, encoding ='utf-8') as json_file:
+            _d = json.load(json_file)
+        return _d
+
+    '''
+    dict(lists)->dict(numpys)
+    '''
+    def reverse_jsonify(self, json_dict):
+        numpy_dict = {}
+        numpy_dict.update((key, np.array(val)) for key,val in json_dict.items() )
+        return numpy_dict
+
 
     def update_curr_data_(self):
         _gcl = self.gc.curr_data_lock
