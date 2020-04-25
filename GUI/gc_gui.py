@@ -45,8 +45,6 @@ from threading import Thread
 
 import serial
 
-from windows import GCSplitter, SaveasGC, SaveasPNG, SaveasJPG, OpenWindow
-
 imdir = 'images'
 
 # c serial cmd definition
