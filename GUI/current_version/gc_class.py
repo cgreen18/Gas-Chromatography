@@ -264,7 +264,7 @@ class GC:
             arr = volt[low:high]
             _m = np.max(arr)
             _mi = arr.argmax()
-            maximas.append((_m, _mi))
+            maximas.append((_mi, _m))
 
         return maximas
 

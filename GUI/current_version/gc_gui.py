@@ -443,12 +443,12 @@ class GCFrame(wx.Frame):
     def on_label_peaks(self, err):
         print('on label peaks')
 
-        #labels = [ {'text':area_0, 'co-ord':(x_0,y_0))} , {'text':area_1,'co-ord':(x_1,y_1)}, ...  ]
-        labels = []
         areas = self.gc.integrate_peaks()
+        # list of (x,y) pairs
         maximas = self.gc.get_peak_local_maximas()
 
-        self.panel_detector.label_peaks_(labels)
+
+        self.panel_detector.label_peaks_(areas, maximas)
         print('out label peaks')
 
     '''
@@ -1247,8 +1247,17 @@ class DetectorPanel(wx.Panel):
 
         return hbox
 
-    def label_peaks_(self):
-        pass
+    def label_peaks_(self, areas, maximas):
+        num_pts = len(areas)
+
+        for i in range(0,num_pts):
+            _t = areas[i]
+            (x , y ) = maximas[i]
+            (x , y) = (float(x) , float(y))
+            self.axes.annotate(_t, (x,y))
+
+        func = self.canvas.draw
+        wx.CallAfter(func)
 
     def fill_under_(self):
         cd = self.get_curr_data()
@@ -1257,6 +1266,8 @@ class DetectorPanel(wx.Panel):
         v = cd[_vi]
         t = cd[_ti]
         self.axes.fill_between(t,v)
+        func = self.canvas.draw
+        wx.CallAfter(func)
 
     def draw(self):
         _vi = self.indices['v']
