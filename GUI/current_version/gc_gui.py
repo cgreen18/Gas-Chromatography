@@ -201,7 +201,7 @@ class GCFrame(wx.Frame):
         # }
 
         _djson = self.load_json_file(name)
-        data_dict_numpy = reverse_jsonify(_djson)
+        data_dict_numpy = self.reverse_jsonify(_djson)
 
         _cdstr = 'Current Data'
         cd = session[_cdstr]
