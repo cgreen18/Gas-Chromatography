@@ -843,7 +843,7 @@ class OpenWindow(DirectoryWindow):
             self.Close()
 
     def open_gc(self, name):
-        self.parent.set_frame_from_file(name)
+        self.parent.set_frame_from_session_(name)
 
     def is_gc(self, name):
         if name[-3:] == '.gc':
