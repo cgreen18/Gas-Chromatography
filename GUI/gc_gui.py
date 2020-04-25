@@ -527,7 +527,7 @@ class GCPlotter(Thread):
             t_last = t_curr
 
             self.frame.panel_detector.update_curr_data_()
-            func = self.frame.panel_detector.draw()
+            func = self.frame.panel_detector.draw
             wx.CallAfter(func)
 
 class GCReceiver(Thread):
@@ -572,7 +572,7 @@ class GCReceiver(Thread):
                 print("notification received about item production...")
 
                 with self.gc_cond:
-                    gc_d = self.gc.get_curr_data_copy()
+                    gc_d = self.gc.get_curr_data()
                 with self.data_lock:
                     self.frame.set_curr_data(gc_d)
 
