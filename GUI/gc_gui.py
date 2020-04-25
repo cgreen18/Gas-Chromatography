@@ -337,8 +337,9 @@ class GCFrame(wx.Frame):
         _l = self.curr_data_frame_lock
         with _l:
             d = self.get_curr_data_copy()
-        _ti = self.indices['t']
-        t_first = d[_ti][0:20]
+        _inds = self.options['indices']
+        _ti = _inds['t']
+        t_first = d[_ti][0:10]
         print(t_first)
         if not self.data_running:
             self.gc.normalize_volt_()
