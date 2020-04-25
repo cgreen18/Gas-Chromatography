@@ -232,6 +232,7 @@ class SaveasGC(SaveasWindow):
 
         curr_data = self.jsonify_data(data_dict)
 
+        prev_data = []
 
         list_data = self.parent.get_prev_data_copy()
         for data in list_data:
