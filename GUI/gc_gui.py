@@ -152,7 +152,7 @@ class GCFrame(wx.Frame):
             d = np.copy(d)
             self.curr_data_frame = d
 
-    def set_curr_data_w_ref(self, d):
+    def set_curr_data_w_ref_(self, d):
         _il = self.is_frame_data_locked()
         if _il:
             self.curr_data_frame = d
