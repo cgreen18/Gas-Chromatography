@@ -454,7 +454,7 @@ class GCTemperature(Thread):
 
         ser.flushInput()
         ser.flushOutput()
-        
+
         time.sleep(.025)
 
         _ = ser.write(b_str)
@@ -566,7 +566,7 @@ class GCReceiver(Thread):
                 print("notification received about item production...")
 
                 with self.gc_cond:
-                    gc_d = self.gc.get_curr_data_copy
+                    gc_d = self.gc.get_curr_data_copy()
                 with self.data_lock:
                     self.frame.set_curr_data(gc_d)
 

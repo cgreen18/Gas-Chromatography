@@ -203,7 +203,7 @@ class GC:
             _d = np.copy(self.curr_data)
             return _d
         else:
-            print('no access')
+            print('get_curr_data: no access')
 
     def set_curr_data(self, d):
         _il = self.is_locked()
@@ -211,14 +211,14 @@ class GC:
             d = np.copy(d)
             self.curr_data = d
         else:
-            print('no access')
+            print('set_curr_data: no access')
 
     def set_curr_data_w_ref(self, d):
         _il = self.is_locked()
         if _il:
             self.curr_data = d
         else:
-            print('no access')
+            print('set_curr_data_w_ref: no access')
 
     def get_volt(self):
         is_locked = self.is_locked()
@@ -227,7 +227,7 @@ class GC:
             _v = np.copy(self.curr_data[_vi])
             return _v
         else:
-            print('no access')
+            print('get_volt: no access')
 
     def set_volt(self, d):
         is_locked = self.is_locked()
@@ -236,7 +236,7 @@ class GC:
             d = np.copy(d)
             self.curr_data[_vi] = d
         else:
-            print('no access')
+            print('set_volt: no access')
 
     def get_time(self):
         _il = self.is_locked()
@@ -245,7 +245,7 @@ class GC:
             _t = self.curr_data[_ti]
             return _t
         else:
-            print('no access')
+            print('get_time: no access')
 
     def set_time(self, d):
         _il = self.is_locked()
@@ -254,7 +254,7 @@ class GC:
             d = np.copy(d)
             self.curr_data[_ti] = d
         else:
-            print('no access')
+            print('set_time: no access')
 
     def set_time_w_ref(self, d):
         _il = self.is_locked()
@@ -262,7 +262,7 @@ class GC:
         if _il:
             self.curr_data[_ti] = d
         else:
-            print('no access')
+            print('set_time_w_ref: no access')
 
     def print_voltage(self):
         print(self.chan.voltage)
