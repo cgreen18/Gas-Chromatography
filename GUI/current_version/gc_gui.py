@@ -146,7 +146,7 @@ class GCFrame(wx.Frame):
         self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
         self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':5.0, 'baud_rate':115200,
                         'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
-                        'single_ended':True, 'indices':{'v':0,'a':1,'dt':2,'t':3},
+                        'single_ended':True, 'indices':{'v':0,'a':1,'t':2,'dt':3},
                         'units_str':{'x-axis':'Time [seconds]' , 'y-axis':'Detector Response [volts]'},
                         'limits':{'x':(0,-1),'y':(0,4)} , 'gc_file_indices': {'cd':'Current Data', 'pd':'Previous Data'}}
         self.options.update(self.constants)
@@ -1357,6 +1357,11 @@ class DetectorPanel(wx.Panel):
             # self.axes.set_xlim(_x)
             # _y = self.limits['y']
             # self.axes.set_ylim(_y)
+
+            _xstr = self.units_str['x-axis']
+            _ystr = self.units_str['y-axis']
+            self.axes.set_xlabel(_xstr)
+            self.axes.set_ylabel(_ystr)
 
             func = self.canvas.draw
             wx.CallAfter(func)
