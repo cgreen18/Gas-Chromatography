@@ -179,7 +179,10 @@ class GCFrame(wx.Frame):
         Setters
     '''
     def set_frame_from_session_(self, filename):
+        print('in set frame')
         [curr , prev] = self.parse_session(filename)
+        print(curr)
+        print(prev)
 
         _l = self.curr_data_frame_lock
         with _l:
