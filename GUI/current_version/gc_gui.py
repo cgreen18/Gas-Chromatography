@@ -1272,8 +1272,9 @@ class DetectorPanel(wx.Panel):
         self.vbox2.Add((-1,es))
 
     def create_figure_(self):
-        self.figure = Figure()
-        self.axes = self.figure.add_subplot(111)
+        _fig, _ax = plt.subplots()
+        self.figure = _fig
+        self.axes = _ax
         _xstr = self.units_str['x-axis']
         _ystr = self.units_str['y-axis']
         self.axes.set_xlabel(_xstr)
@@ -1326,7 +1327,9 @@ class DetectorPanel(wx.Panel):
         self.axes.set_xlabel(_xstr)
         self.axes.set_ylabel(_ystr)
 
-        func = self.canvas.draw
+        self.canvas.draw()
+
+        func = plt.show
         wx.CallAfter(func)
 
     def fill_under_(self):
