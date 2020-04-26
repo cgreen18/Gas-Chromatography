@@ -902,15 +902,15 @@ class GCTemperature(Thread):
         self.oven_val_change = True
         self.oven_stc_txt = self.frame.panel_config.str_ov_fdbk_val
 
-        self.det_temp = None
-        self.last_det_temp = None
+        self.inj_temp = None
+        self.last_inj_temp = None
         self.oven_val_change = True
-        self.det_stc_txt = self.frame.panel_config.str_det_fdbk_val
+        self.inj_stc_txt = self.frame.panel_config.str_inj_fdbk_val
 
         self.last_update_time_raw = None
 
         self.ov_location = 1
-        self.det_location = 3
+        self.inj_location = 2
 
 
     def stop(self):
@@ -924,7 +924,7 @@ class GCTemperature(Thread):
         epsilon = self.ep
 
         o_l = self.ov_location
-        d_l = self.det_location
+        d_l = self.inj_location
 
         t_last = time.time()
 
@@ -942,24 +942,24 @@ class GCTemperature(Thread):
             temperatures = self.parse_response(bit_response)
 
             self.last_oven_temp = self.oven_temp
-            self.last_det_temp = self.det_temp
+            self.last_inj_temp = self.inj_temp
 
             self.oven_temp = float(temperatures[0])
-            self.det_temp = float(temperatures[1])
+            self.inj_temp = float(temperatures[1])
 
             if self.last_oven_temp == self.oven_temp:
                 self.oven_val_change = False
             else:
                 self.oven_val_change = True
 
-            if self.last_det_temp == self.det_temp:
-                self.det_val_change = False
+            if self.last_inj_temp == self.inj_temp:
+                self.inj_val_change = False
             else:
-                self.det_val_change = True
+                self.inj_val_change = True
 
             self.last_update_time_raw = time.time()
 
-            if self.det_val_change and self.oven_val_change:
+            if self.inj_val_change and self.oven_val_change:
                 func = self.set_both_txt_ctrls
                 args = temperatures
                 wx.CallAfter(func, args)
@@ -972,11 +972,11 @@ class GCTemperature(Thread):
 
                 wx.CallAfter(func, args)
 
-            elif self.det_val_change:
-                det_str = temperatures[1]
+            elif self.inj_val_change:
+                inj_str = temperatures[1]
 
-                func = self.det_stc_txt.SetLabel
-                args = det_str
+                func = self.inj_stc_txt.SetLabel
+                args = inj_str
                 wx.CallAfter(func, args)
 
 
@@ -1007,24 +1007,24 @@ class GCTemperature(Thread):
 
     def parse_response(self, resp):
         o_l = self.ov_location
-        d_l = self.det_location
+        d_l = self.inj_location
 
         str_resp = [item.decode() for item in resp]
         str_resp = [item.strip('\r\n') for item in str_resp]
 
         ov_tmp = str_resp[o_l]
 
-        det_tmp = str_resp[d_l]
+        inj_tmp = str_resp[d_l]
 
-        temps = [ov_tmp, det_tmp]
+        temps = [ov_tmp, inj_tmp]
 
         return temps
 
     def set_both_txt_ctrls(self, temps):
         ov_str = temps[0]
-        det_str = temps[1]
+        inj_str = temps[1]
         self.oven_stc_txt.SetLabel(ov_str)
-        self.det_stc_txt.SetLabel(det_str)
+        self.inj_stc_txt.SetLabel(inj_str)
 
 class GCPlotter(Thread):
     def __init__(self, frame, *args, **kwargs):
@@ -1210,10 +1210,10 @@ class DetectorPanel(wx.Panel):
 
         vbox = wx.BoxSizer(wx.VERTICAL)
 
-        str_det = wx.StaticText(self, label = 'Detector')
-        str_det.SetFont(hf)
+        str_det_panel = wx.StaticText(self, label = 'Detector')
+        str_det_panel.SetFont(hf)
 
-        vbox.Add(str_det, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border = b)
+        vbox.Add(str_det_panel, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border = b)
         vbox.Add((-1,es))
 
         hbox = wx.BoxSizer(wx.HORIZONTAL)
@@ -1429,22 +1429,22 @@ class ControlPanel( wx.Panel ):
 
         self.vbox.Add((-1,es))
 
-        #Detector temp
-        hbox_det_set = self.build_det_static_text_one()
+        #injector temp
+        hbox_inj_set = self.build_inj_static_text_one()
 
-        self.tc_det_set = wx.TextCtrl(self)
-        hbox_det_set.Add(self.tc_det_set, proportion = 1)
-        self.Bind(wx.EVT_TEXT_ENTER, self.det_set , self.tc_det_set)
+        self.tc_inj_set = wx.TextCtrl(self)
+        hbox_inj_set.Add(self.tc_inj_set, proportion = 1)
+        self.Bind(wx.EVT_TEXT_ENTER, self.inj_set , self.tc_inj_set)
 
-        self.vbox.Add(hbox_det_set, flag=wx.LEFT|wx.TOP,border =b)
+        self.vbox.Add(hbox_inj_set, flag=wx.LEFT|wx.TOP,border =b)
 
-        hbox_det_fdbk = self.build_det_static_text_two()
+        hbox_inj_fdbk = self.build_inj_static_text_two()
 
-        self.str_det_fdbk_val = wx.StaticText(self, label = 'N/A')
-        self.str_det_fdbk_val.SetFont(f)
-        hbox_det_fdbk.Add(self.str_det_fdbk_val)
+        self.str_inj_fdbk_val = wx.StaticText(self, label = 'N/A')
+        self.str_inj_fdbk_val.SetFont(f)
+        hbox_inj_fdbk.Add(self.str_inj_fdbk_val)
 
-        self.vbox.Add(hbox_det_fdbk, flag=wx.LEFT|wx.TOP,border =b)
+        self.vbox.Add(hbox_inj_fdbk, flag=wx.LEFT|wx.TOP,border =b)
 
         self.SetSizer(self.vbox)
 
@@ -1453,27 +1453,27 @@ class ControlPanel( wx.Panel ):
         str = self.tc_ov_set.GetLineText()
         self.gcframe.on_ov_txt_ctrl(str)
 
-    def det_set(self, event):
-        str = self.tc_det_set.GetLineText()
-        self.gcframe.on_det_txt_ctrl(str)
+    def inj_set(self, event):
+        str = self.tc_inj_set.GetLineText()
+        self.gcframe.on_inj_txt_ctrl(str)
 
-    def build_det_static_text_two(self):
-        hbox_det_fdbk = wx.BoxSizer(wx.HORIZONTAL)
-        str_det_fdbk = wx.StaticText(self, label = 'Detector Temp. Reading: ')
+    def build_inj_static_text_two(self):
+        hbox_inj_fdbk = wx.BoxSizer(wx.HORIZONTAL)
+        str_inj_fdbk = wx.StaticText(self, label = 'Injector Temp. Reading: ')
         f = self.fonts['font']
-        str_det_fdbk.SetFont(f)
-        hbox_det_fdbk.Add(str_det_fdbk)
+        str_inj_fdbk.SetFont(f)
+        hbox_inj_fdbk.Add(str_inj_fdbk)
 
-        return hbox_det_fdbk
+        return hbox_inj_fdbk
 
-    def build_det_static_text_one(self):
-        hbox_det_set = wx.BoxSizer(wx.HORIZONTAL)
-        str_det_set = wx.StaticText(self, label = 'Set Detector Temp.: ')
+    def build_inj_static_text_one(self):
+        hbox_inj_set = wx.BoxSizer(wx.HORIZONTAL)
+        str_inj_set = wx.StaticText(self, label = 'Set Injector Temp.: ')
         f = self.fonts['font']
-        str_det_set.SetFont(f)
-        hbox_det_set.Add(str_det_set)
+        str_inj_set.SetFont(f)
+        hbox_inj_set.Add(str_inj_set)
 
-        return hbox_det_set
+        return hbox_inj_set
 
     def build_oven_static_text_one(self):
         hbox_ov_set = wx.BoxSizer(wx.HORIZONTAL)
