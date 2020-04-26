@@ -212,7 +212,12 @@ class GCFrame(wx.Frame):
         # }
 
         _djson = self.load_json_file(name)
+        print('in parse, json')
+        print(_djson)
+
         data_dict_numpy = self.reverse_jsonify(_djson)
+        print('in parse, dict')
+        print(type(data_dict_numpy))
 
         _cdstr = 'Current Data'
         cd = data_dict_numpy[_cdstr]
