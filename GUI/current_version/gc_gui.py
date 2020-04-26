@@ -180,12 +180,13 @@ class GCFrame(wx.Frame):
     '''
     def set_frame_from_session_(self, filename):
         print('in set frame')
-        curr , prev = self.parse_session(filename)
-        print(type(curr))
-        print(curr)
-        print(curr.shape)
-        curr = [val for key,val in curr]
-        prev = [ [ val for key,val in data_slice ] for data_slice in prev]
+        _file_data_dict = self.parse_session(filename)
+        print(type(_file_data_dict['cd']))
+        print(_file_data_dict['cd'])
+        print(_file_data_dict['cd'].shape)
+
+        curr = [val for key,val in _file_data_dict['cd'].items()]
+        prev = [ [ val for key,val in data_slice ] for data_slice in _file_data_dict['pd'].items()]
 
         _l = self.curr_data_frame_lock
         with _l:
@@ -229,7 +230,10 @@ class GCFrame(wx.Frame):
         _pdstr = 'Previous Data'
         pd = data_dict_numpy[_pdstr]
 
-        return (cd , pd)
+        _dict = {'cd':cd , 'pd':pd}
+
+        return _dict
+
     def load_json_file(self, n):
         with open(n, encoding ='utf-8') as json_file:
             _d = json.load(json_file)
