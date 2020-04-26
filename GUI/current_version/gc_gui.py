@@ -180,23 +180,20 @@ class GCFrame(wx.Frame):
     '''
     def set_frame_from_session_(self, filename):
         print('in set frame')
-        _file_data_dict = self.parse_session(filename)
-        print(type(_file_data_dict['cd']))
-        print(_file_data_dict['cd'])
-        print(_file_data_dict['cd'].shape)
+        cd , pd = self.parse_session(filename)
 
-        curr = [val for key,val in _file_data_dict['cd'].items()]
-        prev = [ [ val for key,val in data_slice ] for data_slice in _file_data_dict['pd'].items()]
+        print('after parse')
+        print(cd)
 
         _l = self.curr_data_frame_lock
         with _l:
-            self.set_curr_data_w_ref_(curr)
+            self.set_curr_data_w_ref_(cd)
 
         _gcl = self.gc_lock
         with _gcl:
-            self.gc.set_curr_data_w_ref_(curr)
+            self.gc.set_curr_data_w_ref_(cd)
 
-        self.prev_data = prev
+        self.prev_data = pd
 
         with _l:
             d = self.get_curr_data()
@@ -216,29 +213,14 @@ class GCFrame(wx.Frame):
 
         data_dict_numpy = self.reverse_jsonify(_djson)
 
+        _cd = ind['cd']
+        _pd = ind['pd']
 
+        cd = data_dict_numpy[_cd]
 
+        pd = data_dict_numpy[_pd]
 
-        print('in parse, dict')
-        print(type(data_dict_numpy))
-        print(data_dict_numpy.items())
-        print(data_dict_numpy.items())
-
-
-
-        _cdstr = 'Current Data'
-        cd = data_dict_numpy[_cdstr]
-
-        print('cd')
-        print(cd)
-
-
-        _pdstr = 'Previous Data'
-        pd = data_dict_numpy[_pdstr]
-
-        _dict = {'cd':cd , 'pd':pd}
-
-        return _dict
+        return (cd , pd)
 
     def load_json_file(self, n):
         with open(n, encoding ='utf-8') as json_file:
@@ -256,12 +238,11 @@ class GCFrame(wx.Frame):
         _curr_data = [val for key, val in numpy_dict[_cd].items()]
         for data_slice in numpy_dict[_pd]:
             _prev_data = [val for key,val in data_slice.items()  ]
-        print(_prev_data)
+
         numpy_dict.update({_cd : np.array(_curr_data)})
         numpy_dict.update({_pd : np.array(_prev_data)})
 
         return numpy_dict
-
 
     def update_curr_data_(self):
         _gcl = self.gc.curr_data_lock
