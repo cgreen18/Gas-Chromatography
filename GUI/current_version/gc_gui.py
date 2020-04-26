@@ -213,6 +213,8 @@ class GCFrame(wx.Frame):
 
         data_dict_numpy = self.reverse_jsonify(_djson)
 
+        ind = self.options['gc_file_indices']
+
         _cd = ind['cd']
         _pd = ind['pd']
 
