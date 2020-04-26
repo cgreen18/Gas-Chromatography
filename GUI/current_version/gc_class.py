@@ -216,6 +216,7 @@ class GC:
                     on_peak = False
                     if i - low >= time_thresh:
                         peaks.append((low, i))
+
         return peaks
 
     def break_into_peaks_ret_volt_copy(self):
@@ -252,6 +253,8 @@ class GC:
         [peaks , volt] = self.break_into_peaks_ret_volt_copy()
         print('in integrate, peaks is: ')
         print(peaks)
+        print('for volt of length: ')
+        print(volt)
 
         areas = []
 

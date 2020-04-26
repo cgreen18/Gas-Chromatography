@@ -144,7 +144,7 @@ class GCFrame(wx.Frame):
         self.gc_lock = self.gc.curr_data_lock
 
     def establish_options_(self, uo):
-        self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':5.0, 'baud_rate':115200,
+        self.options = {'frame_size':(1000,400), 'sash_size':300, 'data_samp_rate':5.0, 'baud_rate':115200,
                         'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
                         'single_ended':True, 'indices':{'v':0,'a':1,'t':2,'dt':3},
                         'units_str':{'x-axis':'Time [seconds]' , 'y-axis':'Detector Response [volts]'},
@@ -153,7 +153,7 @@ class GCFrame(wx.Frame):
 
         _constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
         self.options.update(_constants)
-        
+
         self.options.update(uo)
 
 #BIG TODO
@@ -489,6 +489,8 @@ class GCFrame(wx.Frame):
         print(areas)
         # list of (x,y) pairs
         maximas = self.gc.get_peak_local_maximas()
+        print('maximas')
+        print(maximas)
 
 
         self.panel_detector.label_peaks_(areas, maximas)
