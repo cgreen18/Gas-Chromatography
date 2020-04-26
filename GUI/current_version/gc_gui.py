@@ -144,7 +144,7 @@ class GCFrame(wx.Frame):
         self.gc_lock = self.gc.curr_data_lock
 
     def establish_options_(self, uo):
-        self.options = {'frame_size':(1800,400), 'sash_size':250, 'data_samp_rate':5.0, 'baud_rate':115200,
+        self.options = {'frame_size':(2800,400), 'sash_size':250, 'data_samp_rate':5.0, 'baud_rate':115200,
                         'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
                         'single_ended':True, 'indices':{'v':0,'a':1,'t':2,'dt':3},
                         'units_str':{'x-axis':'Time [seconds]' , 'y-axis':'Detector Response [volts]'},
@@ -1318,8 +1318,8 @@ class DetectorPanel(wx.Panel):
 
         for i in range(0,num_pts):
             _text = str(areas[i])
-            (x , y ) = maximas[i]
-            self.axes.annotate(_text, xy= (x,y), xytext=(5,0))
+            x , y  = maximas[i]
+            self.axes.annotate(_text, xy= (x,y))#, xytext=(0,0))
 
         _xstr = self.units_str['x-axis']
         _ystr = self.units_str['y-axis']
