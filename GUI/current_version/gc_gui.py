@@ -492,7 +492,7 @@ class GCFrame(wx.Frame):
         print('maximas')
         print(maximas)
 
-
+        self.panel_detector.update_curr_data_()
         self.panel_detector.label_peaks_(areas, maximas)
         print('out label peaks')
 
@@ -1315,20 +1315,30 @@ class DetectorPanel(wx.Panel):
         print(areas)
         print(maximas)
 
+        cd = self.get_curr_data
+        ind = self.gcframe.options['indices']
+        _vi = ind['v']
+        _ti = ind['t']
+
+        v = cd[_vi]
+        t = cd[_ti]
 
         for i in range(0,num_pts):
             _text = str(areas[i])
-            x , y  = maximas[i]
-            self.axes.annotate(_text, xy= (x,y))#, xytext=(0,0))
+            max_index , max_val  = maximas[i]
+            _x = t[max_index]
+            _y = v[max_index]
+            self.axes.annotate(_text, xy= (_x,_y), xytext=(0,-.001))
 
         _xstr = self.units_str['x-axis']
         _ystr = self.units_str['y-axis']
         self.axes.set_xlabel(_xstr)
         self.axes.set_ylabel(_ystr)
 
-        self.canvas.draw()
 
-        func = self.figure.show()
+        self.axes.annotate('waddup b', xy = (20, .1), xytext = ())
+
+        func = self.canvas.draw
         wx.CallAfter(func)
 
     def fill_under_(self):
