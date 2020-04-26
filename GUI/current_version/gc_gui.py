@@ -181,7 +181,8 @@ class GCFrame(wx.Frame):
     def set_frame_from_session_(self, filename):
         print('in set frame')
         [curr , prev] = self.parse_session(filename)
-        print(curr)
+        curr = [val for key,val in curr.items() ]
+        prev = [ [ val for key,val in data_slice.items() ] for data_slice in prev]
 
         _l = self.curr_data_frame_lock
         with _l:
