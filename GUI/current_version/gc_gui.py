@@ -182,8 +182,11 @@ class GCFrame(wx.Frame):
         print('in set frame')
         cd , pd = self.parse_session(filename)
 
-        print('after parse')
+        print('after parse cd')
         print(cd)
+
+        print('after parse pd')
+        print(pd)
 
         _l = self.curr_data_frame_lock
         with _l:
