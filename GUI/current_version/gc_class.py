@@ -254,7 +254,7 @@ class GC:
         print('in integrate, peaks is: ')
         print(peaks)
         print('for volt of length: ')
-        print(volt)
+        print(len(volt))
 
         areas = []
 

@@ -144,7 +144,7 @@ class GCFrame(wx.Frame):
         self.gc_lock = self.gc.curr_data_lock
 
     def establish_options_(self, uo):
-        self.options = {'frame_size':(1000,400), 'sash_size':300, 'data_samp_rate':5.0, 'baud_rate':115200,
+        self.options = {'frame_size':(1000,400), 'sash_size':400, 'data_samp_rate':5.0, 'baud_rate':115200,
                         'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
                         'single_ended':True, 'indices':{'v':0,'a':1,'t':2,'dt':3},
                         'units_str':{'x-axis':'Time [seconds]' , 'y-axis':'Detector Response [volts]'},
@@ -1310,11 +1310,16 @@ class DetectorPanel(wx.Panel):
 
     def label_peaks_(self, areas, maximas):
         num_pts = len(areas)
+        print('in label_peaks_')
+        print(num_pts)
+        print(area)
+        print(maximas)
+
 
         for i in range(0,num_pts):
-            _t = areas[i]
+            _text = str(areas[i])
             (x , y ) = maximas[i]
-            self.axes.annotate(_t, xy= (x,y), xytext=(5,5))
+            self.axes.annotate(_text, xy= (x,y), xytext=(5,0))
 
         func = self.canvas.draw
         wx.CallAfter(func)
