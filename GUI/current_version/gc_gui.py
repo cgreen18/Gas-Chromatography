@@ -1315,7 +1315,7 @@ class DetectorPanel(wx.Panel):
         print(areas)
         print(maximas)
 
-        cd = self.get_curr_data
+        cd = self.get_curr_data()
         ind = self.gcframe.options['indices']
         _vi = ind['v']
         _ti = ind['t']
