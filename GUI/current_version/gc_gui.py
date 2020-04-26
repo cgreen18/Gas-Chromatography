@@ -256,8 +256,8 @@ class GCFrame(wx.Frame):
         _curr_data = [val for key, val in numpy_dict[_cd].items()]
         _prev_data = [val for key,val in data_slice.items() for data_slice in numpy_dict[_pd] ]
         print(_prev_data)
-        numpy_dict.update(_cd : np.array(_curr_data))
-        numpy_dict.update(_pd : np.array(_prev_data))
+        numpy_dict.update({_cd : np.array(_curr_data)})
+        numpy_dict.update({_pd : np.array(_prev_data)})
 
         return numpy_dict
 
