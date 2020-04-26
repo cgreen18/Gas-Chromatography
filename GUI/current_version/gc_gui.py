@@ -182,7 +182,6 @@ class GCFrame(wx.Frame):
         print('in set frame')
         [curr , prev] = self.parse_session(filename)
         print(curr)
-        print(prev)
 
         _l = self.curr_data_frame_lock
         with _l:
@@ -193,6 +192,11 @@ class GCFrame(wx.Frame):
             self.gc.set_curr_data_w_ref_(curr)
 
         self.prev_data = prev
+
+        with _l:
+            d = self.get_curr_data()
+            print('after:')
+            print(d)
 
     def parse_session(self, name):
         # # Format of JSON .gc filetype
