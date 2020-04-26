@@ -1328,7 +1328,7 @@ class DetectorPanel(wx.Panel):
             max_index , max_val  = maximas[i]
             _x = t[max_index]
             _y = v[max_index]
-            self.axes.annotate(_text, xy= (_x,_y), xytext=(0,-.001))
+            self.axes.annotate(_text, xy= (_x,_y), xytext=(0,-.01))
 
         _xstr = self.units_str['x-axis']
         _ystr = self.units_str['y-axis']
