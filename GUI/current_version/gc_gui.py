@@ -1336,7 +1336,7 @@ class DetectorPanel(wx.Panel):
         self.axes.set_ylabel(_ystr)
 
 
-        self.axes.annotate('waddup b', xy = (20, .1), xytext = ())
+        self.axes.annotate('waddup b', xy = (20, .1))
 
         func = self.canvas.draw
         wx.CallAfter(func)
