@@ -74,7 +74,7 @@ class GC:
         self.curr_data_lock = Lock()
         self.time_out = 1 #sec
         self.epsilon = 0.01
-        self.pk_volt_min_after_norm = 0.002
+        self.pk_volt_min_after_norm = 0.01
         self.pk_time_min = 10
         self.peaks = []
         self.prev_data = []
@@ -141,7 +141,11 @@ class GC:
         volt = self.get_volt()
         _e = self.curr_data_lock.release()
 
-        np.convolve(vec, np.ones((window,))/window, mode='valid')
+        np.convolve(volt, np.ones((window,))/window, mode='valid')
+
+        _e = self.curr_data_lock.acquire(to)
+        self.set_volt_(volt)
+        _e = self.curr_data_lock.release()
 
     #@description: Appends current data copy to previoius data list and sets current data back to zero vector.
     def curr_to_prev_(self):
@@ -246,6 +250,8 @@ class GC:
 
     def integrate_peaks(self):
         [peaks , volt] = self.break_into_peaks_ret_volt_copy()
+        print('in integrate, peaks is: ')
+        print(peaks)
 
         areas = []
 

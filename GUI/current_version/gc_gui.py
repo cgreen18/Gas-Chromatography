@@ -104,10 +104,10 @@ class GCFrame(wx.Frame):
 
         if len(possible) == 0:
             print("Error: No ACM ports found to connect to Arduino.")
-            print("Continuing for now.")
+            print("Attempting on default ttyACM0 for now.")
             possible.append('ttyACM0')
         elif len(possible) != 1:
-            print("Error: Multiple possible ACM ports to connect Arduino")
+            print("Error: Multiple possible ACM ports to connect Arduino.")
             print("Defaulting to '/dev/ttyACM0'")
             possible[0] = 'ttyACM0'
 
@@ -124,7 +124,7 @@ class GCFrame(wx.Frame):
         try:
             ser = serial.Serial(port, baudrate = bd, timeout = to)
         except:
-            print("Error connecting to serial...")
+            print("Error: Cannot create serial connection with Arduino.")
 
         self.ser_conn = ser
 
@@ -144,14 +144,16 @@ class GCFrame(wx.Frame):
         self.gc_lock = self.gc.curr_data_lock
 
     def establish_options_(self, uo):
-        self.constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
         self.options = {'frame_size':(800,400), 'sash_size':300, 'data_samp_rate':5.0, 'baud_rate':115200,
                         'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
                         'single_ended':True, 'indices':{'v':0,'a':1,'t':2,'dt':3},
                         'units_str':{'x-axis':'Time [seconds]' , 'y-axis':'Detector Response [volts]'},
-                        'limits':{'x':(0,-1),'y':(0,4)} , 'gc_file_indices': {'cd':'Current Data', 'pd':'Previous Data'}}
-        self.options.update(self.constants)
+                        'limits':{'x':(0,-1),'y':(0,4)} , 'gc_file_indices': {'cd':'Current Data', 'pd':'Previous Data'},
+                        'window':100}
 
+        _constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
+        self.options.update(_constants)
+        
         self.options.update(uo)
 
 #BIG TODO
@@ -164,7 +166,7 @@ class GCFrame(wx.Frame):
             pass
             #
         else:
-            print('Err')
+            print('Error: Invalid temperature thread type.')
 
     '''
     Lock function
@@ -180,14 +182,7 @@ class GCFrame(wx.Frame):
         Setters
     '''
     def set_frame_from_session_(self, filename):
-        print('in set frame')
         cd , pd = self.parse_session(filename)
-
-        print('after parse cd')
-        print(cd)
-
-        print('after parse pd')
-        print(pd)
 
         _l = self.curr_data_frame_lock
         with _l:
@@ -198,11 +193,6 @@ class GCFrame(wx.Frame):
             self.gc.set_curr_data_w_ref_(cd)
 
         self.prev_data = pd
-
-        with _l:
-            d = self.get_curr_data()
-            print('after:')
-            print(d)
 
     def parse_session(self, name):
         # # Format of JSON .gc filetype
@@ -393,14 +383,12 @@ class GCFrame(wx.Frame):
         if self.curr_data_frame_lock.locked():
             self.curr_data_frame_lock.release()
 
-        print(self.curr_data_frame_lock.locked())
-        print(self.gc.is_locked())
+        print('Message: Stopped data collection threads.')
 
     def on_plot_btn(self):
         if self.data_running:
             self.stop_data_coll_()
 
-        print('plot')
         self.panel_detector.update_curr_data_()
         self.panel_detector.draw()
 
@@ -460,18 +448,15 @@ class GCFrame(wx.Frame):
         _saveas_jpg_window = SaveasJPG(self, self.options)
 
     def on_data_integrate(self, err):
-        print("on integrate")
         print(self.data_running)
         if not self.data_running:
             ans = self.gc.integrate_volt()
-            print("The integral is: ")
+            print("The integral of voltage over the sampling period is: ")
             print(ans)
             self.gc.calc_cumsum_into_area_()
             self.update_curr_data_()
-        print('out integrate')
 
     def on_data_normalize(self, err):
-        print("on normalize")
         print(self.data_running)
         _l = self.curr_data_frame_lock
         with _l:
@@ -486,7 +471,6 @@ class GCFrame(wx.Frame):
 
             self.panel_detector.update_curr_data_()
             self.panel_detector.draw()
-        print('out normalize')
 
     def on_clean_time(self, err):
         if not self.data_running:
@@ -497,20 +481,22 @@ class GCFrame(wx.Frame):
             self.panel_detector.draw()
 
     def on_fill(self, err):
-        print("on fill")
         self.panel_detector.fill_under_()
-        print('out fill')
 
     def on_label_peaks(self, err):
-        print('on label peaks')
-
         areas = self.gc.integrate_peaks()
+        print('areas')
+        print(areas)
         # list of (x,y) pairs
         maximas = self.gc.get_peak_local_maximas()
 
 
         self.panel_detector.label_peaks_(areas, maximas)
         print('out label peaks')
+
+    def on_mov_mean(self, err):
+        _w = self.options['window']
+        self.gc.mov_mean_(_w)
 
     '''
     Defaults overridden
@@ -911,7 +897,6 @@ class GCTemperature(Thread):
         self._stop_event = threading.Event()
 
         self.ser_conn = serial_connection
-        print(self.ser_conn)
         self.ser_lock = serial_lock
 
         self.oven_temp = None
@@ -1117,15 +1102,13 @@ class GCReceiver(Thread):
                 val = self.gc_cond.wait(to)
 
             if val:
-                print("notification received about item production...")
-
                 with self.gc_cond:
                     gc_d = self.gc.get_curr_data()
                 with self.data_lock:
                     self.frame.set_curr_data_(gc_d)
 
             else:
-              print("waiting timeout...")
+              print("Error: Timeout on data reception reached.")
 
 class GCData(Thread):
     def __init__(self, gc, condition, *args, **kwargs):
@@ -1203,9 +1186,6 @@ class GCData(Thread):
             with self.condition:
                 self.gc.set_curr_data_(new)
                 self.condition.notify_all()
-            print('new daata')
-
-        print('done running')
 
 #Panels
 class DetectorPanel(wx.Panel):
