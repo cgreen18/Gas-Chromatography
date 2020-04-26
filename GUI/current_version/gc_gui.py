@@ -22,6 +22,7 @@ Version (mainly for final report later):
                         Menu grapher function: fill almost works
 3.0 - 24 April 2020 - Arduino serial interface. Temperature control and feedback thread. Normalize, integrate, and clean time menu functions.
 3.1 - 25 April 2020 - Open .gc file will set current and previous data to the loaded file.
+3.2 - 25 April 2020 - Opening .gc file works.
 '''
 
 import numpy as np
