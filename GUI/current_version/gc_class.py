@@ -74,7 +74,7 @@ class GC:
         self.curr_data_lock = Lock()
         self.time_out = 1 #sec
         self.epsilon = 0.01
-        self.pk_volt_min_after_norm = 0.01
+        self.pk_volt_min_after_norm = 0.005
         self.pk_time_min = 10
         self.peaks = []
         self.prev_data = []
@@ -240,13 +240,19 @@ class GC:
         for i in range(0, num_pts):
             if not on_peak:
                 if volt[i] >= volt_thresh:
+                    print('found a peak!')
+                    print(i)
                     on_peak = True
                     low = i
             else:
                 if volt[i] <= volt_thresh:
                     on_peak = False
                     if i - low >= time_thresh:
+                        print('found a trough')
+                        print(low)
+                        print(i)
                         peaks.append((low, i))
+
         return [peaks , volt ]
 
     def integrate_peaks(self):
@@ -272,7 +278,7 @@ class GC:
         for low, high in peaks:
             arr = volt[low:high]
             _m = np.max(arr)
-            _mi = arr.argmax()
+            _mi = arr.argmax() + low
             maximas.append((_mi, _m))
 
         return maximas
