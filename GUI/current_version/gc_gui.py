@@ -110,7 +110,7 @@ class GCFrame(wx.Frame):
         return string
 
     def establish_serial_conn_(self):
-        bd = self.options['baud_rate']
+        bd = self.options['BAUDRATE']
         to = self.options['time_out']
 
         port = self.get_arduino_port()
@@ -137,11 +137,11 @@ class GCFrame(wx.Frame):
         self.gc_lock = self.gc.get_lock()
 
     def establish_options_(self, uo):
-        self.options = {'frame_size':(400,400), 'sash_size':250, 'data_samp_rate':5.0, 'baud_rate':115200,
-                        'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
+        self.options = {'frame_size':(1200,600), 'sash_size':400, 'data_samp_rate':20.0,
+                        'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':10.0, 'temp_refresh_rate':1.0,
                         'single_ended':True, 'indices':{'v':0,'a':1,'t':2,'dt':3},
                         'units_str':{'x-axis':'Time [seconds]' , 'y-axis':'Detector Response [volts]'},
-                        'limits':{'x':(0,-1),'y':(0,4)} , 'gc_file_indices': {'cd':'Current Data', 'pd':'Previous Data'},
+                        'gc_file_indices': {'cd':'Current Data', 'pd':'Previous Data'},
                         'window':100}
 
         _constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
@@ -356,12 +356,12 @@ class GCFrame(wx.Frame):
     def on_paus_btn(self):
         gc_thread = self.data_rover_thread
 
-        if not self.is_paused:
+        if not self.data_paused:
             gc_thread.pause()
-            self.is_paused = True
+            self.data_paused = True
         else:
             gc_thread.un_pause()
-            self.is_paused - False
+            self.data_paused - False
 
     def on_stop_btn(self):
         self.stop_data_coll_()
