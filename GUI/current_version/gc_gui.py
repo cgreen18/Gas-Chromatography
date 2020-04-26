@@ -238,14 +238,19 @@ class GCFrame(wx.Frame):
     def reverse_jsonify(self, json_dict):
         numpy_dict = json_dict
         ind = self.options['gc_file_indices']
-        _cd = ind['cd']
-        _pd = ind['pd']
-        _curr_data = [val for key, val in numpy_dict[_cd].items()]
-        for data_slice in numpy_dict[_pd]:
-            _prev_data = [val for key,val in data_slice.items()  ]
 
+        _cd = ind['cd']
+        _curr_data = [val for key, val in numpy_dict[_cd].items()]
         numpy_dict.update({_cd : np.array(_curr_data)})
-        numpy_dict.update({_pd : np.array(_prev_data)})
+
+        _pd = ind['pd']
+        _prev_data = []
+        for data_slice in numpy_dict[_pd]:
+             _arr = [val for key,val in data_slice.items() ]
+             _np_arr = np.array(_arr)
+             _prev_data.append(_list)
+
+        numpy_dict.update({_pd:_prev_data})
 
         return numpy_dict
 
