@@ -183,6 +183,7 @@ class GCFrame(wx.Frame):
         [curr , prev] = self.parse_session(filename)
         print(type(curr))
         print(curr)
+        print(curr.shape)
         curr = [val for key,val in curr]
         prev = [ [ val for key,val in data_slice ] for data_slice in prev]
 
