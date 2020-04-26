@@ -1194,7 +1194,6 @@ class DetectorPanel(wx.Panel):
         self.options = self.parent.options
         self.indices = self.options['indices']
         self.units_str = self.options['units_str']
-        self.limits = self.options['limits']
 
         self.fonts = parent.create_fonts()
 
