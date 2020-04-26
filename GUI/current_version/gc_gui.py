@@ -139,7 +139,7 @@ class GCFrame(wx.Frame):
     def establish_options_(self, uo):
         self.options = {'frame_size':(1200,600), 'sash_size':400, 'data_samp_rate':10.0,
                         'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':5.0, 'temp_refresh_rate':1.0,
-                        'single_ended':True, 'indices':{'v':0,'a':1,'t':2,'dt':3},
+                        'single_ended':True, 'indices':{'v':0,'a':1,'t':2,'dt':3}, 'area_accuracy': 8,
                         'units_str':{'x-axis':'Time [seconds]' , 'y-axis':'Detector Response [volts]'},
                         'gc_file_indices': {'cd':'Current Data', 'pd':'Previous Data'},
                         'window':100}
@@ -324,6 +324,11 @@ class GCFrame(wx.Frame):
             _ = ser.write(b_str)
 
     def on_play_btn(self):
+        if self.data_paused:
+            gc_thread.un_pause()
+            self.data_paused = False
+            return
+
         rr = self.options['data_samp_rate']
         sp = 1 / rr
         ep = self.options['epsilon_time']
@@ -359,9 +364,6 @@ class GCFrame(wx.Frame):
         if not self.data_paused:
             gc_thread.pause()
             self.data_paused = True
-        else:
-            gc_thread.un_pause()
-            self.data_paused - False
 
     def on_stop_btn(self):
         self.stop_data_coll_()
@@ -1313,8 +1315,11 @@ class DetectorPanel(wx.Panel):
         v = cd[_vi]
         t = cd[_ti]
 
+        accuracy = self.options['area_accuracy']
+
         for i in range(0,num_pts):
-            _text = 'Relative area:\n' + str(areas[i])
+            _astr = str(areas[i])
+            _text = 'Relative area:\n' + _astr[:accuracy]
             max_index , max_val  = maximas[i]
             _x = t[max_index]
             _y = v[max_index]
