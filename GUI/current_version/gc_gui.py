@@ -340,7 +340,8 @@ class GCFrame(wx.Frame):
 
         gc = self.gc
         condition = self.gc_cond
-        self.data_rover_thread = GCData(gc, condition, args = ( sp, ep ) )
+        _ind = self.options['indices']
+        self.data_rover_thread = GCData(gc, condition, _ind, args = ( sp, ep ) )
 
         rsp = self.options['plot_refresh_rate']
         lock = self.curr_data_frame_lock
@@ -1106,11 +1107,12 @@ class GCReceiver(Thread):
               print("Error: Timeout on data reception reached.")
 
 class GCData(Thread):
-    def __init__(self, gc, condition, *args, **kwargs):
+    def __init__(self, gc, condition, indices, *args, **kwargs):
         super(GCData, self).__init__()
 
         self.sp = kwargs['args'][0]
         self.ep = kwargs['args'][1]
+        self.indices = indices
         self.gc = gc
         self._stop_event = threading.Event()
         self._pause_event = threading.Event()
@@ -1163,7 +1165,7 @@ class GCData(Thread):
 
             new = np.zeros((dims, 1))
 
-            ind = self.options['indices']
+            ind = self.indices
             _vi = ind['v']
             _dti = ind['dt']
             _ti = ind['t']
