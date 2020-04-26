@@ -34,6 +34,10 @@ class MainApp(gc_gui.GCFrame):
             options = yaml.load(f, Loader=yaml.FullLoader)
             self.options = options
 
+        # dont have time to figure out in yaml
+        _dict = {'READ_TMP_CMD_STR' :'001 000 000 000' , 'SET_TMP_CMD_STR': '000 XXX XXX 000'}
+        self.options.update(_dict)
+
         gc_gui.GCFrame.__init__(self, parent, self.options)
 
 def main():

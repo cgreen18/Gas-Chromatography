@@ -51,15 +51,6 @@ import serial
 
 imdir = '.images'
 
-# c serial cmd definition
-READ_TMP_CMD_STR = '001 000 000 000'
-SET_TMP_CMD_STR = '000 XXX XXX 000'
-# For '___ XXX YYY ___' XXX is oven and YYY is injector
-OVEN_INDEX = 1
-INJ_INDEX = 2
-
-SER_DELAY = .01 #sec
-
 # Frames
 class GCFrame(wx.Frame):
     # self is MainApp(GCFrame)
@@ -159,17 +150,6 @@ class GCFrame(wx.Frame):
         self.options['frame_size'] = self.options['DEFAULT_FRAME_SIZE']
         self.options['sash_size'] = self.options['DEFAULT_SASH_SIZE']
 
-#BIG TODO
-    def set_temp_ser_cmd(self, temp, which = 'oven'):
-        if which == 'oven':
-            pass
-            # do something
-            # SET_TMP_CMD_STR
-        elif which == 'det':
-            pass
-            #
-        else:
-            print('Error: Invalid temperature thread type.')
 
     '''
     Lock function
@@ -313,21 +293,35 @@ class GCFrame(wx.Frame):
     '''
     Button Events
     '''
-    def on_ov_txt_ctrl(self, string):
-        print("Text control changed")
-        print(string + " received")
-        val = float(string)
-        str = 'oven'
+    def on_temp_txt_ctrl(self, ov_str, inj_str):
+        self.set_temp_ser_cmd(ov_str, inj_str)
 
-        with self.ser_lock:
-            self.ser_cmd_set_temp(val, str)
+    def set_temp_ser_cmd(self, ov_str_val, inj_str_val):
+        base_str = self.options['SET_TMP_CMD_STR']
+        ov_ind = self.options['OVEN_INDEX']
+        inj_ind = self.optinos['INJ_INDEX']
 
-    def on_det_txt_ctrl(self, string):
-        val = float(string)
-        str = 'det'
+        ov_str_val = self.panel_config.tc_det_set.GetLineText()
+        inj_str_val = self.panel_config.tc_inj_set.GetLineText()
 
-        with self.ser_lock:
-            self.ser_cmd_set_temp(val, str)
+        ov_str_val = ov_str_val[:3]
+        inj_str_val = inj_str_val[:3]
+
+        base_str[3*ov_ind + 1 : 3*(ov_ind) + 1] = ov_str_val
+        base_str[3*inj_ind+1:3*(inj_ind) + 1] = inj_str_val
+
+        b_str = base_str.encode()
+
+        ser = self.ser_conn
+        lock = self.ser_lock
+        with lock:
+            ser.flushInput()
+            ser.flushOutput()
+
+        time.sleep(ser_delay)
+
+        with lock:
+            _ = ser.write(b_str)
 
     def on_play_btn(self):
         rr = self.options['data_samp_rate']
@@ -909,8 +903,8 @@ class GCTemperature(Thread):
 
         self.last_update_time_raw = None
 
-        self.ov_location = 1
-        self.inj_location = 2
+        self.ov_location = self.frame.options['OVEN_INDEX']
+        self.inj_location = self.frame.options['INJ_INDEX']
 
 
     def stop(self):
@@ -936,8 +930,7 @@ class GCTemperature(Thread):
 
             t_last = t_curr
 
-            with self.frame.ser_lock:
-                bit_response = self.query_temp()
+            bit_response = self.query_temp()
 
             temperatures = self.parse_response(bit_response)
 
@@ -979,42 +972,46 @@ class GCTemperature(Thread):
                 args = inj_str
                 wx.CallAfter(func, args)
 
-
-
     def query_temp(self):
+        ser_delay = self.frame.options['SER_DELAY']
         # From c library. Defined in c_constants.py
         #READ_TMP_CMD_STR = '000 000 000 000'
-        b_str = READ_TMP_CMD_STR.encode()
-
+        _str = self.frame.options['READ_TMP_CMD_STR']
+        b_str = _str.encode()
 
         ser = self.ser_conn
 
-        ser.flushInput()
-        ser.flushOutput()
+        lock = self.ser_lock
+        with lock:
+            ser.flushInput()
+            ser.flushOutput()
 
-        time.sleep(.025)
+        time.sleep(ser_delay)
 
-        _ = ser.write(b_str)
-        while ser.in_waiting == 0:
-            time.sleep(SER_DELAY)
+        with lock:
+            _ = ser.write(b_str)
+            while ser.in_waiting == 0:
+                time.sleep(ser_delay)
 
         bit_response = []
-        while ser.in_waiting > 0:
-            line = ser.readline()
-            bit_response.append(line)
+        with lock:
+            while ser.in_waiting > 0:
+                line = ser.readline()
+                bit_response.append(line)
+
         return bit_response
 
 
     def parse_response(self, resp):
         o_l = self.ov_location
-        d_l = self.inj_location
+        i_l = self.inj_location
 
         str_resp = [item.decode() for item in resp]
         str_resp = [item.strip('\r\n') for item in str_resp]
 
         ov_tmp = str_resp[o_l]
 
-        inj_tmp = str_resp[d_l]
+        inj_tmp = str_resp[i_l]
 
         temps = [ov_tmp, inj_tmp]
 
@@ -1451,11 +1448,10 @@ class ControlPanel( wx.Panel ):
 
     def oven_set(self, event):
         str = self.tc_ov_set.GetLineText()
-        self.gcframe.on_ov_txt_ctrl(str)
+        self.gcframe.on_temp_txt_ctrl(str)
 
     def inj_set(self, event):
-        str = self.tc_inj_set.GetLineText()
-        self.gcframe.on_inj_txt_ctrl(str)
+        self.gcframe.on_temp_txt_ctrl(str)
 
     def build_inj_static_text_two(self):
         hbox_inj_fdbk = wx.BoxSizer(wx.HORIZONTAL)
