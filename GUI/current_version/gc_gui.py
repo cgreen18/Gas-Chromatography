@@ -70,7 +70,7 @@ class GCFrame(wx.Frame):
         self.establish_options_(user_options)
         self.parent = parent
 
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = self.options['DEFAULT_FRAME_SIZE'], style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = self.options['frame_size'], style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
         self.build_figure_()
@@ -153,8 +153,9 @@ class GCFrame(wx.Frame):
 
         _constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
         self.options.update(_constants)
-
         self.options.update(uo)
+        self.options['frame_size'] = self.options['DEFAULT_FRAME_SIZE']
+        self.options['sash_size'] = self.options['DEFAULT_SASH_SIZE']
 
 #BIG TODO
     def set_temp_ser_cmd(self, temp, which = 'oven'):
