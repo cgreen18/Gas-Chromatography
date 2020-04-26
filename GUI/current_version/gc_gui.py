@@ -253,7 +253,7 @@ class GCFrame(wx.Frame):
         ind = self.options['gc_file_indices']
         _cd = ind['cd']
         _pd = ind['pd']
-        _curr_data = [val for key, val numpy_dict[_cd].items()]
+        _curr_data = [val for key, val in numpy_dict[_cd].items()]
         _prev_data = [val for key,val in data_slice.items() for data_slice in numpy_dict[_pd] ]
         print(_prev_data)
         numpy_dict.update(_cd : np.array(_curr_data))
