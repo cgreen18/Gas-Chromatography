@@ -148,7 +148,7 @@ class GCFrame(wx.Frame):
                         'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
                         'single_ended':True, 'indices':{'v':0,'a':1,'dt':2,'t':3},
                         'units_str':{'x-axis':'Time [seconds]' , 'y-axis':'Detector Response [volts]'},
-                        'limits':{'x':(0,-1),'y':(0,4)}}
+                        'limits':{'x':(0,-1),'y':(0,4)} , 'gc_file_indices': {'cd':'Current Data', 'pd':'Previous Data'}}
         self.options.update(self.constants)
 
         self.options.update(uo)
@@ -215,10 +215,16 @@ class GCFrame(wx.Frame):
         _djson = self.load_json_file(name)
 
         data_dict_numpy = self.reverse_jsonify(_djson)
+
+
+
+
         print('in parse, dict')
         print(type(data_dict_numpy))
         print(data_dict_numpy.items())
         print(data_dict_numpy.items())
+
+
 
         _cdstr = 'Current Data'
         cd = data_dict_numpy[_cdstr]
@@ -243,8 +249,15 @@ class GCFrame(wx.Frame):
     dict(lists)->dict(numpys)
     '''
     def reverse_jsonify(self, json_dict):
-        numpy_dict = {}
-        numpy_dict.update((key, np.array(val)) for key,val in json_dict.items() )
+        numpy_dict = json_dict
+        ind = self.options['gc_file_indices']
+        _cd = ind['cd']
+        _pd = ind['pd']
+        _curr_data = [val for key, val numpy_dict[_cd].items()]
+        _prev_data = [val for key,val in data_slice.items() for data_slice in numpy_dict[_pd] ]
+        print(_prev_data)
+        numpy_dict.update(_cd : np.array(_curr_data))
+        numpy_dict.update(_pd : np.array(_prev_data))
         return numpy_dict
 
 
