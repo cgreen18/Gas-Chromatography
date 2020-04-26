@@ -180,7 +180,7 @@ class GCFrame(wx.Frame):
     '''
     def set_frame_from_session_(self, filename):
         print('in set frame')
-        [curr , prev] = self.parse_session(filename)
+        curr , prev = self.parse_session(filename)
         print(type(curr))
         print(curr)
         print(curr.shape)
@@ -212,21 +212,24 @@ class GCFrame(wx.Frame):
         # }
 
         _djson = self.load_json_file(name)
-        print('in parse, json')
-        print(_djson)
 
         data_dict_numpy = self.reverse_jsonify(_djson)
         print('in parse, dict')
         print(type(data_dict_numpy))
+        print(data_dict_numpy.items())
+        print(data_dict_numpy.items())
 
         _cdstr = 'Current Data'
         cd = data_dict_numpy[_cdstr]
 
+        print('cd')
+        print(cd)
+
+
         _pdstr = 'Previous Data'
         pd = data_dict_numpy[_pdstr]
 
-        return [cd , pd]
-
+        return (cd , pd)
     def load_json_file(self, n):
         with open(n, encoding ='utf-8') as json_file:
             _d = json.load(json_file)
