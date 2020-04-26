@@ -23,6 +23,7 @@ Version (mainly for final report later):
 3.0 - 24 April 2020 - Arduino serial interface. Temperature control and feedback thread. Normalize, integrate, and clean time menu functions.
 3.1 - 25 April 2020 - Open .gc file will set current and previous data to the loaded file.
 3.2 - 25 April 2020 - Opening .gc file works.
+3.3 - 25 April 2020 - Label peaks works.
 '''
 
 import numpy as np
@@ -51,20 +52,20 @@ import serial
 imdir = '.images'
 
 # c serial cmd definition
-READ_TMP_CMD_STR = '000 000 000 000'
-
-# __future__!! better set it later
-SET_TMP_CMD_STR = '000 000 000 000'
+READ_TMP_CMD_STR = '001 000 000 000'
+SET_TMP_CMD_STR = '000 XXX XXX 000'
+# For '___ XXX YYY ___' XXX is oven and YYY is injector
+OVEN_INDEX = 1
+INJ_INDEX = 2
 
 SER_DELAY = .01 #sec
-
 
 # Frames
 class GCFrame(wx.Frame):
     # self is MainApp(GCFrame)
     # parent is None
     def __init__(self, parent, user_options):
-        self.__version__ = '3.0+'
+        self.__version__ = '3.3'
         self.__authors__ = 'Conor Green and Matt McPartlan'
 
         self.establish_options_(user_options)
@@ -86,7 +87,8 @@ class GCFrame(wx.Frame):
         self.curr_data_frame_lock = threading.Lock()
         self.establish_GC_()
 
-        self.curr_data_frame = np.zeros((self.gc.dims, 0))
+        _dims = self.gc.get_dims()
+        self.curr_data_frame = np.zeros((_dims, 0))
         self.update_curr_data_()
 
         self.prev_data = []
@@ -141,7 +143,7 @@ class GCFrame(wx.Frame):
     def establish_GC_(self):
         se = self.options['single_ended']
         self.gc = GC(se)
-        self.gc_lock = self.gc.curr_data_lock
+        self.gc_lock = self.gc.get_lock()
 
     def establish_options_(self, uo):
         self.options = {'frame_size':(400,400), 'sash_size':250, 'data_samp_rate':5.0, 'baud_rate':115200,
@@ -247,7 +249,7 @@ class GCFrame(wx.Frame):
         return numpy_dict
 
     def update_curr_data_(self):
-        _gcl = self.gc.curr_data_lock
+        _gcl = self.gc.get_lock()
         with _gcl:
             _d = self.gc.get_curr_data()
 
@@ -264,7 +266,7 @@ class GCFrame(wx.Frame):
         self.re_int_curr_data()
 
     def re_int_curr_data(self):
-        _dims = self.gc.dims
+        _dims = self.gc.get_dims()
 
         _l = self.curr_data_frame_lock
         with _l:
@@ -402,8 +404,9 @@ class GCFrame(wx.Frame):
                 self.update_curr_data_()
                 self.prev_data.append(self.curr_data)
 
+        _dims = self.gc.get_dims()
         with self.curr_data_frame_lock:
-            self.curr_data = np.zeros((self.gc.dims,0))
+            self.curr_data = np.zeros((_dims,0))
 
     '''
     Formatting/building functions
@@ -449,7 +452,6 @@ class GCFrame(wx.Frame):
         _saveas_jpg_window = SaveasJPG(self, self.options)
 
     def on_data_integrate(self, err):
-        print(self.data_running)
         if not self.data_running:
             ans = self.gc.integrate_volt()
             print("The integral of voltage over the sampling period is: ")
@@ -458,14 +460,12 @@ class GCFrame(wx.Frame):
             self.update_curr_data_()
 
     def on_data_normalize(self, err):
-        print(self.data_running)
         _l = self.curr_data_frame_lock
         with _l:
             d = self.get_curr_data_copy()
         _inds = self.options['indices']
         _ti = _inds['t']
         t_first = d[_ti][0:10]
-        print(t_first)
         if not self.data_running:
             self.gc.normalize_volt_()
             self.update_curr_data_()
@@ -486,16 +486,11 @@ class GCFrame(wx.Frame):
 
     def on_label_peaks(self, err):
         areas = self.gc.integrate_peaks()
-        print('areas')
-        print(areas)
         # list of (x,y) pairs
         maximas = self.gc.get_peak_local_maximas()
-        print('maximas')
-        print(maximas)
 
         self.panel_detector.update_curr_data_()
         self.panel_detector.label_peaks_(areas, maximas)
-        print('out label peaks')
 
     def on_mov_mean(self, err):
         _w = self.options['window']
@@ -1150,7 +1145,7 @@ class GCData(Thread):
 
         sampling_period = self.sp
         epsilon = self.ep
-        dims = self.gc.dims
+        dims = self.gc.get_dims()
 
         while not self.stopped():
             while self.paused():
@@ -1171,10 +1166,10 @@ class GCData(Thread):
 
             new = np.zeros((dims, 1))
 
-            indices = self.gc.indices
-            _vi = indices['v']
-            _dti = indices['dt']
-            _ti = indices['t']
+            ind = self.options['indices']
+            _vi = ind['v']
+            _dti = ind['dt']
+            _ti = ind['t']
 
             new[_vi] = v
             new[_dti] = dt
@@ -1311,10 +1306,6 @@ class DetectorPanel(wx.Panel):
 
     def label_peaks_(self, areas, maximas):
         num_pts = len(areas)
-        print('in label_peaks_')
-        print(num_pts)
-        print(areas)
-        print(maximas)
 
         cd = self.get_curr_data()
         ind = self.gcframe.options['indices']
@@ -1325,11 +1316,11 @@ class DetectorPanel(wx.Panel):
         t = cd[_ti]
 
         for i in range(0,num_pts):
-            _text = str(areas[i])
+            _text = 'Relative area:\n' + str(areas[i])
             max_index , max_val  = maximas[i]
             _x = t[max_index]
             _y = v[max_index]
-            self.axes.annotate(_text, xy= (_x,_y), xytext=(10,-10), xycoords='data', textcoords = 'offset pixels')
+            self.axes.annotate(_text, xy= (_x,_y), xytext=(20,-20), xycoords='data', textcoords = 'offset pixels')
 
         _xstr = self.units_str['x-axis']
         _ystr = self.units_str['y-axis']
@@ -1356,10 +1347,6 @@ class DetectorPanel(wx.Panel):
         if self.curr_data.size != 0:
             self.axes.cla()
             self.axes.plot(self.curr_data[_ti], self.curr_data[_vi])
-            # _x = self.limits['x']
-            # self.axes.set_xlim(_x)
-            # _y = self.limits['y']
-            # self.axes.set_ylim(_y)
 
             _xstr = self.units_str['x-axis']
             _ystr = self.units_str['y-axis']

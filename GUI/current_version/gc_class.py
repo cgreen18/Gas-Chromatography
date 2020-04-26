@@ -18,6 +18,7 @@ Version:
 2.3 - 24 April 2020 - Modified lock structure. Added re_init_data and curr_to_prev to move current data to prev_data list.
 
 3.0 - 24 April 2020 - Clean version that works great with gui script. Version 3 is very pydocs friendly and has accompanying html, gc_class.html
+3.1 - 25 April 2020 - Functions to split into peaks, calculate the area of each region, and get the maximum.
 '''
 
 
@@ -51,7 +52,7 @@ class GC:
 
     #@param: single_ended = True if single ended ADC and vice-versa
     def __init__(self, single_ended):
-        self.__version__ = '3.0+'
+        self.__version__ = '3.1'
         self.__authors__ = 'Conor Green and Matt McPartlan'
 
         #ADS1115
@@ -70,15 +71,20 @@ class GC:
         #Numpy/data
         self.dims = 4 #voltage, dt, t
         self.indices = {'v':0,'a':1,'dt':2,'t':3}
+
         self.curr_data = np.zeros((self.dims, 0))
         self.curr_data_lock = Lock()
+
+        self.prev_data = []
+        self.run_num = 0
+
         self.time_out = 1 #sec
+
         self.epsilon = 0.01
+
         self.pk_volt_min_after_norm = 0.005
         self.pk_time_min = 10
         self.peaks = []
-        self.prev_data = []
-        self.run_num = 0
 
     #@description: Subtracts initial time from all time points => t[0] = 0
     def clean_time_(self):
@@ -120,8 +126,6 @@ class GC:
         _e = self.curr_data_lock.acquire(to)
         volt = self.get_volt()
         _e = self.curr_data_lock.release()
-
-        print('acquired volt')
 
         _min = volt.min()
         volt = volt - _min
@@ -175,17 +179,14 @@ class GC:
     #@param: directly given voltage vector
     #@returns: int or float that is the area of voltage, including negatives
     def integrate_volt_direct(self, voltage):
-        print('direct called')
         if len(voltage) != 0:
             _l = 0
             _h = -1
             _a = self.integrate(voltage, _l, _h)
-            print(_a)
             return _a
         else:
             print("No data")
 
-    #@state: UNFINISHED
     #@description: Breaks the voltage vector into potential peaks. Simple and untested algorithm.
     #@returns: List of tuples of start and end index (both inclusive) of peaks
     def break_into_peaks(self):
@@ -240,27 +241,18 @@ class GC:
         for i in range(0, num_pts):
             if not on_peak:
                 if volt[i] >= volt_thresh:
-                    print('found a peak!')
-                    print(i)
                     on_peak = True
                     low = i
             else:
                 if volt[i] <= volt_thresh:
                     on_peak = False
                     if i - low >= time_thresh:
-                        print('found a trough')
-                        print(low)
-                        print(i)
                         peaks.append((low, i))
 
         return [peaks , volt ]
 
     def integrate_peaks(self):
         [peaks , volt] = self.break_into_peaks_ret_volt_copy()
-        print('in integrate, peaks is: ')
-        print(peaks)
-        print('for volt of length: ')
-        print(len(volt))
 
         areas = []
 
@@ -367,6 +359,9 @@ class GC:
             return _t
         else:
             print('get_time: no access')
+
+    def get_dims(self):
+        return self.dims
 
     '''
     Setters: set_curr_data_, set_time_w_ref_, set_volt_, set_time_, set_time_w_ref_, set_area_
