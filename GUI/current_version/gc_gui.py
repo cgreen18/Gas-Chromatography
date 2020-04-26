@@ -1328,15 +1328,12 @@ class DetectorPanel(wx.Panel):
             max_index , max_val  = maximas[i]
             _x = t[max_index]
             _y = v[max_index]
-            self.axes.annotate(_text, xy= (_x,_y), xytext=(10,10), xycoords='data', textcoords = 'offset pixels')
+            self.axes.annotate(_text, xy= (_x,_y), xytext=(10,-10), xycoords='data', textcoords = 'offset pixels')
 
         _xstr = self.units_str['x-axis']
         _ystr = self.units_str['y-axis']
         self.axes.set_xlabel(_xstr)
         self.axes.set_ylabel(_ystr)
-
-
-        self.axes.annotate('waddup b', xy = (_x, _y))
 
         func = self.canvas.draw
         wx.CallAfter(func)
