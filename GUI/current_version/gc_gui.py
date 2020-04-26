@@ -258,6 +258,7 @@ class GCFrame(wx.Frame):
         print(_prev_data)
         numpy_dict.update(_cd : np.array(_curr_data))
         numpy_dict.update(_pd : np.array(_prev_data))
+
         return numpy_dict
 
 
