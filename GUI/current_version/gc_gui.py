@@ -245,6 +245,13 @@ class GCFrame(wx.Frame):
         self.prev_data.append(_d)
         self.re_int_curr_data()
 
+    def prev_to_curr_(self):
+        d = self.prev_data.pop()
+
+        _l = self.curr_data_frame_lock
+        with _l:
+            self.set_curr_data_(d)
+
     def re_int_curr_data(self):
         _dims = self.gc.get_dims()
 
@@ -454,6 +461,9 @@ class GCFrame(wx.Frame):
     def on_jpg_save(self, err):
         _saveas_jpg_window = SaveasJPG(self, self.options)
 
+    def on_previous_set(self, err):
+        self.prev_to_curr_(self)
+
     def on_data_integrate(self, err):
         if not self.data_running:
             ans = self.gc.integrate_volt()
@@ -463,12 +473,6 @@ class GCFrame(wx.Frame):
             self.update_curr_data_()
 
     def on_data_normalize(self, err):
-        _l = self.curr_data_frame_lock
-        with _l:
-            d = self.get_curr_data_copy()
-        _inds = self.options['indices']
-        _ti = _inds['t']
-        t_first = d[_ti][0:10]
         if not self.data_running:
             self.gc.normalize_volt_()
             self.update_curr_data_()
@@ -485,19 +489,26 @@ class GCFrame(wx.Frame):
             self.panel_detector.draw()
 
     def on_fill(self, err):
-        self.panel_detector.fill_under_()
+        if not self.data_running:
+            self.panel_detector.fill_under_()
 
     def on_label_peaks(self, err):
-        areas = self.gc.integrate_peaks()
-        # list of (x,y) pairs
-        maximas = self.gc.get_peak_local_maximas()
+        if not self.data_running:
+            areas = self.gc.integrate_peaks()
+            # list of (x,y) pairs
+            maximas = self.gc.get_peak_local_maximas()
 
-        self.panel_detector.update_curr_data_()
-        self.panel_detector.label_peaks_(areas, maximas)
+            self.panel_detector.update_curr_data_()
+            self.panel_detector.label_peaks_(areas, maximas)
 
     def on_mov_mean(self, err):
-        _w = self.options['window']
-        self.gc.mov_mean_(_w)
+        if not self.data_running:
+            _w = self.options['window']
+            self.gc.mov_mean_(_w)
+            self.update_curr_data_()
+
+            self.panel_detector.update_curr_data_()
+            self.panel_detector.draw()
 
     '''
     Defaults overridden
@@ -1569,7 +1580,9 @@ class GCMenuBar(wx.MenuBar):
     def create_data_menu(self):
         data_menu = wx.Menu()
 
-        data_menu.Append(wx.ID_ANY, '&Previous Set')
+        prev_set = data_menu.Append(wx.ID_ANY, '&Previous Set')
+        self.parent.Bind(wx.EVT_MENU, self.parent.on_previous_set, prev_set)
+
         data_menu_ops = wx.Menu()
         integ = data_menu_ops.Append(wx.ID_ANY, '&Integrate')
         self.parent.Bind(wx.EVT_MENU, self.parent.on_data_integrate, integ )
@@ -1579,6 +1592,9 @@ class GCMenuBar(wx.MenuBar):
 
         clean_time = data_menu_ops.Append(wx.ID_ANY, '&Clean Time Axis')
         self.parent.Bind(wx.EVT_MENU, self.parent.on_clean_time, clean_time)
+
+        lpf = data_menu_ops.Append(wx.ID_ANY, '&Apply Low Pass Filter')
+        self.parent.Bind(wx.EVT_MENU, self.parent.on_mov_mean, lpf)
 
         data_menu.Append(wx.ID_ANY, '&Operations...', data_menu_ops)
 
