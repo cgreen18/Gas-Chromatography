@@ -28,11 +28,11 @@ printf "Enabling I2C and SPI in raspi-config\n"
 raspi-config nonint do_i2c 0
 raspi-config nonint do_spi 0
 
-printf "\nConfiguring 'gas_chromatograph.py' to autorun at startup via .bashrc\n"
+printf "\n""Configuring 'gas_chromatograph.py' to autorun at startup via .bashrc\n"
 # Default gc_venv
-echo -e '\n#Probably bad style to have 5 lines in .bashrc but this RPi is dedicated to GC, so oh well.' >> /home/pi/.bashrc
-echo -e '\nsource "/home/pi/gtest/bin/activate"' >> /home/pi/.bashrc
-echo -e '\ncd /home/pi/Gas-Chromatography' >> /home/pi/.bashrc
-echo -e '\ncat README.md' >> /home/pi/.bashrc
-echo -e '\ncd /home/pi/Gas-Chromatography/GUI/current_version' >> /home/pi/.bashrc
-echo -e '\npython3 gas_chromatography.py' >> /home/pi/.bashrc
+echo '\n#Probably bad style to have 5 lines in .bashrc but this RPi is dedicated to GC, so oh well.' >> /home/pi/.bashrc
+echo '\nsource "/home/pi/gtest/bin/activate"' >> /home/pi/.bashrc
+echo '\ncd /home/pi/Gas-Chromatography' >> /home/pi/.bashrc
+echo '\ncat README.md' >> /home/pi/.bashrc
+echo '\ncd /home/pi/Gas-Chromatography/GUI/current_version' >> /home/pi/.bashrc
+echo '\npython3 gas_chromatography.py' >> /home/pi/.bashrc
