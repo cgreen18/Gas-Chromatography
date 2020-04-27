@@ -337,9 +337,8 @@ class GCFrame(wx.Frame):
             ser.flushInput()
             ser.flushOutput()
 
-        time.sleep(ser_delay)
-
-        with lock:
+            time.sleep(ser_delay)
+            
             _ = ser.write(b_str)
 
     def on_play_btn(self):
@@ -1011,6 +1010,8 @@ class GCTemperature(Thread):
         _str = self.frame.options['READ_TMP_CMD_STR']
         b_str = _str.encode()
 
+        bit_response = []
+
         ser = self.ser_conn
 
         lock = self.ser_lock
@@ -1018,15 +1019,12 @@ class GCTemperature(Thread):
             ser.flushInput()
             ser.flushOutput()
 
-        time.sleep(ser_delay)
+            time.sleep(ser_delay)
 
-        with lock:
             _ = ser.write(b_str)
             while ser.in_waiting == 0:
                 time.sleep(ser_delay)
 
-        bit_response = []
-        with lock:
             while ser.in_waiting > 0:
                 line = ser.readline()
                 bit_response.append(line)
