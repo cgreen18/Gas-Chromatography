@@ -141,7 +141,7 @@ class GCFrame(wx.Frame):
                         'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
                         'single_ended':True, 'indices':{'v':0,'a':1,'t':2,'dt':3}, 'area_accuracy': 8,
                         'units_str':{'x-axis':'Time [seconds]' , 'y-axis':'Detector Response [volts]'},
-                        'gc_file_indices': {'cd':'Current Data', 'pd':'Previous Data'},
+                        'gc_file_indices': {'cd':'Current Data', 'pd':'Previous Data', 'rn':'Run Number'},
                         'window':100}
 
         _constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
@@ -165,7 +165,7 @@ class GCFrame(wx.Frame):
         Setters
     '''
     def set_frame_from_session_(self, filename):
-        cd , pd = self.parse_session(filename)
+        cd , pd, rn = self.parse_session(filename)
 
         _l = self.curr_data_frame_lock
         with _l:
@@ -176,6 +176,7 @@ class GCFrame(wx.Frame):
             self.gc.set_curr_data_w_ref_(cd)
 
         self.prev_data = pd
+        self.run_number = rn
 
     def parse_session(self, name):
         # # Format of JSON .gc filetype
@@ -194,12 +195,15 @@ class GCFrame(wx.Frame):
 
         _cd = ind['cd']
         _pd = ind['pd']
+        _rn = ind['rn']
 
         cd = data_dict_numpy[_cd]
 
         pd = data_dict_numpy[_pd]
 
-        return (cd , pd)
+        rn = data_dict_numpy[_rn]
+
+        return (cd , pd, rn)
 
     def load_json_file(self, n):
         with open(n, encoding ='utf-8') as json_file:
@@ -251,6 +255,8 @@ class GCFrame(wx.Frame):
         _l = self.curr_data_frame_lock
         with _l:
             self.set_curr_data_(d)
+
+        self.run_number -= 1
 
     def re_int_curr_data(self):
         _dims = self.gc.get_dims()
@@ -803,11 +809,14 @@ class SaveasGC(SaveasWindow):
         if name[-3:] != '.gc':
             name = name + '.gc'
 
+        run_num = self.run_number
+
         # Format of JSON .gc filetype
         curr_session = {
         'Date' : date_str ,
         'Time' : time_str ,
         'Current Data' : curr_data ,
+        'Run Number' : run_num,
          'Previous Data': prev_data
         }
 

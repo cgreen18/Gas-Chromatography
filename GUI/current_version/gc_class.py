@@ -93,26 +93,13 @@ class GC:
             _e = self.curr_data_lock.acquire(to)
             t = self.get_time()
             _e = self.curr_data_lock.release()
-            print(t[0:10])
 
-
-            # Hokey fix in case
-            if t[0] == 0:
-                t[0] = t[1]-.05
-                t = t - t[0]
-            else:
-                t = t - t[0]
-
-            print(t[0])
+            t = t - t[0]
 
             _e = self.curr_data_lock.acquire(to)
             self.set_time_(t)
             _e = self.curr_data_lock.release()
 
-            _e = self.curr_data_lock.acquire(to)
-            t = self.get_time()
-            _e = self.curr_data_lock.release()
-            print(t[0])
 
     #@description: Calculates the cumulative sum of the voltage at each point and stores the result in area.
     def calc_cumsum_into_area_(self):
