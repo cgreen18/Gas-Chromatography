@@ -313,6 +313,7 @@ class GCFrame(wx.Frame):
         base_str = self.options['SET_TMP_CMD_STR']
         ov_ind = self.options['OVEN_INDEX']
         inj_ind = self.options['INJ_INDEX']
+        ser_delay = self.options['SER_DELAY']
 
         ov_str_val = ov_str_val[:3]
         while len(ov_str_val) < 3:
