@@ -314,8 +314,8 @@ class GCFrame(wx.Frame):
         ov_ind = self.options['OVEN_INDEX']
         inj_ind = self.optinos['INJ_INDEX']
 
-        ov_str_val = self.panel_config.tc_det_set.GetLineText()
-        inj_str_val = self.panel_config.tc_inj_set.GetLineText()
+        ov_str_val = self.panel_config.tc_det_set.GetLineText(0)
+        inj_str_val = self.panel_config.tc_inj_set.GetLineText(0)
 
         ov_str_val = ov_str_val[:3]
         inj_str_val = inj_str_val[:3]
