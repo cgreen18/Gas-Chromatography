@@ -93,7 +93,7 @@ class GC:
             _e = self.curr_data_lock.acquire(to)
             t = self.get_time()
             _e = self.curr_data_lock.release()
-            print(t[0])
+            print(t[0:10])
 
 
             # Hokey fix in case
