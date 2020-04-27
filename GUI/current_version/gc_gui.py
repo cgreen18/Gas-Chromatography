@@ -314,9 +314,6 @@ class GCFrame(wx.Frame):
         ov_ind = self.options['OVEN_INDEX']
         inj_ind = self.optinos['INJ_INDEX']
 
-        ov_str_val = self.panel_config.tc_det_set.GetLineText(0)
-        inj_str_val = self.panel_config.tc_inj_set.GetLineText(0)
-
         ov_str_val = ov_str_val[:3]
         inj_str_val = inj_str_val[:3]
 
@@ -1481,11 +1478,14 @@ class ControlPanel( wx.Panel ):
 
 
     def oven_set(self, event):
-        str = self.tc_ov_set.GetLineText()
-        self.gcframe.on_temp_txt_ctrl(str)
+        ov_str = self.tc_ov_set.GetLineText(0)
+        inj_str = self.tc_inj_set.GetLineText(0)
+        self.gcframe.on_temp_txt_ctrl(ov_str, inj_str)
 
     def inj_set(self, event):
-        self.gcframe.on_temp_txt_ctrl(str)
+        ov_str = self.tc_ov_set.GetLineText(0)
+        inj_str = self.tc_inj_set.GetLineText(0)
+        self.gcframe.on_temp_txt_ctrl(ov_str, inj_str)
 
     def build_inj_static_text_two(self):
         hbox_inj_fdbk = wx.BoxSizer(wx.HORIZONTAL)
