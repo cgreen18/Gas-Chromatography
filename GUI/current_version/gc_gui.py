@@ -1047,7 +1047,7 @@ class GCTemperature(Thread):
         _ind = self.ov_location
         ov_tmp = str_resp[4*_ind: 4*(_ind + 1) - 1]
         
-        _ind = self.ov_location
+        _ind = self.inj_location
         inj_tmp = str_resp[4*_ind: 4*(_ind + 1) - 1]
 
         temps = [ov_tmp, inj_tmp]
@@ -1504,7 +1504,7 @@ class ControlPanel( wx.Panel ):
 
     def build_inj_static_text_two(self):
         hbox_inj_fdbk = wx.BoxSizer(wx.HORIZONTAL)
-        str_inj_fdbk = wx.StaticText(self, label = 'Injector Temp. Reading: ')
+        str_inj_fdbk = wx.StaticText(self, label = 'Injector Temp. Reading (deg C): ')
         f = self.fonts['font']
         str_inj_fdbk.SetFont(f)
         hbox_inj_fdbk.Add(str_inj_fdbk)
@@ -1531,7 +1531,7 @@ class ControlPanel( wx.Panel ):
 
     def build_oven_static_text_two(self):
         hbox_ov_fdbk = wx.BoxSizer(wx.HORIZONTAL)
-        str_ov_fdbk = wx.StaticText(self, label = 'Oven Temp. Reading: ')
+        str_ov_fdbk = wx.StaticText(self, label = 'Oven Temp. Reading (deg C): ')
         f = self.fonts['font']
         str_ov_fdbk.SetFont(f)
         hbox_ov_fdbk.Add(str_ov_fdbk)

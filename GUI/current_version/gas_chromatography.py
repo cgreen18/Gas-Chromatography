@@ -30,6 +30,11 @@ class MainApp(gc_gui.GCFrame):
     def __init__(self, parent):
         self.__version__ = '3.0'
         self.__authors__ = 'Conor Green and Matt McPartlan'
+        
+        print('\n\n\n\n--------------------------------------------------------------------')
+        print('Running gas_chromatography.py')
+        print('Press ctrl+c to terminate.')
+        print('Messages and errors printed below.')
 
         with open('config.yaml') as f:
             options = yaml.load(f, Loader=yaml.FullLoader)
