@@ -319,11 +319,11 @@ class GCFrame(wx.Frame):
 
         ov_str_val = ov_str_val[:3]
         while len(ov_str_val) < 3:
-            ov_str_val = ' ' + ov_str_val
+            ov_str_val = '0' + ov_str_val
 
         inj_str_val = inj_str_val[:3]
         while len(inj_str_val) < 3:
-            inj_str_val = ' ' + inj_str_val
+            inj_str_val = '0' + inj_str_val
 
         print("Setting oven temperature to: {:s}".format(ov_str_val))
         print("Setting injector temperature to: {:s}".format( inj_str_val))
@@ -335,6 +335,7 @@ class GCFrame(wx.Frame):
 
         ser = self.ser_conn
         lock = self.ser_lock
+        
         with lock:
             ser.flushInput()
             ser.flushOutput()
@@ -345,7 +346,7 @@ class GCFrame(wx.Frame):
 
     def on_play_btn(self):
         if self.data_paused:
-            gc_thread.un_pause()
+            self.data_rover_thread.un_pause()
             self.data_paused = False
             return
         elif self.data_running:
@@ -1041,9 +1042,13 @@ class GCTemperature(Thread):
         str_resp = [item.decode() for item in resp]
         str_resp = [item.strip('\r\n') for item in str_resp]
 
-        ov_tmp = str_resp[o_l]
+        str_resp = str_resp[0]
 
-        inj_tmp = str_resp[i_l]
+        _ind = self.ov_location
+        ov_tmp = str_resp[4*_ind: 4*(_ind + 1) - 1]
+        
+        _ind = self.ov_location
+        inj_tmp = str_resp[4*_ind: 4*(_ind + 1) - 1]
 
         temps = [ov_tmp, inj_tmp]
 
