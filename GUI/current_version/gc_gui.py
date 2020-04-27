@@ -138,7 +138,7 @@ class GCFrame(wx.Frame):
 
     def establish_options_(self, uo):
         self.options = {'frame_size':(1200,600), 'sash_size':400, 'data_samp_rate':5.0,
-                        'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':5.0, 'temp_refresh_rate':1.0,
+                        'time_out':3, 'epsilon_time':0.001, 'plot_refresh_rate':2.0, 'temp_refresh_rate':1.0,
                         'single_ended':True, 'indices':{'v':0,'a':1,'t':2,'dt':3}, 'area_accuracy': 8,
                         'units_str':{'x-axis':'Time [seconds]' , 'y-axis':'Detector Response [volts]'},
                         'gc_file_indices': {'cd':'Current Data', 'pd':'Previous Data'},
