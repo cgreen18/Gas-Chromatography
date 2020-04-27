@@ -20,7 +20,3 @@ __pycache__
 #ignore GC file types
 
 *.gc
-
-# ignore main for now
-
-main.py
