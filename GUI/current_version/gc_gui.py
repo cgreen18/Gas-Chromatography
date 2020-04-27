@@ -1554,9 +1554,9 @@ class GCMenuBar(wx.MenuBar):
     def create_grapher_menu(self):
         grapher_menu = wx.Menu()
 
-        grapher_menu.Append(wx.ID_ANY, '&Edit Axes')
-
-        grapher_menu.AppendSeparator()
+        # grapher_menu.Append(wx.ID_ANY, '&Edit Axes')
+        #
+        # grapher_menu.AppendSeparator()
 
         grapher_menu.Append(wx.ID_ANY, '&Save Image')
 
