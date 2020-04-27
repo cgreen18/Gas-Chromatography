@@ -1485,13 +1485,13 @@ class ControlPanel( wx.Panel ):
     def oven_set(self, event):
         ov_str = self.tc_ov_set.GetLineText(0)
         inj_str = self.tc_inj_set.GetLineText(0)
-        if len(ov_str) != and len(inj_str != 0):
+        if len(ov_str) != 0 and len(inj_str != 0):
             self.gcframe.on_temp_txt_ctrl(ov_str, inj_str)
 
     def inj_set(self, event):
         ov_str = self.tc_ov_set.GetLineText(0)
         inj_str = self.tc_inj_set.GetLineText(0)
-        if len(ov_str) != and len(inj_str != 0):
+        if len(ov_str) != 0 and len(inj_str != 0):
             self.gcframe.on_temp_txt_ctrl(ov_str, inj_str)
 
     def build_inj_static_text_two(self):
