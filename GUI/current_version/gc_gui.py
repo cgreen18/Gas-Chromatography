@@ -331,6 +331,8 @@ class GCFrame(wx.Frame):
             gc_thread.un_pause()
             self.data_paused = False
             return
+        elif self.data_running:
+            return
 
         rr = self.options['data_samp_rate']
         sp = 1 / rr
@@ -369,7 +371,8 @@ class GCFrame(wx.Frame):
             self.data_paused = True
 
     def on_stop_btn(self):
-        self.stop_data_coll_()
+        if self.data_running:
+            self.stop_data_coll_()
 
     def stop_data_coll_(self):
         self.plotter_thread.stop()
