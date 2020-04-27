@@ -315,13 +315,18 @@ class GCFrame(wx.Frame):
         inj_ind = self.options['INJ_INDEX']
 
         ov_str_val = ov_str_val[:3]
+        while len(ov_str_val) < 3:
+            ov_str_val = ' ' + ov_str_val
+
         inj_str_val = inj_str_val[:3]
+        while len(inj_str_val) < 3:
+            inj_str_val = ' ' + inj_str_val
 
         print("Setting oven temperature to: {:s}".format(ov_str_val))
         print("Setting injector temperature to: {:s}".format( inj_str_val))
 
-        base_str[3*ov_ind + 1 : 3*(ov_ind) + 1] = ov_str_val
-        base_str[3*inj_ind+1:3*(inj_ind) + 1] = inj_str_val
+        base_str = base_str[:4*ov_ind] + ov_str_val + base_str[4*(ov_ind + 1) -1:]
+        base_str = base_str[:4*inj_ind] + inj_str_val + base_str[4*(inj_ind + 1) -1:]
 
         b_str = base_str.encode()
 
@@ -1480,12 +1485,14 @@ class ControlPanel( wx.Panel ):
     def oven_set(self, event):
         ov_str = self.tc_ov_set.GetLineText(0)
         inj_str = self.tc_inj_set.GetLineText(0)
-        self.gcframe.on_temp_txt_ctrl(ov_str, inj_str)
+        if len(ov_str) != and len(inj_str != 0):
+            self.gcframe.on_temp_txt_ctrl(ov_str, inj_str)
 
     def inj_set(self, event):
         ov_str = self.tc_ov_set.GetLineText(0)
         inj_str = self.tc_inj_set.GetLineText(0)
-        self.gcframe.on_temp_txt_ctrl(ov_str, inj_str)
+        if len(ov_str) != and len(inj_str != 0):
+            self.gcframe.on_temp_txt_ctrl(ov_str, inj_str)
 
     def build_inj_static_text_two(self):
         hbox_inj_fdbk = wx.BoxSizer(wx.HORIZONTAL)
