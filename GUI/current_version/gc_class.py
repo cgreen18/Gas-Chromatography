@@ -19,6 +19,8 @@ Version:
 
 3.0 - 24 April 2020 - Clean version that works great with gui script. Version 3 is very pydocs friendly and has accompanying html, gc_class.html
 3.1 - 25 April 2020 - Functions to split into peaks, calculate the area of each region, and get the maximum.
+3.2 - 27 April 2020 - Moving mean works. Fixed indices.
+4.0 - 27 April 2020 - Finalized for capstone project submission. Pydocs final. Moved to main.py (=> .exe/bin)
 '''
 
 
@@ -39,9 +41,10 @@ from threading import Lock
 
 class GC:
     '''
-    Modification functions: clean_time_, calc_cumsum_into_area_, normalize_volt_, mov_mean_, curr_to_prev_
-    Math functions: integrate_volt, integrate_volt_direct, break_into_peaks
-    helper functions: define_peaks, reint_curr_data, inc_run_num_, integrate
+    Modification functions: clean_time_, normalize_volt_, mov_mean_, curr_to_prev_
+    Math functions: integrate_volt, integrate_volt_direct, break_into_peaks, break_into_peaks_ret_volt_copy,
+                        integrate_peaks, get_peak_local_maximas, calc_cumsum_into_area_
+    helper functions: define_peaks, reint_curr_data_, inc_run_num_, integrate
     ADS configuration functions: reint_ADS, set_gain, set_mode
     Lock functions: get_lock, is_locked
     Getters: get_curr_data, get_volt, get_time
@@ -52,7 +55,7 @@ class GC:
 
     #@param: single_ended = True if single ended ADC and vice-versa
     def __init__(self, single_ended):
-        self.__version__ = '3.1'
+        self.__version__ = '4.0'
         self.__authors__ = 'Conor Green and Matt McPartlan'
 
         #ADS1115
@@ -99,7 +102,6 @@ class GC:
             _e = self.curr_data_lock.acquire(to)
             self.set_time_(t)
             _e = self.curr_data_lock.release()
-
 
     #@description: Calculates the cumulative sum of the voltage at each point and stores the result in area.
     def calc_cumsum_into_area_(self):
@@ -154,7 +156,7 @@ class GC:
             _d = self.get_curr_data()
 
         self.prev_data.append(_d)
-        self.reint_curr_data()
+        self.reint_curr_data_()
 
     #@returns: int or float that is the area of voltage, including negatives
     def integrate_volt(self):
@@ -216,6 +218,9 @@ class GC:
 
         return peaks
 
+    #@description: Breaks the voltage vector into potential peaks.
+    #@returns: List of tuples of start and end index (both inclusive) of peaks
+    #@returns: Copy of voltage vector to save a little time in parent method.
     def break_into_peaks_ret_volt_copy(self):
         ep = self.epsilon
         if abs(self.integrate_volt() - 1.0 ) > ep:
@@ -247,6 +252,8 @@ class GC:
 
         return [peaks , volt ]
 
+    #@description: Calculates the area of peaks (calls within) of voltage.
+    #@returns: List of areas corresponding to peaks in order
     def integrate_peaks(self):
         [peaks , volt] = self.break_into_peaks_ret_volt_copy()
 
@@ -258,6 +265,8 @@ class GC:
 
         return areas
 
+    #@description: Calculates the maximum values and indices of those maximas of voltage.
+    #@returns: List of (max_index, max_val) pairs
     def get_peak_local_maximas(self):
         [peaks,volt] = self.break_into_peaks_ret_volt_copy()
 
@@ -272,7 +281,7 @@ class GC:
         return maximas
 
     '''
-    helper functions: reint_curr_data, inc_run_num_, integrate
+    helper functions: reint_curr_data_, inc_run_num_, integrate
     '''
     def integrate(self, arr, low, high):
         if low < len(arr) -1:
@@ -290,7 +299,7 @@ class GC:
 
         return area
 
-    def reint_curr_data(self):
+    def reint_curr_data_(self):
         _dims = self.dims
 
         _l = self.curr_data_lock

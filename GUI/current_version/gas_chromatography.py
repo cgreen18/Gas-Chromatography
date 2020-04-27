@@ -12,6 +12,7 @@ Version:
 2.0 - 21 April 2020 - Final version. Moved all code to gc_gui.py...
                         and made this a simple App running script.
 3.0 - 24 April 2020 - Same as 2.0. Updated version to match gc_class and gc_gui
+4.0 - 27 April 2020 - Manually configure serial string constants. Serial integer constants are set normally through yaml file.
 '''
 
 import wx

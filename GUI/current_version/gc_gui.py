@@ -24,6 +24,8 @@ Version (mainly for final report later):
 3.1 - 25 April 2020 - Open .gc file will set current and previous data to the loaded file.
 3.2 - 25 April 2020 - Opening .gc file works.
 3.3 - 25 April 2020 - Label peaks works.
+3.4 - 27 April 2020 - Low pass filter works. Run numbers added to .gc json file type.
+4.0 - 27 April 2020 - Finalized to submit for capstone course. Will move to main.py (=>.exe/bin)
 '''
 
 import numpy as np
@@ -338,7 +340,7 @@ class GCFrame(wx.Frame):
             ser.flushOutput()
 
             time.sleep(ser_delay)
-            
+
             _ = ser.write(b_str)
 
     def on_play_btn(self):
