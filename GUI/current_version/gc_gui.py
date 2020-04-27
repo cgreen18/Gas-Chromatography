@@ -1364,6 +1364,8 @@ class DetectorPanel(wx.Panel):
 
             func = self.canvas.draw
             wx.CallAfter(func)
+        else:
+            print("Error: Empty curr_data")
 
     def ply_btn_evt(self, event):
         self.gcframe.on_play_btn()
