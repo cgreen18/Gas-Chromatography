@@ -142,7 +142,7 @@ class GCFrame(wx.Frame):
                         'single_ended':True, 'indices':{'v':0,'a':1,'t':2,'dt':3}, 'area_accuracy': 8,
                         'units_str':{'x-axis':'Time [seconds]' , 'y-axis':'Detector Response [volts]'},
                         'gc_file_indices': {'cd':'Current Data', 'pd':'Previous Data', 'rn':'Run Number'},
-                        'window':10}
+                        'window':3}
 
         _constants = {'BODY_FONT_SIZE': 11, 'HEADER_FONT_SIZE':18,'EXTRA_SPACE':10, 'BORDER':10}
         self.options.update(_constants)
