@@ -70,7 +70,7 @@ class GC:
 
         #Numpy/data
         self.dims = 4 #voltage, dt, t
-        self.indices = {'v':0,'a':1,'dt':2,'t':3}
+        self.indices = {'v':0,'a':1,'t':2,'dt':3}
 
         self.curr_data = np.zeros((self.dims, 0))
         self.curr_data_lock = Lock()
