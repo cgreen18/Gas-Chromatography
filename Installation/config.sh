@@ -1,5 +1,4 @@
 # !/bin/bash
-# config.sh
 
 printf "%-120s\n" "-------------------------------------------------------------------------------------------------------------------"
 printf "%-120s\n" "| Configuration script to install the required dependencies for Gas-Chromatography on a new Raspberry Pi."
