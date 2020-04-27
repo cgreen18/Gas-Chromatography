@@ -312,7 +312,7 @@ class GCFrame(wx.Frame):
     def set_temp_ser_cmd(self, ov_str_val, inj_str_val):
         base_str = self.options['SET_TMP_CMD_STR']
         ov_ind = self.options['OVEN_INDEX']
-        inj_ind = self.optinos['INJ_INDEX']
+        inj_ind = self.options['INJ_INDEX']
 
         ov_str_val = ov_str_val[:3]
         inj_str_val = inj_str_val[:3]
