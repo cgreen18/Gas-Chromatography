@@ -6,6 +6,7 @@
 
 #no pyc
 *.pyc
+__pycache__
 
 #ignore the html for now
 
@@ -13,9 +14,13 @@
 
 #ignore all test .png and .jpg files
 
-*.jpg
-*.png
+#*.jpg
+#*.png
 
 #ignore GC file types
 
 *.gc
+
+# ignore main for now
+
+main.py
