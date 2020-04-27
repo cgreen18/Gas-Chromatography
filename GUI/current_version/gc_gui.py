@@ -1446,7 +1446,7 @@ class ControlPanel( wx.Panel ):
 
         self.tc_ov_set = wx.TextCtrl(self)
         hbox_ov_set.Add(self.tc_ov_set, proportion=1)
-        self.Bind(wx.EVT_TEXT_ENTER, self.oven_set , self.tc_ov_set)
+        self.Bind(wx.EVT_TEXT , self.oven_set , self.tc_ov_set)
 
         self.vbox.Add(hbox_ov_set, flag=wx.LEFT|wx.TOP,border =b)
 
@@ -1465,7 +1465,7 @@ class ControlPanel( wx.Panel ):
 
         self.tc_inj_set = wx.TextCtrl(self)
         hbox_inj_set.Add(self.tc_inj_set, proportion = 1)
-        self.Bind(wx.EVT_TEXT_ENTER, self.inj_set , self.tc_inj_set)
+        self.Bind(wx.EVT_TEXT, self.inj_set , self.tc_inj_set)
 
         self.vbox.Add(hbox_inj_set, flag=wx.LEFT|wx.TOP,border =b)
 
