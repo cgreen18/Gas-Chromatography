@@ -1624,9 +1624,6 @@ class GCMenuBar(wx.MenuBar):
 
         file_menu.AppendSeparator()
 
-        file_menu.Append(wx.ID_PRINT, '&Print')
-        file_menu.AppendSeparator()
-
         item_quit = file_menu.Append(wx.ID_EXIT, '&Quit' , 'Quit application')
         self.parent.Bind(wx.EVT_MENU, self.parent.on_quit,item_quit)
 
