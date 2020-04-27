@@ -809,7 +809,7 @@ class SaveasGC(SaveasWindow):
         if name[-3:] != '.gc':
             name = name + '.gc'
 
-        run_num = self.run_number
+        run_num = self.parent.run_number
 
         # Format of JSON .gc filetype
         curr_session = {

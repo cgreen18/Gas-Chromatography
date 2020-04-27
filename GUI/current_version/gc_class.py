@@ -141,7 +141,7 @@ class GC:
         volt = self.get_volt()
         _e = self.curr_data_lock.release()
 
-        np.convolve(volt, np.ones((window,))/window, mode='valid')
+        volt = np.convolve(volt, np.ones((window,))/window, mode='same')
 
         _e = self.curr_data_lock.acquire(to)
         self.set_volt_(volt)
