@@ -462,7 +462,7 @@ class GCFrame(wx.Frame):
         _saveas_jpg_window = SaveasJPG(self, self.options)
 
     def on_previous_set(self, err):
-        self.prev_to_curr_(self)
+        self.prev_to_curr_()
 
     def on_data_integrate(self, err):
         if not self.data_running:
