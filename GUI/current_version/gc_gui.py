@@ -307,6 +307,9 @@ class GCFrame(wx.Frame):
         ov_str_val = ov_str_val[:3]
         inj_str_val = inj_str_val[:3]
 
+        print("Setting oven temperature to: {:s}".format(ov_str_val))
+        print("Setting injector temperature to: {:s}".format( inj_str_val))
+
         base_str[3*ov_ind + 1 : 3*(ov_ind) + 1] = ov_str_val
         base_str[3*inj_ind+1:3*(inj_ind) + 1] = inj_str_val
 

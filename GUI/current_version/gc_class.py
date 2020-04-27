@@ -101,6 +101,8 @@ class GC:
             else:
                 t = t - t[0]
 
+            print(t[0])
+
             _e = self.curr_data_lock.acquire(to)
             self.set_time_(t)
             _e = self.curr_data_lock.release()
