@@ -27,8 +27,6 @@ import os
 import codecs, json
 import time
 
-from gc_class import GC
-
 import threading
 from threading import Thread, Lock
 
@@ -2093,7 +2091,7 @@ self - MainApp object
 param: self.parent - the parent wxPython object, in this case None (main call of MainApp(None))
 attribute: self.options - the UI defeaults and current settings loaded from YAML config file
 '''
-class MainApp(gc_gui.GCFrame):
+class MainApp(GCFrame):
     def __init__(self, parent):
         self.__version__ = '3.0'
         self.__authors__ = 'Conor Green and Matt McPartlan'
@@ -2119,7 +2117,7 @@ class MainApp(gc_gui.GCFrame):
         'SET_TMP_CMD_STR': '000 XXX XXX 000'}
         self.options.update(_dict)
 
-        gc_gui.GCFrame.__init__(self, parent, self.options)
+        GCFrame.__init__(self, parent, self.options)
 
 def main():
     app = wx.App()
