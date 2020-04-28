@@ -1,6 +1,9 @@
 # GUI
 Main folder for the Python software supporting the GC instrument.
 
+### Pydocs
+.html pydocs available in the folder of that name. gc_class and gas_chromatography are well documented and explain every method.
+
 ### Versions
 |Version     | Date | Features | Branch |
 |:-----------|:--------|:--------|:--------|
