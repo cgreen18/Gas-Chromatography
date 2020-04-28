@@ -11,6 +11,9 @@ Matt has written a great explanation and justification for this project in the d
 ## Installation
 There are automatic installation and configuration scripts, install.sh and config.sh, respectively, located in the [Installation Folder](https://github.com/cgreen18/Gas-Chromatography/tree/master/Installation)
 
+## Versions and Branches
+Older versions are saved as branches. Current version is very similar to version 4.0, which is actually a little broken on edge cases.
+
 ## Graphical User Interface
 ![GUI](https://github.com/cgreen18/Gas-Chromatography/blob/master/images/GC_Demo_Operation.png)
 
