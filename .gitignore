@@ -19,4 +19,4 @@ __pycache__
 
 #ignore GC file types
 
-*.gc
+.gc
