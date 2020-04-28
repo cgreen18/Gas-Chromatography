@@ -33,7 +33,7 @@ Older versions are saved as branches. Current version is very similar to version
 The shell of an old Gow-mac GC.
 
 
-<a href="url"><img src="https://github.com/cgreen18/Gas-Chromatography/blob/master/images/Galmac.jpg" align="center" width="360" > </a>
+<a href="url"><img src="https://github.com/cgreen18/Gas-Chromatography/blob/master/images/Galmac.jpg" width="360" align="center" > </a>
 
 
 ## Team Member Biographies
