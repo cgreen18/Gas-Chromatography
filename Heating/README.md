@@ -1,3 +1,5 @@
+# See [GCController](https://github.com/mmcpartlan98/GCController) repository for heating code.
+
 # Oven, Injector, and Detector Heating Control
 
 ![Increasing Delay gif](https://github.com/cgreen18/Gas-Chromatography/blob/master/Heating/images/GC_TriacClipping_Oscilloscope_IncreasingDelay.gif)
@@ -18,9 +20,7 @@ Legend:
 * Green - Trigger square pulse
 
 ### Estimating Temperature
-The voltage across the thermocouples is amplified by ~250 by an [LM358N](http://www.ti.com/product/LM358-N) as seen in the figure below.
-
-![Non-inverting_amp](https://github.com/cgreen18/Gas-Chromatography/blob/master/Heating/images/GC_ThermoAmp_SimpleCircuit_Snippet.png)
+The voltage across the K-type thermocouples is read as an analog voltage by the Arduino
 
 
 ### PID Control
