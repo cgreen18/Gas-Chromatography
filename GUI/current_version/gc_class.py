@@ -131,6 +131,8 @@ class GC:
         _area = self.integrate_volt_direct(volt)
         volt = volt / _area
 
+        volt = abs(volt)
+
         _e = self.curr_data_lock.acquire(to)
         self.set_volt_(volt)
         _e = self.curr_data_lock.release()
