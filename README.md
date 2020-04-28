@@ -26,14 +26,17 @@ Older versions are saved as branches. Current version is very similar to version
 
 ## Current Prototype
 ##### Full Assembly
-![Lab Setup](https://github.com/cgreen18/Gas-Chromatography/blob/master/images/GC_Lab_Setup.jpg)
+<a href="url"><img src="https://github.com/cgreen18/Gas-Chromatography/blob/master/images/GC_Lab_Setup.jpg" align="center" width="480" > </a>
+
 
 ##### Disassembled
-![Current Prototype Disassembled](https://github.com/cgreen18/Gas-Chromatography/blob/master/images/GC_Unfinished.jpg)
+<a href="url"><img src="https://github.com/cgreen18/Gas-Chromatography/blob/master/images/GC_Unfinished.jpg" align="center" width="480" > </a>
+
 
 ## Old Prototype
 The shell of an old Gow-mac GC.
-![Gow-mac_Taken_Apart](https://github.com/cgreen18/Gas-Chromatography/blob/master/images/Galmac.jpg)
+<a href="url"><img src="https://github.com/cgreen18/Gas-Chromatography/blob/master/images/Galmac.jpg" align="center" width="480" > </a>
+
 
 ## Team Member Biographies
 
