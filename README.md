@@ -4,7 +4,7 @@ The senior capstone project by Conor Green and Matt McPartlan to fulfill degree 
 ## Background on Gas Chromatography
 Matt has written a great explanation and justification for this project in the document "[Introduction to Chromatography](https://github.com/cgreen18/Gas-Chromatography/blob/master/Documentation/Introduction%20to%20Chromatography.pdf)."
 
-## Three Main Components 
+## Two Software Components 
 * [Heating](https://github.com/cgreen18/Gas-Chromatography/tree/master/Heating)
 * [Graphical user interface (GUI)](https://github.com/cgreen18/Gas-Chromatography/tree/master/GUI)
 
