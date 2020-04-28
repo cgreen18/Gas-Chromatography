@@ -5,19 +5,14 @@ The senior capstone project by Conor Green and Matt McPartlan to fulfill degree 
 Matt has written a great explanation and justification for this project in the document "[Introduction to Chromatography](https://github.com/cgreen18/Gas-Chromatography/blob/master/Documentation/Introduction%20to%20Chromatography.pdf)."
 
 ## Three Main Components 
-* [Analog voltage measurement](https://github.com/cgreen18/Gas-Chromatography/tree/master/Voltage%20Measurement)
 * [Heating](https://github.com/cgreen18/Gas-Chromatography/tree/master/Heating)
-* [Analog to digital conversion (ADC)](https://github.com/cgreen18/Gas-Chromatography/tree/master/ADC)
-
-## Additional Requirements
 * [Graphical user interface (GUI)](https://github.com/cgreen18/Gas-Chromatography/tree/master/GUI)
-* ~~Auto-injector~~
 
 ## Installation
 There are automatic installation and configuration scripts, install.sh and config.sh, respectively, located in the [Installation Folder](https://github.com/cgreen18/Gas-Chromatography/tree/master/Installation)
 
 ## Current Prototype
-IMAGE MISSING
+![Current Prototype Dis-assembled](https://github.com/cgreen18/Gas-Chromatography/blob/master/images/GC_Unfinished.jpg)
 
 ## Old Prototype
 The shell of an old Gow-mac GC.
